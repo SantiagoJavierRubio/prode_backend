@@ -1,0 +1,34 @@
+{
+  "name": "prode_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SantiagoJavierRubio/prode_backend.git"
+  },
+  "author": "Rodrigo Cabrera - Santiago Javier Rubio",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SantiagoJavierRubio/prode_backend/issues"
+  },
+  "homepage": "https://github.com/SantiagoJavierRubio/prode_backend#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^4.6.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-session": "^1.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
