@@ -17,7 +17,8 @@ router.post('/email', async (req, res) => {
     }
 })
 router.get('/google', passport.authenticate('google', {
-    scope: ['profile', 'email']
+    scope: ['profile', 'email'],
+    prompt: 'select_account'
 }))
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), 
     (req, res) => {
@@ -26,5 +27,9 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
         res.redirect('/')
     }
 )
+router.post('/logout', (req, res) => {
+    res.clearCookie('jwt')
+    res.redirect('/')
+})
 
 export default router

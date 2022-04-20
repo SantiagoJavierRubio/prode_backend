@@ -6,6 +6,7 @@ import config from './config.js'
 import passport from 'passport'
 import authRoutes from './routes/auth.js'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import './authentication/passportStrategies.js'
 import 'dotenv/config'
 
@@ -14,6 +15,9 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+app.use(cors({
+    origin: '*'
+}))
 app.use(session({
     store: MongoStore.create({
         mongoUrl: config.mongoUrl,
@@ -23,7 +27,7 @@ app.use(session({
         }
     }),
     secret: config.sessionSecret,
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: {
         maxAge: 1000*60*60*24*30
@@ -32,10 +36,9 @@ app.use(session({
 
 // AUTHENTICATION SETUP
 app.use(passport.initialize())
-app.use(passport.session())
 
 // ROUTES
-app.get('/', passport.authenticate('jwt', { session: false, failureRedirect: '/login' }),(req, res) => {
+app.get('/', passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
     res.send('Welcome to the home page!')
 })
 app.use('/auth', authRoutes)
