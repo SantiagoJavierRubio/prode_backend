@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 
 const UserSchema = new mongoose.Schema({
     name: String,
-    surname: String,
     email: String,
     password: String,
     score: {
@@ -17,7 +16,7 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-}, collection='users')
+}, {collection: 'users'})
 
 const User = mongoose.model('User', UserSchema)
 

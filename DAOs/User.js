@@ -1,5 +1,5 @@
-import Container from '../Containers/Models/User'
-import Model from '../Models/User'
+import Container from '../Containers/mongoDB.js'
+import Model from '../Models/User.js'
 import bcrypt from 'bcryptjs'
 
 const hashPassword = async (password) => {
@@ -16,6 +16,15 @@ class User extends Container {
     constructor() {
         super(Model)
     }
+    async findByEmail(email) {
+        try {
+            if(!email) throw new Error('Email is required')
+            const user = await this.getOne({ email })
+            return user
+        } catch (err) {
+            return err
+        }
+    }
     async createWithEmail(data) {
         try {
             if(!data.email) throw new Error('Email is required')
@@ -28,7 +37,35 @@ class User extends Container {
             return err
         }
     }
+    async checkCredentials(email, password) {
+        try {
+            if(!email) throw new Error('Email is required')
+            if(!password) throw new Error('Password is required')
+            const user = await this.getOne({ email })
+            if(!user) throw new Error('User not found')
+            const isValid = await bcrypt.compare(password, user.password)
+            if(!isValid) throw new Error('Invalid password')
+            return user
+        } catch(err) {
+            return err
+        }
+    }
+    async createWithGoogle(data) {
+        try {
+            const userData = {
+                email: data.emails[0].value,
+                name: data.displayName || data.name.givenName || data.name.familyName || 'no name',
+                verified: true
+            }
+            if(!userData.email) throw new Error('Email is required')
+            const user = await this.create(userData)
+            if(!user) throw new Error('Failed to create user')
+            return user
+        } catch (err) {
+            return err
+        }
+    }
 }
 
-
-export default User
+const userDAO = new User()
+export default userDAO
