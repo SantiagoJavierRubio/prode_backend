@@ -2,6 +2,7 @@ import { Router } from 'express'
 import passport from 'passport'
 import User from '../DAOs/User.js'
 import { generateJwtToken } from '../authentication/jwt.js'
+import config from '../config.js'
 
 const router = Router()
 router.post('/email', async (req, res) => {
@@ -24,12 +25,12 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
     (req, res) => {
         const token = generateJwtToken(req.user)
         res.cookie('jwt', token)
-        res.redirect('/')
+        res.redirect(config.clientUrl)
     }
 )
 router.post('/logout', (req, res) => {
     res.clearCookie('jwt')
-    res.redirect('/')
+    res.sendStatus(200)
 })
 
 export default router
