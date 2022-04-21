@@ -1,36 +1,16 @@
 import { Router } from 'express'
 import passport from 'passport'
-import User from '../DAOs/User.js'
-import { generateJwtToken } from '../authentication/jwt.js'
-import config from '../config.js'
+import {createWithEmail, loginWithEmail, verifyEmail, googleVerified, logout} from '../controllers/auth.js'
 
 const router = Router()
-router.post('/email', async (req, res) => {
-    try {
-        const user = await User.checkCredentials(req.body.email, req.body.password)
-        if(user) {
-            const token = generateJwtToken(user)
-            res.cookie('jwt', token)
-            res.redirect('/')
-        }
-    } catch(err) {
-        console.log(err)
-    }
-})
+router.post('/email/create', createWithEmail)
+router.post('/email', loginWithEmail)
+router.get('/email/verify', verifyEmail)
 router.get('/google', passport.authenticate('google', {
     scope: ['profile', 'email'],
     prompt: 'select_account'
 }))
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), 
-    (req, res) => {
-        const token = generateJwtToken(req.user)
-        res.cookie('jwt', token)
-        res.redirect(config.clientUrl)
-    }
-)
-router.post('/logout', (req, res) => {
-    res.clearCookie('jwt')
-    res.sendStatus(200)
-})
+router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), googleVerified)
+router.post('/logout', logout)
 
 export default router

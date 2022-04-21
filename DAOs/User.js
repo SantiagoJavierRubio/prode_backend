@@ -8,7 +8,7 @@ const hashPassword = async (password) => {
         const hash = await bcrypt.hash(password, salt)
         return hash
     } catch(err) {
-        return new Error('Failed to hash password')
+        return { error: 'Failed to hash password' }
     }
 }
 
@@ -30,11 +30,13 @@ class User extends Container {
             if(!data.email) throw new Error('Email is required')
             if(!data.password) throw new Error('Password is required')
             let pwd = await hashPassword(data.password)
+            if(pwd.error) throw new Error(pwd.error)
+            if(await this.getOne({ email: data.email })) throw new Error('Email already in use')
             const user = await this.create({ ...data, password: pwd })
             if(!user) throw new Error('Failed to create user')
-            return user._id
+            return user
         } catch (err) {
-            return err
+            return { error: err.message }
         }
     }
     async checkCredentials(email, password) {
@@ -47,7 +49,7 @@ class User extends Container {
             if(!isValid) throw new Error('Invalid password')
             return user
         } catch(err) {
-            return err
+            return { error: err.message }
         }
     }
     async createWithGoogle(data) {

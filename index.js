@@ -14,6 +14,7 @@ import 'dotenv/config'
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(express.static(process.cwd() + '/public'))
 app.use(cookieParser())
 app.use(cors({
     credentials: true,

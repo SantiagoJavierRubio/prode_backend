@@ -1,5 +1,6 @@
 .env
 config.js
+/email/*.json
 # Logs
 logs
 *.log
