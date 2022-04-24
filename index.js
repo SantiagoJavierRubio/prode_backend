@@ -40,8 +40,8 @@ app.use(session({
 app.use(passport.initialize())
 
 // ROUTES
-app.get('/', passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
-    res.send('Welcome to the home page!')
+app.get('/', (req, res) => {
+    res.send('Welcome to the back end!')
 })
 app.use('/auth', authRoutes)
 app.get('/login', (req, res) => {
