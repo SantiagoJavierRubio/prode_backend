@@ -1,14 +1,20 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
-const VerificationSchema = new mongoose.Schema({
+const VerificationSchema = new mongoose.Schema(
+  {
     user_id: String,
     token: String,
     expiration: {
-        type: Date,
-        default: Date.now() + (1000 * 60 * 60 * 24)
+      type: Date,
+      default: Date.now() + 1000 * 60 * 60 * 24
     }
-}, { collection: 'verifications' })
+  },
+  { collection: 'verifications' }
+);
 
-const VerificationToken = mongoose.model('VerificationToken', VerificationSchema)
+const VerificationToken = mongoose.model(
+  'VerificationToken',
+  VerificationSchema
+);
 
-export default VerificationToken
+export default VerificationToken;

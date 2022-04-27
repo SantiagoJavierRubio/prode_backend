@@ -3,7 +3,7 @@ import passport from 'passport'
 import {createWithEmail, loginWithEmail, verifyEmail, googleVerified, logout} from '../controllers/auth.js'
 
 const router = Router()
-app.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const user = await req.user
     res.json({
         user: {
