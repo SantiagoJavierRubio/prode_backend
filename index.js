@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import config from './config.js';
 import passport from 'passport';
 import authRoutes from './routes/auth.js';
+import fifaRoutes from './routes/fifa.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import './authentication/passportStrategies.js';
@@ -51,6 +52,7 @@ app.use('/auth', authRoutes);
 app.get('/login', (req, res) => {
   res.send('logeate');
 });
+app.use('/fifa', fifaRoutes)
 
 // DB INITIALIZE
 const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };
