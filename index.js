@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: config.clientUrl
+    origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
   })
 );
 app.use(
