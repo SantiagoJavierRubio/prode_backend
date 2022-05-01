@@ -30,6 +30,7 @@ app.use(
     origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
   })
 );
+app.set('trust proxy', 1);
 app.use(
   session({
     store: MongoStore.create({
