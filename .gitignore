@@ -1,6 +1,6 @@
-# .env
-# config.js
-# /email/*.json
+.env
+config.js
+/email/*.json
 # Logs
 logs
 *.log
