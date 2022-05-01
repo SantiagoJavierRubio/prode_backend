@@ -10,6 +10,14 @@ import cors from 'cors';
 import './authentication/passportStrategies.js';
 import 'dotenv/config';
 
+const mode = process.argv[2];
+if(mode === 'dev') { 
+  process.env.MODE = 'development';
+}
+else {
+  process.env.MODE = 'production';
+}
+
 // SERVER SETUP
 const app = express();
 app.use(express.json());
@@ -68,6 +76,7 @@ mongoose.connect(`${config.mongoUrl}`, MONGO_OPTIONS, (err) => {
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   console.log(`Server para el prode mundial corriendo en el puerto ${PORT}`);
+  console.log(process.env.MODE)
 });
 server.on('error', (err) => {
   console.error('Server error: ', err);
