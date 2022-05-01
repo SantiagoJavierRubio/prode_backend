@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'https://prodeqatar2022.netlify.app']
+    origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
   })
 );
 app.use(
@@ -45,6 +45,7 @@ app.use(
     cookie: {
       secure: true,
       sameSite: 'none',
+      httpOnly: false,
       maxAge: 1000 * 60 * 60 * 24 * 30,
       domain: config.clientUrl
     }
