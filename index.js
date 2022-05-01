@@ -46,8 +46,7 @@ app.use(
       secure: true,
       sameSite: 'none',
       httpOnly: false,
-      maxAge: 1000 * 60 * 60 * 24 * 30,
-      domain: config.clientUrl
+      maxAge: 1000 * 60 * 60 * 24 * 30
     }
   })
 );
