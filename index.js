@@ -25,13 +25,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(process.cwd() + '/public'));
 app.use(cookieParser());
 app.use(
-  cors({
-    credentials: true,
-    origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
-  })
-);
-app.set('trust proxy', 1);
-app.use(
   session({
     store: MongoStore.create({
       mongoUrl: config.mongoUrl,
@@ -50,7 +43,14 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24 * 30
     }
   })
-);
+  );
+  app.set('trust proxy', 1);
+  app.use(
+    cors({
+      credentials: true,
+      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
+    })
+  );
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
