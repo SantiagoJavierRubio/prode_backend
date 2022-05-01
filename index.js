@@ -45,10 +45,17 @@ app.use(
     cookie: {
       secure: true,
       sameSite: 'none',
-      maxAge: 1000 * 60 * 60 * 24 * 30
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+      domain: config.clientUrl
     }
   })
 );
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+  next();
+});
 
 // AUTHENTICATION SETUP
 app.use(passport.initialize());
