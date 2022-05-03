@@ -55,6 +55,7 @@ export const googleVerified = async (req, res) => {
   try {
     const user = await verifyGoogle(req.body.token);
     if (user.error) throw new Error(user.error)
+    console.log("Before creating token: ", user)
     const token = generateJwtToken(user);
     res.cookie('jwt', token);
     res.sendStatus(200)

@@ -24,7 +24,7 @@ class User extends Container {
       return user;
     }
  catch (err) {
-      return err;
+      return { error: err.message };
     }
   }
   async createWithEmail(data) {

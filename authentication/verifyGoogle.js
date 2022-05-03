@@ -21,14 +21,12 @@ const checkGoogleUser = async (token) => {
     try {
         const verifiedUser = await verify(token);
         if(!verifiedUser) throw new Error('Google verification failed');
-        const user = await User.findByEmail(verifiedUser?.email);
+        const user = await User.findByEmail(verifiedUser.email);
         if (user) {
             return user;
         }
         else {
-            const newUser = await User.createWithGoogle({
-                verifiedUser
-            });
+            const newUser = await User.createWithGoogle(verifiedUser);
             if (newUser) return newUser;
             throw new Error('Failed to create user');
         }
