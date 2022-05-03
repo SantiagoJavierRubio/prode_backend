@@ -8,7 +8,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
     res.json({
         user: {
             id: user._id,
-            name: user.email,
+            name: user.name || null,
             email: user.email,
             groups: user.groups
         }
@@ -19,6 +19,6 @@ router.post('/email', loginWithEmail)
 router.get('/email/verify', verifyEmail)
 router.post('/google', googleVerified)
 // router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), googleVerified)
-router.post('/logout', logout)
+router.post('/logout', passport.authenticate('jwt', { session: false }), logout)
 
 export default router

@@ -44,7 +44,7 @@ export const loginWithEmail = async (req, res) => {
     if (user.error) throw new Error(user.error);
     if (!user.verified) throw new Error('User is not verified');
     const token = generateJwtToken(user);
-    res.cookie('jwt', token);
+    res.cookie('jwt', token, { sameSite: 'none', secure: true });
     res.redirect(config.clientUrl);
   }
  catch (err) {
@@ -66,6 +66,8 @@ export const googleVerified = async (req, res) => {
 export const logout =
   ('/logout',
   (req, res) => {
-    res.clearCookie('jwt');
+    req.logOut();
+    res.clearCookie('jwt', { path: '/', sameSite: 'none', secure: true });
+    res.clearCookie('connect.sid', { path: '/' });
     res.sendStatus(200);
   });
