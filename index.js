@@ -48,7 +48,7 @@ app.use(
   app.use(
     cors({
       credentials: true,
-      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
+      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app', 'http://localhost:3000']
     })
   );
 app.use((req, res, next) => {

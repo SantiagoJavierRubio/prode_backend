@@ -17,11 +17,8 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 router.post('/email/create', createWithEmail)
 router.post('/email', loginWithEmail)
 router.get('/email/verify', verifyEmail)
-router.get('/google', passport.authenticate('google', {
-    scope: ['profile', 'email'],
-    prompt: 'select_account'
-}))
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), googleVerified)
+router.post('/google', googleVerified)
+// router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), googleVerified)
 router.post('/logout', logout)
 
 export default router

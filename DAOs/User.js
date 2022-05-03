@@ -60,11 +60,9 @@ class User extends Container {
   async createWithGoogle(data) {
     try {
       const userData = {
-        email: data.emails[0].value,
+        email: data.email,
         name:
-          data.displayName ||
-          data.name.givenName ||
-          data.name.familyName ||
+          data.name ||
           'no name',
         verified: true
       };
