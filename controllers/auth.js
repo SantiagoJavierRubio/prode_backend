@@ -2,6 +2,7 @@ import User from '../DAOs/User.js';
 import { generateJwtToken } from '../authentication/jwt.js';
 import sendVerificationEmail from '../email/verificationEmail.js';
 import VerificationToken from '../Models/VerificationToken.js';
+import verifyGoogle from '../authentication/verifyGoogle.js';
 import config from '../config.js';
 
 export const createWithEmail = async (req, res) => {
@@ -43,21 +44,30 @@ export const loginWithEmail = async (req, res) => {
     if (user.error) throw new Error(user.error);
     if (!user.verified) throw new Error('User is not verified');
     const token = generateJwtToken(user);
-    res.cookie('jwt', token);
+    res.cookie('jwt', token, { sameSite: 'none', secure: true });
     res.redirect(config.clientUrl);
   }
  catch (err) {
     res.status(401).json({ error: err.message });
   }
 };
-export const googleVerified = (req, res) => {
-  const token = generateJwtToken(req.user);
-  res.cookie('jwt', token);
-  res.redirect(config.clientUrl);
+export const googleVerified = async (req, res) => {
+  try {
+    const user = await verifyGoogle(req.body.token);
+    if (user.error) throw new Error(user.error)
+    const token = generateJwtToken(user);
+    res.cookie('jwt', token, { sameSite: 'none', secure: true });
+    res.sendStatus(200)
+  }
+  catch(err) {
+    res.status(401).json({ error: err.message });
+  }
 };
 export const logout =
   ('/logout',
   (req, res) => {
-    res.clearCookie('jwt');
+    req.logOut();
+    res.clearCookie('jwt', { path: '/', sameSite: 'none', secure: true });
+    res.clearCookie('connect.sid', { path: '/' });
     res.sendStatus(200);
   });

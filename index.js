@@ -12,18 +12,20 @@ import cors from 'cors';
 import './authentication/passportStrategies.js';
 import 'dotenv/config';
 
+const mode = process.argv[2];
+if(mode === 'dev') { 
+  process.env.MODE = 'development';
+}
+else {
+  process.env.MODE = 'production';
+}
+
 // SERVER SETUP
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(process.cwd() + '/public'));
 app.use(cookieParser());
-app.use(
-  cors({
-    credentials: true,
-    origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app']
-  })
-);
 app.use(
   session({
     store: MongoStore.create({
@@ -37,10 +39,26 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
+      secure: true,
+      sameSite: 'None',
+      httpOnly: false,
       maxAge: 1000 * 60 * 60 * 24 * 30
     }
   })
-);
+  );
+  app.set('trust proxy', 1);
+  app.use(
+    cors({
+      credentials: true,
+      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app', 'http://localhost:3000']
+    })
+  );
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+  next();
+});
 
 // AUTHENTICATION SETUP
 app.use(passport.initialize());
@@ -72,6 +90,7 @@ mongoose.connect(`${config.mongoUrl}`, MONGO_OPTIONS, (err) => {
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   console.log(`Server para el prode mundial corriendo en el puerto ${PORT}`);
+  console.log(process.env.MODE)
 });
 server.on('error', (err) => {
   console.error('Server error: ', err);
