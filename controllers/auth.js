@@ -29,7 +29,7 @@ export const verifyEmail = async (req, res) => {
     const verification = await User.update(user_id, { verified: true });
     if (!verification) throw new Error('Failed to verify email');
     await VerificationToken.findByIdAndRemove(verificationToken._id);
-    res.sendFile('emailVerified.html', { root: `${process.cwd()}/public` });
+    res.redirect(`${config.clientUrl}/verified`);
   }
  catch (err) {
     res.send(`Something went wrong: ${err.message}`);
@@ -45,7 +45,7 @@ export const loginWithEmail = async (req, res) => {
     if (!user.verified) throw new Error('User is not verified');
     const token = generateJwtToken(user);
     res.cookie('jwt', token, { sameSite: 'none', secure: true });
-    res.redirect(config.clientUrl);
+    res.json({ user_id: user._id });
   }
  catch (err) {
     res.status(401).json({ error: err.message });

@@ -49,6 +49,7 @@ class User extends Container {
       if (!password) throw new Error('Password is required');
       const user = await this.getOne({ email });
       if (!user) throw new Error('User not found');
+      if(!user.password) throw new Error('User registered with google')
       const isValid = await bcrypt.compare(password, user.password);
       if (!isValid) throw new Error('Invalid password');
       return user;
