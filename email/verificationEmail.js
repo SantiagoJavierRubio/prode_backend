@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import VerificationToken from '../Models/VerificationToken.js';
 import transporter from './nodemailer.js';
 import { verificationEmailTemplate } from './templates/templates.js';
+import config from '../config.js';
 
 const generateVerificationToken = async (user_id) => {
   try {
@@ -20,7 +21,7 @@ const generateVerificationToken = async (user_id) => {
 const sendVerificationEmail = async (user) => {
   try {
     const token = await generateVerificationToken(user._id);
-    const link = `http://localhost:8080/auth/email/verify?token=${token}&user_id=${user._id}`;
+    const link = `${config.serverUrl}/auth/email/verify?token=${token}&user_id=${user._id}`;
     const mail = await transporter.sendMail({
       to: user.email,
       from: 'No Reply - ProdeMundial <MundialProde@outlook.com>',

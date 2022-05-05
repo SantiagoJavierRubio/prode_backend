@@ -1,10 +1,15 @@
 import 'dotenv/config'
-let url = ''
+const URLS =  {
+  client: '',
+  server: ''
+}
 if(process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-  url = 'http://localhost:3000'
+  URLS.client = 'http://localhost:3000'
+  URLS.server = 'http://localhost:8080'
 } 
 else {
-  url = 'https://prodeqatar2022.vercel.app'
+  URLS.client = 'https://prodeqatar2022.vercel.app',
+  URLS.server = 'https://prode-mundial-backend.herokuapp.com'
 }
 
 const config = {
@@ -14,7 +19,8 @@ const config = {
   googleClientId:
     '468076309040-gaddvkpp6tj8fpm5utn6e3fbbrj0jel2.apps.googleusercontent.com',
   googleClientSecret: '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',
-  clientUrl: url,
+  clientUrl: URLS.client,
+  serverUrl: URLS.server,
   emailAccount: 'MundialProde@outlook.com',
   emailPassword: 'api.fifa.com'
 };
