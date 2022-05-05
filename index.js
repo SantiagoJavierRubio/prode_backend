@@ -2,7 +2,6 @@ import express from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import mongoose from 'mongoose';
-import config from './config.js';
 import passport from 'passport';
 import authRoutes from './routes/auth.js';
 import fifaRoutes from './routes/fifa.js';
@@ -19,6 +18,7 @@ if(mode === 'dev') {
 else {
   process.env.MODE = 'production';
 }
+import config from './config.js';
 
 // SERVER SETUP
 const app = express();
