@@ -1,6 +1,6 @@
 import 'dotenv/config'
 let url = ''
-if(process.env.MODE === 'development' || !process.env.MODE) {
+if(process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
   url = 'http://localhost:3000'
 } 
 else {

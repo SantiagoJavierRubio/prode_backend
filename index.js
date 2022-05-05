@@ -3,6 +3,7 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
+import config from './config.js';
 import authRoutes from './routes/auth.js';
 import fifaRoutes from './routes/fifa.js';
 import predictionRoutes from './routes/predictions.js';
@@ -10,15 +11,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import './authentication/passportStrategies.js';
 import 'dotenv/config';
-
-const mode = process.argv[2];
-if(mode === 'dev') { 
-  process.env.MODE = 'development';
-}
-else {
-  process.env.MODE = 'production';
-}
-import config from './config.js';
 
 // SERVER SETUP
 const app = express();
@@ -50,7 +42,7 @@ app.use(
   app.use(
     cors({
       credentials: true,
-      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app', 'http://localhost:3000']
+      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app', 'http://localhost:3000', 'https://prodeqatar2022.vercel.app']
     })
   );
 app.use((req, res, next) => {
@@ -89,8 +81,7 @@ mongoose.connect(`${config.mongoUrl}`, MONGO_OPTIONS, (err) => {
 // SERVER INITIALIZE
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
-  console.log(`Server para el prode mundial corriendo en el puerto ${PORT}`);
-  console.log(process.env.MODE)
+  console.log(`Server para el prode mundial corriendo en el puerto ${PORT} en modo ${process.env.NODE_ENV || 'development'}`);
 });
 server.on('error', (err) => {
   console.error('Server error: ', err);
