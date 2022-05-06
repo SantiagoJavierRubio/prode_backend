@@ -1,6 +1,14 @@
 import { Router } from 'express'
 import passport from 'passport'
-import {createWithEmail, loginWithEmail, verifyEmail, googleVerified, logout} from '../controllers/auth.js'
+import {
+    createWithEmail,
+    loginWithEmail,
+    verifyEmail,
+    googleVerified,
+    logout,
+    grantTemporaryVerification,
+    requirePasswordChange,
+    changePassword} from '../controllers/auth.js'
 
 const router = Router()
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -20,5 +28,8 @@ router.get('/email/verify', verifyEmail)
 router.post('/google', googleVerified)
 // router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), googleVerified)
 router.post('/logout', passport.authenticate('jwt', { session: false }), logout)
+router.post('/new-password', requirePasswordChange)
+router.get('/change-password', grantTemporaryVerification)
+router.post('/change-password', passport.authenticate('jwt', { session: false }), changePassword)
 
 export default router
