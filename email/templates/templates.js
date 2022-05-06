@@ -9,3 +9,7 @@ const stringFromHtml = (name) => {
 export const verificationEmailTemplate = (link) => {
   return stringFromHtml('verificationEmail').replace('{{link}}', link);
 };
+
+export const changePasswordEmailTemplate = (link) => {
+  return stringFromHtml('changePasswordEmail').replace('{{link}}', link);
+};
