@@ -10,7 +10,7 @@ export const createWithEmail = async (req, res) => {
     const user = await User.createWithEmail(req.body);
     if (user.error) throw new Error(user.error);
     const verificationEmail = await sendVerificationEmail(user);
-    if (verificationEmail.error) throw new Error(verificationEmail.error.message);
+    if (verificationEmail.error) throw new Error(verificationEmail.error);
     res.status(200).json({ user_id: user._id });
   }
  catch (err) {
@@ -54,7 +54,7 @@ export const loginWithEmail = async (req, res) => {
 export const googleVerified = async (req, res) => {
   try {
     const user = await verifyGoogle(req.body.token);
-    if (user.error) throw new Error(user.error.message)
+    if (user.error) throw new Error(user.error)
     const token = generateJwtToken(user);
     res.cookie('jwt', token, { sameSite: 'none', secure: true });
     res.sendStatus(200)
@@ -75,9 +75,9 @@ export const requirePasswordChange = async (req, res) => {
     if(!email) throw new Error('Email is required');
     const user = await User.findByEmail(email);
     if (!user) throw new Error('User not found');
-    if (user.error) throw new Error(user.error.message);
+    if (user.error) throw new Error(user.error);
     const passwordChangeEmail = await sendPasswordChangeEmail(user);
-    if (passwordChangeEmail.error) throw new Error(passwordChangeEmail.error.message);
+    if (passwordChangeEmail.error) throw new Error(passwordChangeEmail.error);
     res.sendStatus(200)
   }
   catch (err) {
@@ -95,7 +95,7 @@ export const grantTemporaryVerification = async (req, res) => {
       throw new Error('Token expired');
     const user = await User.getById(user_id);
     if (!user) throw new Error('User not found');
-    if (user.error) throw new Error(user.error.message);
+    if (user.error) throw new Error(user.error);
     await VerificationToken.findByIdAndRemove(verificationToken._id);
     const jwt = generateJwtToken(user);
     res.cookie('jwt', jwt, { sameSite: 'none', secure: true });
@@ -111,7 +111,7 @@ export const changePassword = async (req, res) => {
     if (!newPassword) throw new Error('New password required');
     const updated = await User.changePassword(req.body.user_id, newPassword);
     if (!updated) throw new Error('Failed to update password');
-    if (updated.error) throw new Error(updated.error.message);
+    if (updated.error) throw new Error(updated.error);
     req.logOut()
     res.clearCookie('jwt', { path: '/', sameSite: 'none', secure: true });
     res.clearCookie('connect.sid', { path: '/' });

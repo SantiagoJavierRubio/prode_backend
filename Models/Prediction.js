@@ -4,8 +4,8 @@ const predictionSchema = new mongoose.Schema({
     matchId: String,
     userId: String,
     groupId: String,
-    scoreHome: Number,
-    scoreAway: Number,
+    homeScore: Number,
+    awayScore: Number,
     edited: {
         type: Date,
         default: Date.now()

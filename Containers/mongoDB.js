@@ -49,6 +49,16 @@ class Container {
       return new Error(`Failed to create element, error: ${err}`);
     }
   }
+  async createMultiple(array) {
+    try {
+      const results = await this.model.insertMany(array);
+      if (!results) throw new Error('Failed to create elements');
+      return results
+    }
+    catch(err) {
+      return new Error(`Failed to create elements, error: ${err}`);
+    }
+  }
   async update(id, data) {
     try {
       const result = await this.model.findByIdAndUpdate(id, data);

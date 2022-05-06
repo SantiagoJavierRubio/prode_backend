@@ -3,9 +3,18 @@ import Prediction from '../DAOs/Prediction.js'
 export const create = async (req, res) => {
     try {
         const userId = await req.user._id
-        const result = await Prediction.createPrediction({ ...req.body, userId: userId })
+        let result
+        if(req.body.multiple) {
+            const predictionData = {
+                userId: userId,
+                groupId: req.body.groupId,
+                predictions: req.body.prediction
+            }
+            result = await Prediction.createMany(predictionData)
+        }
+        else result = await Prediction.createPrediction({ ...req.body.prediction, userId: userId })
         if(result.error) throw new Error(result.error)
-        res.send(result)
+        res.status(200).json(result)
     }
     catch(err) {
         res.status(400).json({ error: err.message })
@@ -14,9 +23,20 @@ export const create = async (req, res) => {
 export const edit = async (req, res) => {
     try {
         const userId = await req.user._id
-        const result = await Prediction.editPrediction(req.params.id, userId, req.body)
+        const result = await Prediction.editPrediction(req.params.id, userId, req.body.prediction)
         if(result.error) throw new Error(result.error)
         res.sendStatus(200)
+    }
+    catch(err) {
+        res.status(400).json({ error: err.message })
+    }
+}
+export const editMany = async (req, res) => {
+    try {
+        const userId = await req.user._id
+        const result = await Prediction.editMany(userId, req.body.prediction)
+        if(result.error) throw new Error(result.error)
+        res.status(200).json(result)
     }
     catch(err) {
         res.status(400).json({ error: err.message })
