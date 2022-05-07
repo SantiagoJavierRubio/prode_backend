@@ -36,7 +36,7 @@ class User extends Container {
       if (pwd.error) throw new Error(pwd.error.message);
       if (await this.getOne({ email: data.email }))
         throw new Error('Email already in use');
-      const user = await this.create({ ...data, password: pwd });
+      const user = await this.create({ ...data, password: pwd, name: data.name || data.email?.split('@')[0] });
       if (!user) throw new Error('Failed to create user');
       return user;
     }
@@ -65,7 +65,7 @@ class User extends Container {
         email: data.email,
         name:
           data.name ||
-          'no name',
+          data.email?.split('@')[0],
         verified: true
       };
       if (!userData.email) throw new Error('Email is required');
