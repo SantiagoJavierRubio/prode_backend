@@ -31,6 +31,7 @@ class User extends Container {
     try {
       if (!data.email) throw new Error('Email is required');
       if (!data.password) throw new Error('Password is required');
+      if (data.password.length < 6) throw new Error('Password must be at least 6 characters');
       let pwd = await hashPassword(data.password);
       if (pwd.error) throw new Error(pwd.error.message);
       if (await this.getOne({ email: data.email }))

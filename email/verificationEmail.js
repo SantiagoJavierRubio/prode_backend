@@ -24,7 +24,7 @@ export const sendVerificationEmail = async (user) => {
     const link = `${config.serverUrl}/auth/email/verify?token=${token}&user_id=${user._id}`;
     const mail = await transporter.sendMail({
       to: user.email,
-      from: 'No Reply - ProdeMundial <MundialProde@outlook.com>',
+      from: 'Admin Prode Mundial <MundialProde@outlook.com>',
       subject: 'Bienvenido a ProdeMundial, verifica tu cuenta',
       html: verificationEmailTemplate(link)
     });
@@ -41,7 +41,7 @@ export const sendPasswordChangeEmail = async (user) => {
     const link = `${config.serverUrl}/auth/change-password?token=${token}&user_id=${user._id}`;
     const mail = await transporter.sendMail({
       to: user.email,
-      from: 'No Reply - ProdeMundial <MundialProde@outlook.com>',
+      from: 'Admin Prode Mundial <MundialProde@outlook.com>',
       subject: 'Cambia tu contraseña',
       html: changePasswordEmailTemplate(link)
     });
