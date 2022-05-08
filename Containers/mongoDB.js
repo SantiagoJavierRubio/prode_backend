@@ -26,6 +26,18 @@ class Container {
       return new Error(`Failed to obtain elements, error: ${err}`);
     }
   }
+  async getManyById(ids, fields = null) {
+    try {
+      const results = fields
+        ? await this.model.find({'_id': { $in: ids }}, fields)
+        : await this.model.find({'_id': { $in: ids }});
+      if (!results) return null;
+      return results;
+    }
+    catch(err) {
+      return new Error(`Failed to obtain elements, error: ${err}`);
+    }
+  }
   async getOne(match, fields = null) {
     try {
       const result = fields

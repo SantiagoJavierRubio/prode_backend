@@ -7,6 +7,7 @@ import config from './config.js';
 import authRoutes from './routes/auth.js';
 import fifaRoutes from './routes/fifa.js';
 import predictionRoutes from './routes/predictions.js';
+import groupRoutes from './routes/groups.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import './authentication/passportStrategies.js';
@@ -65,6 +66,7 @@ app.get('/login', (req, res) => {
 });
 app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
+app.use('/group', groupRoutes)
 
 // DB INITIALIZE
 const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };
