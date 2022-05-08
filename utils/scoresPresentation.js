@@ -1,4 +1,4 @@
-import Users from '../DAOs/users.js';
+import Users from '../DAOs/User.js';
 
 export const scoresWithUsername = async (scores) => {
     try {

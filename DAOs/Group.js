@@ -57,6 +57,17 @@ class Group extends Container {
             return {error: err.message}
         }
     }
+    async getMembers(groupName) {
+        try {
+            if(!groupName) throw new Error('No group')
+            const group = await this.getOne({name: groupName})
+            if(!group) throw new Error('Group not found')
+            return group.members
+        }
+        catch(err) {
+            return {error: err.message}
+        }
+    }
 }
 
 const GroupDAO =  new Group()
