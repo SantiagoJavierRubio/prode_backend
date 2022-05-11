@@ -61,9 +61,6 @@ app.get('/', (req, res) => {
   res.send('Welcome to the back end!');
 });
 app.use('/auth', authRoutes);
-app.get('/login', (req, res) => {
-  res.send('logeate');
-});
 app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
 app.use('/group', groupRoutes)

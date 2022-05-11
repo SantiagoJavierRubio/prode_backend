@@ -7,13 +7,10 @@ export const create = async (req, res) => {
         const groupData = req.body
         if(!groupData.name) throw new Error('Group name is required')
         const user = await req.user
-        const addedToGroup = await User.update(user._id, {groups: [...user.groups, groupData.name]})
-        if(!addedToGroup) throw new Error('Failed to add user to group')
         const newGroup = await Group.createGroup(groupData, user)
-        if(newGroup.error) {
-            await User.update(user._id, {groups: user.groups})
-            throw new Error(newGroup.error)
-        } 
+        if(newGroup.error) throw new Error(newGroup.error)
+        const addedToGroup = await User.joinGroup(user._id, groupData.name)
+        if(addedToGroup.error) throw new Error(addedToGroup.error)
         res.status(201).json(newGroup)
     }
     catch(err) {
@@ -25,13 +22,11 @@ export const join = async (req, res) => {
         const groupName = req.query.groupName;
         if(!groupName) throw new Error('No group')
         const user = await req.user
-        const addedToGroup = await User.update(user._id, {groups: [...user.groups, groupName]})
+        if(user.groups.includes(groupName)) throw new Error('User already in group')
+        const addedToGroup = await User.joinGroup(user._id, groupName)
         if(!addedToGroup) throw new Error('Failed to add user to group')
         const result = await Group.addMember(groupName, user)
-        if(result.error) {
-            await User.update(user._id, {groups: user.groups})
-            throw new Error(result.error)
-        }
+        if(result.error) throw new Error(result.error)
         res.status(200).json(result)
     }
     catch(err) {
@@ -60,8 +55,8 @@ export const leaveGroup = async (req, res) => {
         const groupName = req.query.groupName;
         if(!groupName) throw new Error('No group')
         const user = await req.user
-        const removedFromGroup = await User.update(user._id, {groups: user.groups.filter(group => group !== groupName)})
-        if(!removedFromGroup) throw new Error('Failed to remove user from group')
+        const removedFromGroup = await User.leaveGroup(user._id, groupName)
+        if(removedFromGroup.error) throw new Error(removedFromGroup.error)
         res.status(200)
     }
     catch(err) {

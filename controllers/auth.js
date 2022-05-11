@@ -14,7 +14,7 @@ export const createWithEmail = async (req, res) => {
     res.status(200).json({ user_id: user._id });
   }
  catch (err) {
-    res.status(401).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 export const verifyEmail = async (req, res) => {
@@ -63,11 +63,16 @@ export const googleVerified = async (req, res) => {
     res.status(401).json({ error: err.message });
   }
 };
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
+  try {
     req.logOut();
     res.clearCookie('jwt', { path: '/', sameSite: 'none', secure: true });
     res.clearCookie('connect.sid', { path: '/' });
     res.sendStatus(200);
+  }
+  catch(err) {
+    res.status(400).json({ error: err.message })
+  }
 };
 export const requirePasswordChange = async (req, res) => {
   try {

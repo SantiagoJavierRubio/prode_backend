@@ -32,7 +32,7 @@ class Group extends Container {
             if(!user._id) throw new Error('No user')
             const group = await this.getOne({name: groupName})
             if(!group) throw new Error('Group not found')
-            if(group.members.find(member => member.id === user._id)) throw new Error('User already in group')
+            if(group.members.includes(user._id)) throw new Error('User already in group')
             group.addMember(user._id)
             const result = await group.save()
             if(!result) throw new Error('Failed to add member')

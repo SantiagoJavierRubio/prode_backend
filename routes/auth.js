@@ -12,15 +12,20 @@ import {
 
 const router = Router()
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const user = await req.user
-    res.json({
-        user: {
-            id: user._id,
-            name: user.name || null,
-            email: user.email,
-            groups: user.groups
-        }
-    })
+    try {
+        const user = await req.user
+        res.json({
+            user: {
+                id: user._id,
+                name: user.name || null,
+                email: user.email,
+                groups: user.groups
+            }
+        })
+    }
+    catch(err) {
+        res.status(400).json({error: err.message})
+    }
 })
 router.post('/email/create', createWithEmail)
 router.post('/email', loginWithEmail)
