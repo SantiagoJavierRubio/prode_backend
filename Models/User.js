@@ -5,10 +5,6 @@ const UserSchema = new mongoose.Schema(
     name: String,
     email: String,
     password: String,
-    groups: {
-      type: [String],
-      default: ['general']
-    },
     verified: {
       type: Boolean,
       default: false

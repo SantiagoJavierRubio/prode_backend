@@ -68,6 +68,32 @@ class Group extends Container {
             return {error: err.message}
         }
     }
+    async getGroups(user_id) {
+        try {
+            if(!user_id) throw new Error('No user')
+            const groups = await this.getMany({}, 'members name owner')
+            if(!groups) throw new Error('No groups')
+            return groups.filter(group => group.members.includes(user_id))
+        }
+        catch(err) {
+            return {error: err.message}
+        }
+    }
+    async removeMember(groupName, user_id) {
+        try {
+            if(!groupName) throw new Error('No group')
+            if(!user_id) throw new Error('No user')
+            const group = await this.getOne({name: groupName})
+            if(!group) throw new Error('Group not found')
+            if(!group.members.includes(user_id)) throw new Error('User not in group')
+            const edited = await this.update(group._id, {'$pull': {members: user_id}})
+            if(!edited) throw new Error('Failed to remove member')
+            return edited
+        }
+        catch(err) {
+            return {error: err.message}
+        }
+    }
 }
 
 const GroupDAO =  new Group()
