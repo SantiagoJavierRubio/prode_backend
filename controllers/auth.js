@@ -5,6 +5,16 @@ import VerificationToken from '../Models/VerificationToken.js';
 import verifyGoogle from '../authentication/verifyGoogle.js';
 import config from '../config.js';
 
+export const getUserData = async (req, res) => {
+  try {
+    const user = await User.getById(req.user._id, '-password');
+    if (!user) throw new Error('User not found');
+    res.json({ user: user })
+  }
+  catch(err) {
+      res.status(400).json({ error: err.message })
+  }
+}
 export const createWithEmail = async (req, res) => {
   try {
     const user = await User.createWithEmail(req.body);
