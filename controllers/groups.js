@@ -57,7 +57,23 @@ export const leaveGroup = async (req, res) => {
         const user = await req.user
         const removedFromGroup = await User.leaveGroup(user._id, groupName)
         if(removedFromGroup.error) throw new Error(removedFromGroup.error)
-        res.status(200)
+        res.json({message: 'User removed from group'})
+    }
+    catch(err) {
+        res.status(400).json({error: err.message})
+    }
+}
+
+export const getGroupData = async (req, res) => {
+    try {
+        const groupName = req.query.groupName;
+        if(!groupName) throw new Error('No group')
+        const result = await Group.getOne({name: groupName}, 'name members owner')
+        if(!result) throw new Error('Group not found')
+        const members = await User.getManyById(result.members, 'name email')
+        if(!members) throw new Error('Failed to get members')
+        const payload = {name: result.name, members, owner: members.filter(member => member._id == result.owner)}
+        res.json({groupData: payload})
     }
     catch(err) {
         res.status(400).json({error: err.message})
