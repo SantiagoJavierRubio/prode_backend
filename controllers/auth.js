@@ -7,7 +7,7 @@ import config from '../config.js';
 
 export const getUserData = async (req, res) => {
   try {
-    const user = await User.getById(req.user._id, 'email groups name');
+    const user = await User.getById(req.user._id, 'email name');
     if (!user) throw new Error('User not found');
     res.json({ user: user })
   }
