@@ -92,21 +92,6 @@ class User extends Container {
       return { error: err.message };
     }
   }
-  // async leaveGroup(user_id, groupName) {
-  //   try {
-  //     if(!user_id || !groupName) throw new Error('Missing fields')
-  //     const userGroups = await this.getById(user_id, 'groups')
-  //     if(!userGroups) throw new Error('User not found')
-  //     if(!userGroups.groups.includes(groupName)) throw new Error('User not in group')
-  //     const newGroups = userGroups.filter(group => group !== groupName)
-  //     const left = await this.update(user_id, {groups: newGroups})
-  //     if(!left) throw new Error('Failed to join group')
-  //     return left
-  //   }
-  //   catch(err) {
-  //     return { error: err.message }
-  //   }
-  // }
 }
 
 const userDAO = new User();

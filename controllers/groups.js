@@ -1,6 +1,7 @@
 import Group from '../DAOs/Group.js'
 import User from '../DAOs/User.js'
 import { scoresWithUsername } from '../utils/scoresPresentation.js'
+import getOwnerNames from '../utils/getOwnerNames.js'
 
 export const create = async (req, res) => {
     try {
@@ -73,7 +74,9 @@ export const getGroupData = async (req, res) => {
         else {
             const groups = await Group.getGroups(req.user._id)
             if(groups.error) throw new Error(groups.error)
-            res.send(groups)
+            const withOwnerNames = await getOwnerNames(groups)
+            if(withOwnerNames.error) throw new Error(withOwnerNames.error)
+            res.send(withOwnerNames)
         }
     }
     catch(err) {
