@@ -88,6 +88,8 @@ class Group extends Container {
             if(!group.members.includes(user_id)) throw new Error('User not in group')
             const edited = await this.update(group._id, {'$pull': {members: user_id}})
             if(!edited) throw new Error('Failed to remove member')
+            const score = await Score.getOne({groupId: group._id, userId: user_id})
+            await Score.delete(score._id)
             return edited
         }
         catch(err) {

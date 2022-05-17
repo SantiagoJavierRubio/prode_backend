@@ -1,4 +1,5 @@
 import Fifa from '../DAOs/Fifa.js'
+import { getGroupCode, getStageCode } from '../utils/traslateNamesToCodes.js';
 
 export const getFixture = async (req, res) => {
     try {
@@ -6,10 +7,12 @@ export const getFixture = async (req, res) => {
         const groupId = req.query.groupId || null;
         const stageId = req.query.stageId || null;
         if(groupId) {
-            payload.fixture = await Fifa.getOneGroup(groupId)
+            const groupCode = getGroupCode(groupId)
+            payload.fixture = await Fifa.getOneGroup(groupCode)
         }
         else if (stageId) {
-            payload.fixture = await Fifa.getOneStage(stageId)
+            const stageCode = getStageCode(stageId)
+            payload.fixture = await Fifa.getOneStage(stageCode)
         } 
         else {
             payload.fixture = await Fifa.getAllStages()
