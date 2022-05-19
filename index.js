@@ -10,6 +10,8 @@ import predictionRoutes from './routes/predictions.js';
 import groupRoutes from './routes/groups.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import helmet from 'helmet';
+import scorePredictions from './scorePredictions.js';
 import './authentication/passportStrategies.js';
 import 'dotenv/config';
 
@@ -43,15 +45,10 @@ app.use(
   app.use(
     cors({
       credentials: true,
-      origin: [config.clientUrl, 'https://prodeqatar2022.netlify.app', 'http://prodeqatar2022.netlify.app', 'http://localhost:3000', 'https://prodeqatar2022.vercel.app']
+      origin: config.clientUrl
     })
   );
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,UPDATE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-  next();
-});
+  app.use(helmet());
 
 // AUTHENTICATION SETUP
 app.use(passport.initialize());
@@ -82,6 +79,10 @@ const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   console.log(`Server para el prode mundial corriendo en el puerto ${PORT} en modo ${process.env.NODE_ENV || 'development'}`);
 });
+// server.on('connection', async () => {
+//   const result = await scorePredictions();
+//   console.log(result)
+// })
 server.on('error', (err) => {
   console.error('Server error: ', err);
 });

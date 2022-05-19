@@ -9,6 +9,10 @@ const predictionSchema = new mongoose.Schema({
     edited: {
         type: Date,
         default: Date.now()
+    },
+    checked: {
+        type: Boolean,
+        default: false
     }
 }, {collection: 'predictions'})
 

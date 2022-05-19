@@ -41,6 +41,22 @@ class Scores extends Container {
             return {error: err.message}
         }
     }
+    async addScore(groupId, userId, score) {
+        try {
+            if(!groupId) throw new Error('No group')
+            if(!userId) throw new Error('No user')
+            if(!score) throw new Error('No score')
+            const exists = await this.getOne({groupId: groupId, userId: userId})
+            if(!exists) throw new Error('No score')
+            const newScore = exists.score + parseInt(score)
+            const updated = await this.update(exists._id, {score: newScore})
+            if(!updated) throw new Error('Failed to update score')
+            return updated
+        }
+        catch(err) {
+            return { error: err.message }
+        }
+    }
 }
 
 const ScoresDAO = new Scores()

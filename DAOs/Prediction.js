@@ -88,7 +88,11 @@ class Prediction extends Container {
             const original = await this.getById(id)
             if(!original) throw new Error('Prediction not found')
             if(original.userId != userId) throw new Error('User not allowed to edit this prediction')
-            return await this.update(id, {...data, edited: Date.now()})
+            return await this.update(id, {
+                homeScore: data.homeScore,
+                awayScore: data.awayScore,
+                edited: Date.now()
+            })
         }
      catch (err) {
             return {error: err.message}
@@ -128,6 +132,16 @@ class Prediction extends Container {
             if(!original) throw new Error('Prediction not found')
             if(original.userId != userId) throw new Error('User not allowed to remove this prediction')
             return await this.delete(id)
+        }
+        catch(err) {
+            return {error: err.message}
+        }
+    }
+    async checkPredictions(ids) {
+        try {
+            const updated = await this.model.updateMany({_id: {$in: ids}}, {checked: true})
+            if(!updated) throw new Error('Failed to check predictions')
+            return updated
         }
         catch(err) {
             return {error: err.message}
