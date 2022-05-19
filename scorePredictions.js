@@ -1,6 +1,17 @@
 import Prediction from "./DAOs/Prediction.js";
 import Score from "./DAOs/Scores.js";
 import Fifa from "./DAOs/Fifa.js";
+import config from './config.js';
+import mongoose from 'mongoose';
+
+console.log('Initializing prediction scoring process...')
+const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };
+mongoose.connect(`${config.mongoUrl}`, MONGO_OPTIONS, (err) => {
+  if (err) {
+    console.log('Failed to connect to mongoDB');
+    process.exit()
+  }
+});
 
 const SCORE_VALUES = {
     NONE: 0,
@@ -19,7 +30,7 @@ const getUncheckedPredictions = async () => {
         const matches = await Fifa.getAllMatches();
         const previousMatchesIds = matches.map(match => {
             let matchDate = new Date(match.date);
-            if(matchDate < now && !match.status === 0) return match.id;
+            if(matchDate < now && match.status === 0) return match.id;
         })
         if(previousMatchesIds.length === 0) throw new Error('No matches to score');
         const predictions = await Prediction.getMany({checked: false, matchId: {$in: previousMatchesIds}});
@@ -38,7 +49,7 @@ const calculateResult = (awayScore, homeScore) => {
     if(awayScore > homeScore) return MATCH_RESULT_TYPES.AWAY;
     return MATCH_RESULT_TYPES.HOME;
 }
-const calculateScore = (predictionHomeScore, predictionAwayScore, matchHomeScore, matchAwayScore) => {
+const calculateScore = async (predictionHomeScore, predictionAwayScore, matchHomeScore, matchAwayScore) => {
     if(predictionAwayScore === matchAwayScore && predictionHomeScore === matchHomeScore) return SCORE_VALUES.FULL;
     const predictionResult = calculateResult(predictionAwayScore, predictionHomeScore);
     const matchResult = calculateResult(matchAwayScore, matchHomeScore);
@@ -48,9 +59,10 @@ const calculateScore = (predictionHomeScore, predictionAwayScore, matchHomeScore
 const scoreOnePrediction = async (prediction, matches) => {
     try {
         const match = matches.filter(match => match.id === prediction.matchId)[0];
-        const score = calculateScore(prediction.homeScore, prediction.awayScore, match.homeScore, match.awayScore);
+        const score = await calculateScore(prediction.homeScore, prediction.awayScore, match.homeScore, match.awayScore);
         if(score === 0) return false
-        await Score.addScore(prediction.groupId, prediction.userId, score)
+        const scored = await Score.addScore(prediction.groupId, prediction.userId, score)
+        if(scored.error) throw new Error(scored.error);
         return prediction._id
     }
     catch(err) {
@@ -91,4 +103,12 @@ const scorePredictions = async () => {
     }
 }
 
-export default scorePredictions;
+scorePredictions()
+    .then((result) => {
+        console.log('<------ DONE ------> \n \n', result)
+        console.log('\n ----------------------')
+    })
+    .then(() => console.log('\n Exiting prediction scoring process'))
+    .finally(() => {
+        process.exit()
+    })

@@ -61,6 +61,11 @@ app.use('/auth', authRoutes);
 app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
 app.use('/group', groupRoutes)
+app.get('/score-predictions', async (req, res) => {
+  const result = await scorePredictions();
+  console.log(result)
+  res.send('Scored predictions');
+})
 
 // DB INITIALIZE
 const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };
