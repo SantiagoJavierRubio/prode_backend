@@ -31,11 +31,12 @@ class User extends Container {
     try {
       if (!data.email) throw new Error('Email is required');
       if (!data.password) throw new Error('Password is required');
+      if (data.password.length < 6) throw new Error('Password must be at least 6 characters');
       let pwd = await hashPassword(data.password);
       if (pwd.error) throw new Error(pwd.error.message);
       if (await this.getOne({ email: data.email }))
         throw new Error('Email already in use');
-      const user = await this.create({ ...data, password: pwd });
+      const user = await this.create({ ...data, password: pwd, name: data.name || data.email?.split('@')[0] });
       if (!user) throw new Error('Failed to create user');
       return user;
     }
@@ -64,7 +65,7 @@ class User extends Container {
         email: data.email,
         name:
           data.name ||
-          'no name',
+          data.email?.split('@')[0],
         verified: true
       };
       if (!userData.email) throw new Error('Email is required');
@@ -80,11 +81,11 @@ class User extends Container {
     try {
       if (!password) throw new Error('Password is required');
       if (password.length < 6) throw new Error('Password must be at least 6 characters');
-      let pwd = await hashPassword(data.password);
-      if (pwd.error) throw new Error(pwd.error.message);
+      let pwd = await hashPassword(password);
+      if (pwd.error) throw new Error(pwd.error);
       const updated = await this.update(user_id, { password: pwd });
       if (!updated) throw new Error('Failed to update user');
-      if (updated.error) throw new Error(updated.error.message);
+      if (updated.error) throw new Error(updated.error);
       return true;
     }
     catch (err) {

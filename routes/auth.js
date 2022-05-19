@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import passport from 'passport'
 import {
+    getUserData,
     createWithEmail,
     loginWithEmail,
     verifyEmail,
@@ -11,17 +12,7 @@ import {
     changePassword} from '../controllers/auth.js'
 
 const router = Router()
-router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const user = await req.user
-    res.json({
-        user: {
-            id: user._id,
-            name: user.name || null,
-            email: user.email,
-            groups: user.groups
-        }
-    })
-})
+router.get('/', passport.authenticate('jwt', { session: false }), getUserData)
 router.post('/email/create', createWithEmail)
 router.post('/email', loginWithEmail)
 router.get('/email/verify', verifyEmail)

@@ -1,5 +1,9 @@
 import axios from 'axios'
 import Container from '../Containers/fifa.js'
+import 'dotenv/config'
+
+const SEASON_ID = process.env.MODO_PRUEBA ? '254645' : '255711'
+const GROUP_STAGE = process.env.MODO_PRUEBA ? '275073' : '285063'
 
 class Fifa extends Container {
     constructor() {
@@ -8,7 +12,7 @@ class Fifa extends Container {
     }
     async getAllMatches(lang='es') {
         try {
-            const data = await axios.get(`${this.apiUrl}/calendar/matches?idSeason=255711&count=100&language=${lang}`)
+            const data = await axios.get(`${this.apiUrl}/calendar/matches?idSeason=${SEASON_ID}&count=100&language=${lang}`)
             if(!data.data?.Results) throw new Error('Failed to obtain fixture')
             return this.normalizeMatches(data.data.Results)
         }
@@ -32,7 +36,7 @@ class Fifa extends Container {
             const matches = await this.getAllMatches(lang)
             if(matches.error) throw new Error(matches.error)
             const stages = this.groupByStage(matches)
-            let indexGroups = stages.findIndex(stage => stage.id === '285063')
+            let indexGroups = stages.findIndex(stage => stage.id === GROUP_STAGE)
             if(indexGroups === -1) throw new Error('Failed to group stage')
             stages[indexGroups].groups = this.groupByGroup(stages[indexGroups].matches)
             delete stages[indexGroups].matches
@@ -44,7 +48,7 @@ class Fifa extends Container {
     }
     async getOneStage(id, lang='es') {
         try {
-            const data = await axios.get(`${this.apiUrl}calendar/matches?idSeason=255711&idStage=${id}&count=100&language=${lang}`)
+            const data = await axios.get(`${this.apiUrl}calendar/matches?idSeason=${SEASON_ID}&idStage=${id}&count=100&language=${lang}`)
             if(!data.data?.Results) throw new Error('Failed to obtain fixture')
             return this.normalizeMatches(data.data.Results)
         }
@@ -54,7 +58,7 @@ class Fifa extends Container {
     }
     async getAllGroups(lang='es') {
         try {
-            const matches = await this.getOneStage('285063', lang)
+            const matches = await this.getOneStage(GROUP_STAGE, lang)
             if(matches.error) throw new Error(matches.error)
             return this.groupByGroup(matches)
         } 
@@ -64,7 +68,7 @@ class Fifa extends Container {
     }
     async getOneGroup(id, lang='es') {
         try {
-            const data = await axios.get(`${this.apiUrl}calendar/matches?idSeason=255711&idStage=285063&idGroup=${id}&count=100&language=${lang}`)
+            const data = await axios.get(`${this.apiUrl}calendar/matches?idSeason=${SEASON_ID}&idStage=285063&idGroup=${id}&count=100&language=${lang}`)
             if(!data.data?.Results) throw new Error('Failed to obtain fixture')
             return this.normalizeMatches(data.data.Results)
         }

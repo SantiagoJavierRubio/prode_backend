@@ -26,6 +26,18 @@ class Container {
       return new Error(`Failed to obtain elements, error: ${err}`);
     }
   }
+  async getManyById(ids, fields = null) {
+    try {
+      const results = fields
+        ? await this.model.find({'_id': { $in: ids }}, fields)
+        : await this.model.find({'_id': { $in: ids }});
+      if (!results) return null;
+      return results;
+    }
+    catch(err) {
+      return new Error(`Failed to obtain elements, error: ${err}`);
+    }
+  }
   async getOne(match, fields = null) {
     try {
       const result = fields
@@ -47,6 +59,16 @@ class Container {
     }
  catch (err) {
       return new Error(`Failed to create element, error: ${err}`);
+    }
+  }
+  async createMultiple(array) {
+    try {
+      const results = await this.model.insertMany(array);
+      if (!results) throw new Error('Failed to create elements');
+      return results
+    }
+    catch(err) {
+      return new Error(`Failed to create elements, error: ${err}`);
     }
   }
   async update(id, data) {
