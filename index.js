@@ -11,7 +11,6 @@ import groupRoutes from './routes/groups.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import scorePredictions from './scorePredictions.js';
 import './authentication/passportStrategies.js';
 import 'dotenv/config';
 
