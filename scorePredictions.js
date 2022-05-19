@@ -86,7 +86,7 @@ const addScores = async (predictions, matches) => {
         return { error: err.message }
     }
 }
-export const scorePredictions = async () => {
+const scorePredictions = async () => {
     try {
         const predictionData = await getUncheckedPredictions();
         if(predictionData.error) throw new Error(predictionData.error);
@@ -112,5 +112,3 @@ scorePredictions()
     .finally(() => {
         process.exit()
     })
-
-    export default scorePredictions
