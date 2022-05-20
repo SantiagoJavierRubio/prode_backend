@@ -69,7 +69,7 @@ export const getGroupData = async (req, res) => {
             if(!result.members.includes(req.user._id)) return res.status(401).json({ error: 'User not in group' })
             const members = await User.getManyById(result.members, 'name email')
             if(!members) throw new Error('Failed to get members')
-            const payload = {name: result.name, members, owner: members.filter(member => member._id == result.owner)[0]}
+            const payload = {id: result._id, name: result.name, members, owner: members.filter(member => member._id == result.owner)[0]}
             res.json({groupData: payload})
         } 
         else {

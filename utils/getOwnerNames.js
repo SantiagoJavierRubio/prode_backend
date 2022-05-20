@@ -10,6 +10,7 @@ const getOwnerNames = async (groups) => {
         return groups.map(group => {
             const owner = ownerNames.find(owner => owner._id.toString() === group.owner.toString());
             return {
+                id: group._id,
                 name: group.name,
                 members: group.members,
                 owner: owner.name
