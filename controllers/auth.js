@@ -39,7 +39,7 @@ export const verifyEmail = async (req, res) => {
     const verification = await User.update(user_id, { verified: true });
     if (!verification) throw new Error('Failed to verify email');
     await VerificationToken.findByIdAndRemove(verificationToken._id);
-    res.redirect(`${config.clientUrl}/verified`);
+    res.redirect(`${config.clientUrl}/auth/verified`);
   }
  catch (err) {
     res.send(`Something went wrong: ${err.message}`);
@@ -114,7 +114,7 @@ export const grantTemporaryVerification = async (req, res) => {
     await VerificationToken.findByIdAndRemove(verificationToken._id);
     const jwt = generateJwtToken(user);
     res.cookie('jwt', jwt, { sameSite: 'none', secure: true });
-    res.redirect(`${config.clientUrl}/change-password`);
+    res.redirect(`${config.clientUrl}/auth/change-password`);
   }
   catch(err) {
     res.send(`Something went wrong: ${err.message}`);
