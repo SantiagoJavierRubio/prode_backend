@@ -10,10 +10,10 @@ class Group extends Container {
         try {
             if(!data.name) throw new Error('Group name is required')
             if(!user._id) throw new Error('No user')
-            const nameExists = await this.getOne({name: data.name})
+            const nameExists = await this.getOne({name: data.name.toLowerCase()})
             if(nameExists) throw new Error('Group name already in use')
             const newGroup = await this.create({
-                name: data.name,
+                name: data.name.toLowerCase(),
                 owner: user._id,
                 members: [user._id]
             })
@@ -30,7 +30,7 @@ class Group extends Container {
         try {
             if(!groupName) throw new Error('No group')
             if(!user._id) throw new Error('No user')
-            const group = await this.getOne({name: groupName})
+            const group = await this.getOne({name: groupName.toLowerCase()})
             if(!group) throw new Error('Group not found')
             if(group.members.includes(user._id)) throw new Error('User already in group')
             group.addMember(user._id)
@@ -47,7 +47,7 @@ class Group extends Container {
     async getScores(groupName) {
         try {
             if(!groupName) throw new Error('No group')
-            const group = await this.getOne({name: groupName})
+            const group = await this.getOne({name: groupName.toLowerCase()})
             if(!group) throw new Error('Group not found')
             const scores = await Score.getGroupScores(group._id)
             if(scores.error) throw new Error(scores.error)
@@ -60,7 +60,7 @@ class Group extends Container {
     async getMembers(groupName) {
         try {
             if(!groupName) throw new Error('No group')
-            const group = await this.getOne({name: groupName})
+            const group = await this.getOne({name: groupName.toLowerCase()})
             if(!group) throw new Error('Group not found')
             return group.members
         }
@@ -83,9 +83,15 @@ class Group extends Container {
         try {
             if(!groupName) throw new Error('No group')
             if(!user_id) throw new Error('No user')
-            const group = await this.getOne({name: groupName})
+            const group = await this.getOne({name: groupName.toLowerCase()})
             if(!group) throw new Error('Group not found')
             if(!group.members.includes(user_id)) throw new Error('User not in group')
+            if(group.owner === user_id) {
+                if(group.members.length === 1) throw new Error('Cannot remove admin from group')
+                const otherMembers = group.members.filter(member => member !== user_id)
+                const changedOwner = await this.update(group._id, {owner: otherMembers[0]})
+                if(!changedOwner) throw new Error('Failed to change admin')
+            }
             const edited = await this.update(group._id, {'$pull': {members: user_id}})
             if(!edited) throw new Error('Failed to remove member')
             const score = await Score.getOne({groupId: group._id, userId: user_id})
