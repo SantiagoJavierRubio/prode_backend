@@ -1,4 +1,15 @@
-const GROUP_CODES = {
+import 'dotenv/config';
+
+const GROUP_CODES = process.env.MODO_PRUEBA ? {
+    A: '275075',
+    B: '275077',
+    C: '275079',
+    D: '275081',
+    E: '275083',
+    F: '275085',
+    G: '275087',
+    H: '275089'
+} : {
     A: '285065',
     B: '285066',
     C: '285067',
@@ -9,7 +20,14 @@ const GROUP_CODES = {
     H: '285072'
 }
 
-const STAGE_CODES = {
+const STAGE_CODES = process.env.MODO_PRUEBA ? {
+    GRUPOS: '275073',
+    OCTAVOS: '275093',
+    CUARTOS: '275095',
+    SEMIFINALES: '275097',
+    FINAL: '275101',
+    TERCER_PUESTO: '275099'
+} : {
     GRUPOS: '285063',
     OCTAVOS: '285073',
     CUARTOS: '285074',

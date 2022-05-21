@@ -10,6 +10,7 @@ class Group extends Container {
         try {
             if(!data.name) throw new Error('Group name is required')
             if(!user._id) throw new Error('No user')
+            if(data.name.length > 20) throw new Error('Group name is too long')
             const nameExists = await this.getOne({name: data.name.toUpperCase()})
             if(nameExists) throw new Error('Group name already in use')
             const newGroup = await this.create({
