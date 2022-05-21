@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import passport from 'passport'
-import { create, getAll, edit, editMany, remove } from '../controllers/predictions.js'
+import { create, getAll, edit, editMany, remove, getPreviousForStage } from '../controllers/predictions.js'
 
 const router = Router()
 
@@ -10,5 +10,6 @@ router.get('/', getAll)
 router.put('/:id', edit)
 router.post('/edit-multiple', editMany)
 router.delete('/:id', remove)
+router.get('/history', getPreviousForStage)
 
 export default router

@@ -1,4 +1,6 @@
 import Prediction from '../DAOs/Prediction.js'
+import { getStageCode } from '../utils/traslateNamesToCodes.js'
+import { predictionsByStage } from '../utils/predictionPresentation.js'
 
 export const create = async (req, res) => {
     try {
@@ -64,6 +66,21 @@ export const remove = async (req, res) => {
         const result = await Prediction.removePrediction(req.params.id, userId)
         if(result.error) throw new Error(res.error)
         res.sendStatus(200)
+    }
+    catch(err) {
+        res.status(400).json({ error: err.message })
+    }
+}
+export const getPreviousForStage = async (req, res) => {
+    try {
+        const user = await req.user
+        if(!req.query.stageId) throw new Error('Stage required')
+        const stageId = getStageCode(req.query.stageId)
+        const predictions = await Prediction.getAllByUser(user._id)
+        if(predictions.error) throw new Error(result.error)
+        const result = await predictionsByStage(predictions, stageId)
+        if(result.error) throw new Error(result.error)
+        res.send(result)
     }
     catch(err) {
         res.status(400).json({ error: err.message })
