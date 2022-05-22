@@ -3,6 +3,7 @@ import Group from '../DAOs/Group.js';
 
 const showByGroupName = async (predictions) => {
     try {
+        // TODO Me parece que esto siempre devuelve "{}"
         const byGroups = {}
         await predictions.forEach(async prediction => {
             if(byGroups[prediction.groupId]) byGroups[prediction.groupId].push(prediction)
