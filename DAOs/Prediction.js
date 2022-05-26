@@ -1,15 +1,22 @@
 import Model from '../Models/Prediction.js'
 import Container from '../Containers/mongoDB.js'
+import { hasNulls, arePositiveNumbers } from '../utils/dataCheck.js'
 
 class Prediction extends Container {
     constructor() {
         super(Model)
     }
+    checkPredictionData(prediction) {
+        if(hasNulls([prediction.matchId, prediction.groupId, prediction.homeScore, prediction.awayScore])) return { check: false, error: 'Missing field' }
+        if(!arePositiveNumbers([parseInt(prediction.homeScore), parseInt(prediction.awayScore)])) return { check: false, error: 'Invalid score' }
+        return { check: true }
+    }
     async createPrediction(data) {
         try {
-            if(!data.matchId || !data.groupId || !data.homeScore || !data.awayScore) throw new Error('Missing fields')
+            const check = this.checkPredictionData(data)
+            if(!check.check) throw new Error(check.error)
             const prediction = await this.getOne({matchId: data.matchId, userId: data.userId})
-            if(prediction) throw new Error('Prediction already exists')
+            if(prediction) return await this.editPrediction(prediction._id, data.userId, data)
             return await this.create({
                 ...data,
                 homeScore: parseInt(data.homeScore),
@@ -26,16 +33,16 @@ class Prediction extends Container {
             if(predictions.error) throw new Error(predictions.error.message)
             const response = {
                 created: [],
+                edited: [],
                 errors: []
             }
             const validPredictions = []
+            const predictionsToEdit = []
             await data.predictions.forEach(prediction => {
-                if (!prediction.matchId) 
-                    return response.errors.push({id: null, message: 'Missing matchId'})
-                if (!prediction.groupId || !prediction.homeScore || !prediction.awayScore) 
-                    return response.errors.push({id: prediction.matchId, message: 'Missing field'})
-                if (predictions.find(p => p.matchId === prediction.matchId))
-                    return response.errors.push({id: prediction.matchId, message: 'Prediction already exists'})
+                const check = this.checkPredictionData(prediction)
+                if(!check.check) return response.errors.push({id: prediction.matchId, message: check.error})
+                const existing = predictions.find(p => p.matchId === prediction.matchId)
+                if(existing) return predictionsToEdit.push({data: {...prediction}, id: existing._id})
                 validPredictions.push({
                     ...prediction,
                     userId: data.userId,
@@ -46,6 +53,10 @@ class Prediction extends Container {
             const created = await this.createMultiple(validPredictions)
             if(created.error) throw new Error(created.error.message)
             response.created = [...created]
+            const edited = await this.editMany(data.userId, predictionsToEdit)
+            if(edited.error) throw new Error(created.error.message)
+            response.edited = edited.edited
+            response.errors = [...response.errors, ...edited.errors]
             return response
         }
         catch(err) {
@@ -84,13 +95,15 @@ class Prediction extends Container {
     }
     async editPrediction(id, userId, data) {
         try {
-            if(!id || !userId || !data) throw new Error('Missing fields')
+            if(!id || !userId) throw new Error('Missing fields')
+            const check = this.checkPredictionData(data)
+            if(!check.check) throw new Error(check.error)
             const original = await this.getById(id)
             if(!original) throw new Error('Prediction not found')
             if(original.userId != userId) throw new Error('User not allowed to edit this prediction')
             return await this.update(id, {
-                homeScore: data.homeScore,
-                awayScore: data.awayScore,
+                homeScore: parseInt(data.homeScore),
+                awayScore: parseInt(data.awayScore),
                 edited: Date.now()
             })
         }
