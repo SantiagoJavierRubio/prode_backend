@@ -3,14 +3,16 @@ import Group from '../DAOs/Group.js';
 
 const showByGroupName = async (predictions) => {
     try {
-        // TODO Me parece que esto siempre devuelve "{}"
+        const groupNames =  await Group.getAllForUser(predictions[0].userId, 'name');
+        if(groupNames.error) throw new Error(groupNames.error);
         const byGroups = {}
         await predictions.forEach(async prediction => {
-            if(byGroups[prediction.groupId]) byGroups[prediction.groupId].push(prediction)
+            if(Object.keys(byGroups).includes(prediction.groupId)) {
+                byGroups[prediction.groupId].push(prediction)
+            }
             else {
-                const group = await Group.getById(prediction.groupId)
-                if(!group) throw new Error('Group not found')
-                byGroups[prediction.groupId] = [group.name, prediction]
+                const groupInfo = groupNames.find(group => `${group._id}` === prediction.groupId)
+                byGroups[`${prediction.groupId}`] = [groupInfo.name, prediction]
             }
         })
         return byGroups

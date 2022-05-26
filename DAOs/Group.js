@@ -103,6 +103,15 @@ class Group extends Container {
             return {error: err.message}
         }
     }
+    async getAllForUser(user_id, fields=null) {
+        try {
+            const result = await this.getMany({members: user_id}, fields);
+            return result
+        }
+        catch(err) {
+            return {error: err.message}
+        }
+    }
 }
 
 const GroupDAO =  new Group()

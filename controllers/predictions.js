@@ -79,7 +79,6 @@ export const getPreviousForStage = async (req, res) => {
         const predictions = await Prediction.getAllByUser(user._id)
         if(predictions.error) throw new Error(result.error)
         const result = await predictionsByStage(predictions, stageId)
-        console.log('Result de predictionsByStage', result) // TODO borrar
         if(result.error) throw new Error(result.error)
         res.send(result)
     }
