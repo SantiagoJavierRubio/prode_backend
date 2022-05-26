@@ -49,7 +49,8 @@ export const getAll = async (req, res) => {
         const user = await req.user
         const groupId = req.query.groupId || null
         if(groupId) {
-            if(!user.groups.includes(groupId)) throw new Error('User not allowed to see this group')
+            // TODO: check if user is allowed to see this group
+            // if(!user.groups.includes(groupId)) throw new Error('User not allowed to see this group')
             const result = await Prediction.getAllInGroup(groupId)
             return res.send(result)
         }
