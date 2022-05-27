@@ -1,3 +1,5 @@
+import CustomError from "../Errors/CustomError.js";
+
 class Container {
   constructor(model) {
     this.model = model;
@@ -11,7 +13,7 @@ class Container {
       return result;
     }
  catch (err) {
-      return new Error(`Failed to obtain element, error: ${err}`);
+      throw new CustomError(500, 'Failed to obtain element', err.message, err);
     }
   }
   async getMany(options = {}, fields = null) {
@@ -23,7 +25,7 @@ class Container {
       return results;
     }
  catch (err) {
-      return new Error(`Failed to obtain elements, error: ${err}`);
+      throw new CustomError(500, 'Failed to obtain elements', err.message, err);
     }
   }
   async getManyById(ids, fields = null) {
@@ -35,7 +37,7 @@ class Container {
       return results;
     }
     catch(err) {
-      return new Error(`Failed to obtain elements, error: ${err}`);
+      throw new CustomError(500, 'Failed to obtain elements', err.message, err);
     }
   }
   async getOne(match, fields = null) {
@@ -47,18 +49,17 @@ class Container {
       return result;
     }
  catch (err) {
-      return new Error(`Failed to obtain element, error: ${err}`);
+      throw new CustomError(500, 'Failed to obtain element', err.message, err);
     }
   }
   async create(data) {
     try {
       const newElement = new this.model(data);
       const result = await newElement.save();
-      if (!result) throw new Error('Failed to create element');
       return result;
     }
  catch (err) {
-      return new Error(`Failed to create element, error: ${err}`);
+      return new CustomError(500, 'Failed to create element', err.message, err);
     }
   }
   async createMultiple(array) {
@@ -68,27 +69,25 @@ class Container {
       return results
     }
     catch(err) {
-      return new Error(`Failed to create elements, error: ${err}`);
+      throw new CustomError(500, 'Failed to create elements', err.message, err);
     }
   }
   async update(id, data) {
     try {
-      const result = await this.model.findByIdAndUpdate(id, data);
-      if (!result) throw new Error('Failed to update element');
+      await this.model.findByIdAndUpdate(id, data);
       return true;
     }
  catch (err) {
-      return new Error(`Failed to update element, error: ${err}`);
+      throw new CustomError(500, 'Failed to update element', err.message, err);
     }
   }
   async delete(id) {
     try {
-      const result = await this.model.findByIdAndDelete(id);
-      if (!result) throw new Error('Failed to delete element');
+      await this.model.findByIdAndDelete(id);
       return true;
     }
  catch (err) {
-      return new Error(`Failed to delete element, error: ${err}`);
+      throw new CustomError(500, 'Failed to delete element', err.message, err);
     }
   }
 }

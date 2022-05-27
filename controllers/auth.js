@@ -16,7 +16,7 @@ export const getUserData = async (req, res, next) => {
       next(err)
   }
 }
-export const createWithEmail = async (req, res) => {
+export const createWithEmail = async (req, res, next) => {
   try {
     const user = await User.createWithEmail(req.body);
     if (user.error) throw new Error(user.error);
@@ -25,10 +25,10 @@ export const createWithEmail = async (req, res) => {
     res.status(200).json({ user_id: user._id });
   }
  catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err)
   }
 };
-export const verifyEmail = async (req, res) => {
+export const verifyEmail = async (req, res, next) => {
   try {
     const token = req.query.token;
     const user_id = req.query.user_id;
@@ -43,10 +43,10 @@ export const verifyEmail = async (req, res) => {
     res.redirect(`${config.clientUrl}/auth/verified`);
   }
  catch (err) {
-    res.send(`Something went wrong: ${err.message}`);
+    next(err)
   }
 };
-export const loginWithEmail = async (req, res) => {
+export const loginWithEmail = async (req, res, next) => {
   try {
     const user = await User.checkCredentials(
       req.body.email || null,
@@ -59,10 +59,10 @@ export const loginWithEmail = async (req, res) => {
     res.status(200).json({ user_id: user._id });
   }
  catch (err) {
-    res.status(401).json({ error: err.message });
+    next(err)
   }
 };
-export const googleVerified = async (req, res) => {
+export const googleVerified = async (req, res, next) => {
   try {
     const user = await verifyGoogle(req.body.token);
     if (user.error) throw new Error(user.error)
@@ -71,10 +71,10 @@ export const googleVerified = async (req, res) => {
     res.sendStatus(200)
   }
   catch(err) {
-    res.status(401).json({ error: err.message });
+    next(err)
   }
 };
-export const logout = async (req, res) => {
+export const logout = async (req, res, next) => {
   try {
     req.logOut();
     res.clearCookie('jwt', { path: '/', sameSite: 'none', secure: true });
@@ -82,10 +82,10 @@ export const logout = async (req, res) => {
     res.sendStatus(200);
   }
   catch(err) {
-    res.status(400).json({ error: err.message })
+    next(err)
   }
 };
-export const requirePasswordChange = async (req, res) => {
+export const requirePasswordChange = async (req, res, next) => {
   try {
     const email = req.body.email || null;
     if(!email) throw new Error('Email is required');
@@ -97,10 +97,10 @@ export const requirePasswordChange = async (req, res) => {
     res.sendStatus(200)
   }
   catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err)
   }
 }
-export const grantTemporaryVerification = async (req, res) => {
+export const grantTemporaryVerification = async (req, res, next) => {
   try {
     const token = req.query.token;
     const user_id = req.query.user_id;
@@ -118,10 +118,10 @@ export const grantTemporaryVerification = async (req, res) => {
     res.redirect(`${config.clientUrl}/auth/change-password`);
   }
   catch(err) {
-    res.send(`Something went wrong: ${err.message}`);
+    next(err)
   }
 }
-export const changePassword = async (req, res) => {
+export const changePassword = async (req, res, next) => {
   try {
     const newPassword = req.body.password || null;
     if (!newPassword) throw new Error('New password required');
@@ -134,6 +134,6 @@ export const changePassword = async (req, res) => {
     res.sendStatus(200);
   } 
   catch (err) {
-    res.status(400).json({error: err.message})
+    next(err)
   }
 }
