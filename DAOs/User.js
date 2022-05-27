@@ -1,6 +1,8 @@
 import Container from '../Containers/mongoDB.js';
 import Model from '../Models/User.js';
 import bcrypt from 'bcryptjs';
+import CustomError from '../Errors/CustomError.js';
+import { hasNulls } from '../utils/dataCheck.js';
 
 const hashPassword = async (password) => {
   try {
@@ -9,7 +11,7 @@ const hashPassword = async (password) => {
     return hash;
   }
  catch (err) {
-    return { error: 'Failed to hash password' };
+    throw new CustomError(500, 'Failed to hash password', err.message);
   }
 };
 
@@ -18,49 +20,31 @@ class User extends Container {
     super(Model);
   }
   async findByEmail(email) {
-    try {
-      if (!email) throw new Error('Email is required');
-      const user = await this.getOne({ email });
-      return user;
-    }
- catch (err) {
-      return { error: err.message };
-    }
+    if (hasNulls([email])) throw new CustomError(400, 'Email is required');
+    const user = await this.getOne({ email });
+    return user;
   }
   async createWithEmail(data) {
-    try {
-      if (!data.email) throw new Error('Email is required');
-      if (!data.password) throw new Error('Password is required');
-      if (data.password.length < 6) throw new Error('Password must be at least 6 characters');
+      if (hasNulls([data.email, data.password])) throw new CustomError(400, 'Email and password are required');
+      if (data.password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
       let pwd = await hashPassword(data.password);
-      if (pwd.error) throw new Error(pwd.error.message);
       if (await this.getOne({ email: data.email }))
-        throw new Error('Email already in use');
+        throw new CustomError(406, 'Email already in use');
       const user = await this.create({ ...data, password: pwd, name: data.name || data.email?.split('@')[0] });
-      if (!user) throw new Error('Failed to create user');
+      if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
       return user;
-    }
- catch (err) {
-      return { error: err.message };
-    }
   }
   async checkCredentials(email, password) {
-    try {
-      if (!email) throw new Error('Email is required');
-      if (!password) throw new Error('Password is required');
+      if(hasNulls([email, password])) throw new CustomError(400, 'Email and password are required');
       const user = await this.getOne({ email });
-      if (!user) throw new Error('User not found');
-      if(!user.password) throw new Error('User registered with google')
+      if (!user) throw new CustomError(404, 'User not found');
+      if(!user.password) throw new CustomError(406, 'User registered with google', 'Try to sign in with google')
       const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) throw new Error('Invalid password');
+      if (!isValid) throw new CustomError(401, 'Invalid password');
       return user;
-    }
- catch (err) {
-      return { error: err.message };
-    }
   }
   async createWithGoogle(data) {
-    try {
+      if (hasNulls([data.email])) throw new CustomError(400, 'Email is required');
       const userData = {
         email: data.email,
         name:
@@ -68,29 +52,17 @@ class User extends Container {
           data.email?.split('@')[0],
         verified: true
       };
-      if (!userData.email) throw new Error('Email is required');
       const user = await this.create(userData);
-      if (!user) throw new Error('Failed to create user');
+      if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
       return user;
-    }
- catch (err) {
-      return err;
-    }
   }
   async changePassword(user_id, password) {
-    try {
-      if (!password) throw new Error('Password is required');
-      if (password.length < 6) throw new Error('Password must be at least 6 characters');
+      if (hasNulls([password])) throw new CustomError(400, 'Password is required');
+      if (password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
       let pwd = await hashPassword(password);
-      if (pwd.error) throw new Error(pwd.error);
       const updated = await this.update(user_id, { password: pwd });
-      if (!updated) throw new Error('Failed to update user');
-      if (updated.error) throw new Error(updated.error);
+      if (!updated) throw new CustomError(500, 'Failed to update user', 'Something went wrong when updating this user data');
       return true;
-    }
-    catch (err) {
-      return { error: err.message };
-    }
   }
 }
 
