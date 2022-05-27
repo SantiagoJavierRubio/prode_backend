@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import { hasNulls } from './dataCheck.js'
+import CustomError from '../Errors/CustomError.js'
 
 const GROUP_CODES = process.env.MODO_PRUEBA ? {
     A: '275075',
@@ -37,14 +39,14 @@ const STAGE_CODES = process.env.MODO_PRUEBA ? {
 }
 
 export const getGroupCode = (input) => {
-    if(!input) return { error: 'No input' }
+    if(hasNulls([input])) throw new CustomError(406, 'No group code or name')
     const i = input.toUpperCase()
     if(GROUP_CODES[i]) return GROUP_CODES[i]
     return input
 }
 
 export const getStageCode = (input) => {
-    if(!input) return { error: 'No input' }
+    if(hasNulls([input])) throw new CustomError(406, 'No stage code or name')
     const i = input.toUpperCase()
     if(STAGE_CODES[i]) return STAGE_CODES[i]
     return input

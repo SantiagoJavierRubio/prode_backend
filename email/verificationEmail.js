@@ -3,6 +3,7 @@ import VerificationToken from '../Models/VerificationToken.js';
 import transporter from './nodemailer.js';
 import { verificationEmailTemplate, changePasswordEmailTemplate } from './templates/templates.js';
 import config from '../config.js';
+import CustomError from '../Errors/CustomError.js';
 
 const generateVerificationToken = async (user_id) => {
   try {
@@ -15,7 +16,7 @@ const generateVerificationToken = async (user_id) => {
     return token;
   }
  catch (err) {
-    throw new Error(err.message);
+    throw new CustomError(500, 'Failed to create verification token', err.message, err);
   }
 };
 export const sendVerificationEmail = async (user) => {
@@ -32,7 +33,7 @@ export const sendVerificationEmail = async (user) => {
     return { success: true };
   }
  catch (err) {
-    return { error: err.message };
+    throw new CustomError(500, 'Failed to send email', err.message, err);
   }
 };
 export const sendPasswordChangeEmail = async (user) => {
@@ -45,10 +46,10 @@ export const sendPasswordChangeEmail = async (user) => {
       subject: 'Cambia tu contraseña',
       html: changePasswordEmailTemplate(link)
     });
-    if (!mail.accepted.length > 0) throw new Error('Failed to send email');
+    if (!mail.accepted.length > 0) throw new Error('Email rejected');
     return { success: true };
   }
  catch (err) {
-    return { error: err.message };
+    throw new CustomError(500, 'Failed to send password change email', err.message, err);
   }
 }

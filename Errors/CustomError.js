@@ -1,9 +1,9 @@
 class CustomError {
-    constructor(status, message, details, trace) {
-        this.status = status || 500
-        this.message = message || 'Internal Server Error'
-        this.details = details || null
-        this.trace = trace || null
+    constructor(status, message, details=null, trace=null) {
+        this.status = status
+        this.message = message
+        this.details = details
+        this.trace = trace
     }
 }
 

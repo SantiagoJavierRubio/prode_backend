@@ -1,8 +1,10 @@
 import Prediction from '../DAOs/Prediction.js'
 import { getStageCode } from '../utils/traslateNamesToCodes.js'
 import { predictionsByStage } from '../utils/predictionPresentation.js'
+import CustomError from '../Errors/CustomError.js'
+import errorHandler from '../Errors/errorHandler.js'
 
-export const create = async (req, res) => {
+export const create = async (req, res, next) => {
     try {
         const userId = await req.user._id
         let result
@@ -15,36 +17,34 @@ export const create = async (req, res) => {
             result = await Prediction.createMany(predictionData)
         }
         else result = await Prediction.createPrediction({ ...req.body.prediction, userId: userId })
-        if(result.error) throw new Error(result.error)
         res.status(200).json(result)
     }
     catch(err) {
-        res.status(400).json({ error: err.message })
+        errorHandler(err, req, res, next)
     }
 }
-export const edit = async (req, res) => {
+export const edit = async (req, res, next) => {
     try {
         const userId = await req.user._id
         const result = await Prediction.editPrediction(req.params.id, userId, req.body.prediction)
-        if(result.error) throw new Error(result.error)
+        if(result.error) throw new CustomError(result.code || 500, result.error)
         res.sendStatus(200)
     }
     catch(err) {
-        res.status(400).json({ error: err.message })
+        errorHandler(err, req, res, next)
     }
 }
-export const editMany = async (req, res) => {
+export const editMany = async (req, res, next) => {
     try {
         const userId = await req.user._id
         const result = await Prediction.editMany(userId, req.body.prediction)
-        if(result.error) throw new Error(result.error)
         res.status(200).json(result)
     }
     catch(err) {
-        res.status(400).json({ error: err.message })
+        errorHandler(err, req, res, next)
     }
 }
-export const getAll = async (req, res) => {
+export const getAll = async (req, res, next) => {
     try {
         const user = await req.user
         const userGroupId = req.query.userGroupId || null
@@ -58,32 +58,28 @@ export const getAll = async (req, res) => {
         return res.send(result)
     }
     catch(err) {
-        res.status(400).json({ error: err.message })
+        errorHandler(err, req, res, next)
     }
 }
-export const remove = async (req, res) => {
+export const remove = async (req, res, next) => {
     try {
         const userId = await req.user._id
-        const result = await Prediction.removePrediction(req.params.id, userId)
-        if(result.error) throw new Error(res.error)
+        await Prediction.removePrediction(req.params.id, userId)
         res.sendStatus(200)
     }
     catch(err) {
-        res.status(400).json({ error: err.message })
+        errorHandler(err, req, res, next)
     }
 }
-export const getPreviousForStage = async (req, res) => {
+export const getPreviousForStage = async (req, res, next) => {
     try {
         const user = await req.user
-        if(!req.query.stageId) throw new Error('Stage required')
         const stageId = getStageCode(req.query.stageId)
         const predictions = await Prediction.getAllByUser(user._id)
-        if(predictions.error) throw new Error(result.error)
         const result = await predictionsByStage(predictions, stageId)
-        if(result.error) throw new Error(result.error)
         res.send(result)
     }
     catch(err) {
-        res.status(400).json({ error: err.message })
+        errorHandler(err, req, res, next)
     }
 }

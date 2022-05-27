@@ -1,39 +1,29 @@
 import Fifa from '../DAOs/Fifa.js';
 import Group from '../DAOs/Group.js';
+import CustomError from '../Errors/CustomError.js';
+import { hasNulls } from './dataCheck.js';
 
 const showByGroupName = async (predictions) => {
-    try {
-        const groupNames =  await Group.getAllForUser(predictions[0].userId, 'name');
-        if(groupNames.error) throw new Error(groupNames.error);
-        const byGroups = {}
-        await predictions.forEach(async prediction => {
-            if(Object.keys(byGroups).includes(prediction.userGroupId)) {
-                byGroups[prediction.userGroupId].push(prediction)
-            }
-            else {
-                const groupInfo = groupNames.find(group => `${group._id}` === prediction.userGroupId)
-                byGroups[`${prediction.userGroupId}`] = [groupInfo.name, prediction]
-            }
-        })
-        return byGroups
-    }
-    catch(err) {
-        return {error: err.message}
-    }
+    const groupNames =  await Group.getAllForUser(predictions[0].userId, 'name');
+    const byGroups = {}
+    await predictions.forEach(async prediction => {
+        if(Object.keys(byGroups).includes(prediction.userGroupId)) {
+            byGroups[prediction.userGroupId].push(prediction)
+        }
+        else {
+            const groupInfo = groupNames.find(group => `${group._id}` === prediction.userGroupId)
+            byGroups[`${prediction.userGroupId}`] = [groupInfo.name, prediction]
+        }
+    })
+    return byGroups
 }
  
 export const predictionsByStage = async (predictions, stageId) => {
-    try {
-        const matches = await Fifa.getOneStage(stageId);
-        if(matches.error) throw new Error(matches.error);
-        const stageMatchesIds = await matches.map(match => match.id);
-        const predictionsByStage = await predictions.filter(prediction => stageMatchesIds.includes(prediction.matchId));
-        if(predictionsByStage.length === 0) return { error: 'No predictions for this stage' };
-        const result = await showByGroupName(predictionsByStage);
-        if(result.error) throw new Error(result.error)
-        return result;
-    }
-    catch(err) {
-        return { error: err.message }
-    }
+    if(hasNulls([predictions, stageId])) throw new CustomError(406, 'Missing field')
+    const matches = await Fifa.getOneStage(stageId);
+    const stageMatchesIds = await matches.map(match => match.id);
+    const predictionsByStage = await predictions.filter(prediction => stageMatchesIds.includes(prediction.matchId));
+    if(predictionsByStage.length === 0) throw new CustomError(404, 'No predictions for this stage');
+    const result = await showByGroupName(predictionsByStage);
+    return result;
 }
