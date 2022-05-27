@@ -9,7 +9,7 @@ export const create = async (req, res) => {
         if(req.body.multiple) {
             const predictionData = {
                 userId: userId,
-                groupId: req.body.groupId,
+                userGroupId: req.body.userGroupId,
                 predictions: req.body.prediction
             }
             result = await Prediction.createMany(predictionData)
@@ -47,11 +47,11 @@ export const editMany = async (req, res) => {
 export const getAll = async (req, res) => {
     try {
         const user = await req.user
-        const groupId = req.query.groupId || null
-        if(groupId) {
+        const userGroupId = req.query.userGroupId || null
+        if(userGroupId) {
             // TODO: check if user is allowed to see this group
             // if(!user.groups.includes(groupId)) throw new Error('User not allowed to see this group')
-            const result = await Prediction.getAllInGroup(groupId)
+            const result = await Prediction.getAllInGroup(userGroupId)
             return res.send(result)
         }
         const result = await Prediction.getAllByUser(user._id)

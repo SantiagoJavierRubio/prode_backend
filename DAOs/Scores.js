@@ -5,13 +5,13 @@ class Scores extends Container {
     constructor() {
         super(Model)
     }
-    async createGroupScore(groupId, userId) {
+    async createGroupScore(userGroupId, userId) {
         try {
-            if(!groupId) throw new Error('No group')
+            if(!userGroupId) throw new Error('No group')
             if(!userId) throw new Error('No user')
-            const exists = await this.getOne({groupId: groupId, userId: userId})
+            const exists = await this.getOne({userGroupId: userGroupId, userId: userId})
             if(exists) throw new Error('Score already exists')
-            const newScore = await this.create({groupId: groupId, userId: userId})
+            const newScore = await this.create({userGroupId: userGroupId, userId: userId})
             if(!newScore) throw new Error('Failed to create score')
             return newScore
         }
@@ -19,10 +19,10 @@ class Scores extends Container {
             return {error: err.message}
         }
     }
-    async getGroupScores(groupId) {
+    async getGroupScores(userGroupId) {
         try {
-            if(!groupId) throw new Error('No group')
-            const scores = await this.getMany({groupId: groupId})
+            if(!userGroupId) throw new Error('No group')
+            const scores = await this.getMany({userGroupId: userGroupId})
             if(!scores) throw new Error('No scores')
             return scores
         }
@@ -41,12 +41,12 @@ class Scores extends Container {
             return {error: err.message}
         }
     }
-    async addScore(groupId, userId, score) {
+    async addScore(userGroupId, userId, score) {
         try {
-            if(!groupId) throw new Error('No group')
+            if(!userGroupId) throw new Error('No group')
             if(!userId) throw new Error('No user')
             if(!score) throw new Error('No score')
-            const exists = await this.getOne({groupId: groupId, userId: userId})
+            const exists = await this.getOne({userGroupId: userGroupId, userId: userId})
             if(!exists) throw new Error('No score')
             const newScore = exists.score + parseInt(score)
             const updated = await this.update(exists._id, {score: newScore})

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 const ScoresSchema = new mongoose.Schema({
-    groupId: String,
+    userGroupId: String,
     userId: String,
     score: {
         type: Number,

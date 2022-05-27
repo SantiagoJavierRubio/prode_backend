@@ -7,7 +7,7 @@ class Prediction extends Container {
         super(Model)
     }
     checkPredictionData(prediction) {
-        if(hasNulls([prediction.matchId, prediction.groupId, prediction.homeScore, prediction.awayScore])) return { check: false, error: 'Missing field' }
+        if(hasNulls([prediction.matchId, prediction.userGroupId, prediction.homeScore, prediction.awayScore])) return { check: false, error: 'Missing field' }
         if(!arePositiveNumbers([parseInt(prediction.homeScore), parseInt(prediction.awayScore)])) return { check: false, error: 'Invalid score' }
         return { check: true }
     }
@@ -29,7 +29,7 @@ class Prediction extends Container {
     }
     async createMany(data) {
         try {
-            const predictions = await this.getAllByUserInGroup(data.userId, data.groupId)
+            const predictions = await this.getAllByUserInGroup(data.userId, data.userGroupId)
             if(predictions.error) throw new Error(predictions.error.message)
             const response = {
                 created: [],
@@ -73,9 +73,9 @@ class Prediction extends Container {
             return {error: err.message}
         }
     }
-    async getAllInGroup(groupId) {
+    async getAllInGroup(userGroupId) {
         try {
-            const results = await this.getMany({groupId: groupId})
+            const results = await this.getMany({userGroupId: userGroupId})
             if (!results) return null;
             return results;
         }
@@ -83,9 +83,9 @@ class Prediction extends Container {
             return {error: err.message}
         }
     }
-    async getAllByUserInGroup(userId, groupId) {
+    async getAllByUserInGroup(userId, userGroupId) {
         try {
-            const results = await this.getMany({userId: userId, groupId: groupId})
+            const results = await this.getMany({userId: userId, userGroupId: userGroupId})
             if (!results) return null;
             return results;
         }

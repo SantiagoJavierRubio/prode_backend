@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 const predictionSchema = new mongoose.Schema({
     matchId: String,
     userId: String,
-    groupId: String,
+    userGroupId: String,
     homeScore: Number,
     awayScore: Number,
     edited: {

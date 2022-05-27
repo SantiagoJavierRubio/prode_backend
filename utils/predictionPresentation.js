@@ -7,12 +7,12 @@ const showByGroupName = async (predictions) => {
         if(groupNames.error) throw new Error(groupNames.error);
         const byGroups = {}
         await predictions.forEach(async prediction => {
-            if(Object.keys(byGroups).includes(prediction.groupId)) {
-                byGroups[prediction.groupId].push(prediction)
+            if(Object.keys(byGroups).includes(prediction.userGroupId)) {
+                byGroups[prediction.userGroupId].push(prediction)
             }
             else {
-                const groupInfo = groupNames.find(group => `${group._id}` === prediction.groupId)
-                byGroups[`${prediction.groupId}`] = [groupInfo.name, prediction]
+                const groupInfo = groupNames.find(group => `${group._id}` === prediction.userGroupId)
+                byGroups[`${prediction.userGroupId}`] = [groupInfo.name, prediction]
             }
         })
         return byGroups
