@@ -4,15 +4,16 @@ import { sendVerificationEmail, sendPasswordChangeEmail} from '../email/verifica
 import VerificationToken from '../Models/VerificationToken.js';
 import verifyGoogle from '../authentication/verifyGoogle.js';
 import config from '../config.js';
+import CustomError from '../Errors/CustomError.js';
 
-export const getUserData = async (req, res) => {
+export const getUserData = async (req, res, next) => {
   try {
     const user = await User.getById(req.user._id, 'email name');
-    if (!user) throw new Error('User not found');
+    if (!user) throw new CustomError(406, 'User not found');
     res.json({ user: user })
   }
   catch(err) {
-      res.status(400).json({ error: err.message })
+      next(err)
   }
 }
 export const createWithEmail = async (req, res) => {

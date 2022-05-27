@@ -11,11 +11,13 @@ import groupRoutes from './routes/groups.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
+import errorHandler from './Errors/errorHandler.js';
 import './authentication/passportStrategies.js';
 import 'dotenv/config';
 
-// SERVER SETUP
 const app = express();
+
+// MIDDLEWARES
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(process.cwd() + '/public'));
@@ -48,6 +50,7 @@ app.use(
     })
   );
   app.use(helmet());
+  app.use(errorHandler);
 
 // AUTHENTICATION SETUP
 app.use(passport.initialize());
