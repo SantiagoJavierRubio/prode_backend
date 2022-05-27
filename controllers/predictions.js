@@ -1,6 +1,6 @@
 import Prediction from '../DAOs/Prediction.js'
-import { getStageCode } from '../utils/traslateNamesToCodes.js'
-import { predictionsByStage } from '../utils/predictionPresentation.js'
+import { getStageCode, getGroupCode } from '../utils/traslateNamesToCodes.js'
+import { predictionsByStage, filterForOneGroup, filterForOneStage } from '../utils/predictionPresentation.js'
 import CustomError from '../Errors/CustomError.js'
 import errorHandler from '../Errors/errorHandler.js'
 
@@ -48,13 +48,19 @@ export const getAll = async (req, res, next) => {
     try {
         const user = await req.user
         const userGroupId = req.query.userGroupId || null
+        const stageId = req.query.stage ? getStageCode(req.query.stage) : null
+        const groupId = req.query.group ? getGroupCode(req.query.group) : null
+        let result
         if(userGroupId) {
             // TODO: check if user is allowed to see this group
             // if(!user.groups.includes(groupId)) throw new Error('User not allowed to see this group')
-            const result = await Prediction.getAllInGroup(userGroupId)
-            return res.send(result)
+            result = await Prediction.getAllInGroup(userGroupId)
         }
-        const result = await Prediction.getAllByUser(user._id)
+        else {
+            result = await Prediction.getAllByUser(user._id)
+        }
+        if (stageId) result = await filterForOneStage(result, stageId)
+        else if (groupId) result = await filterForOneGroup(result, groupId)
         return res.send(result)
     }
     catch(err) {
