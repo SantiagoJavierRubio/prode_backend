@@ -4,6 +4,7 @@ import { scoresWithUsername } from '../utils/scoresPresentation.js'
 import getOwnerNames from '../utils/getOwnerNames.js'
 import CustomError from '../Errors/CustomError.js'
 import errorHandler from '../Errors/errorHandler.js'
+import Prediction from '../DAOs/Prediction.js'
 
 export const create = async (req, res, next) => {
     try {
@@ -45,7 +46,8 @@ export const leaveGroup = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;
         const user = await req.user
-        await Group.removeMember(groupName, user._id)
+        const userGroupId = await Group.removeMember(groupName, user._id)
+        await Prediction.removeAllByUserInGroup(user._id, userGroupId)
         res.json({message: 'User removed from group'})
     }
     catch(err) {

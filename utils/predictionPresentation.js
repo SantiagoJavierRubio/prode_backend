@@ -23,7 +23,7 @@ export const predictionsByStage = async (predictions, stageId) => {
     const matches = await Fifa.getOneStage(stageId);
     const stageMatchesIds = await matches.map(match => match.id);
     const predictionsByStage = await predictions.filter(prediction => stageMatchesIds.includes(prediction.matchId));
-    if(predictionsByStage.length === 0) throw new CustomError(404, 'No predictions for this stage');
+    //if(predictionsByStage.length === 0) throw new CustomError(404, 'No predictions for this stage');
     const result = await showByGroupName(predictionsByStage);
     return result;
 }

@@ -1,4 +1,5 @@
 import Prediction from '../DAOs/Prediction.js'
+import Group from '../DAOs/Group.js'
 import { getStageCode, getGroupCode } from '../utils/traslateNamesToCodes.js'
 import { predictionsByStage, filterForOneGroup, filterForOneStage } from '../utils/predictionPresentation.js'
 import CustomError from '../Errors/CustomError.js'
@@ -52,8 +53,7 @@ export const getAll = async (req, res, next) => {
         const groupId = req.query.group ? getGroupCode(req.query.group) : null
         let result
         if(userGroupId) {
-            // TODO: check if user is allowed to see this group
-            // if(!user.groups.includes(groupId)) throw new Error('User not allowed to see this group')
+            await Group.checkForUserInGroup(userGroupId, user._id)
             result = await Prediction.getAllInGroup(userGroupId)
         }
         else {

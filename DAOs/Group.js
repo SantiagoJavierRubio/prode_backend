@@ -66,12 +66,19 @@ class Group extends Container {
         if(!edited) throw new CustomError(500, 'Failed to remove member')
         const score = await Score.getOne({userGroupId: group._id, userId: user_id})
         await Score.delete(score._id)
-        return edited
+        return group._id
     }
     async getAllForUser(user_id, fields=null) {
         if(hasNulls([user_id])) throw new CustomError(406, 'No user id provided')
         const result = await this.getMany({members: user_id}, fields);
         return result
+    }
+    async checkForUserInGroup(id, user_id) {
+        if(hasNulls([id, user_id])) throw new CustomError(406, 'Missing field')
+        const group = await this.getOne({_id: id}, 'members')
+        if(!group) throw new CustomError(404, 'Group not found')
+        if(!group.members.includes(user_id)) throw new CustomError(401, 'User not in group')
+        return true
     }
 }
 
