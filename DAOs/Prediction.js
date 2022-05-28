@@ -74,7 +74,6 @@ class Prediction extends Container {
         const predictionsForGroup = await this.getMany({userId: userId, userGroupId: userGroupId}, '_id')
         if(!predictionsForGroup) return
         await this.model.deleteMany({'_id': {$in: predictionsForGroup}})
-        console.log('Removed predictions correctly')
     }
     async editPrediction(id, userId, data) {
         if(hasNulls([id, userId])) return { error: 'Missing field', code: 406 }

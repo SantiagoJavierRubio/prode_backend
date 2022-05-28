@@ -54,7 +54,7 @@ export const getAll = async (req, res, next) => {
         let result
         if(userGroupId) {
             await Group.checkForUserInGroup(userGroupId, user._id)
-            result = await Prediction.getAllInGroup(userGroupId)
+            result = await Prediction.getAllByUserInGroup(user._id, userGroupId)
         }
         else {
             result = await Prediction.getAllByUser(user._id)
