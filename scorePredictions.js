@@ -61,7 +61,7 @@ const scoreOnePrediction = async (prediction, matches) => {
         const match = matches.filter(match => match.id === prediction.matchId)[0];
         const score = await calculateScore(prediction.homeScore, prediction.awayScore, match.homeScore, match.awayScore);
         if(score === 0) return false
-        const scored = await Score.addScore(prediction.groupId, prediction.userId, score)
+        const scored = await Score.addScore(prediction.userGroupId, prediction.userId, score)
         if(scored.error) throw new Error(scored.error);
         return prediction._id
     }

@@ -1,151 +1,128 @@
 import Model from '../Models/Prediction.js'
 import Container from '../Containers/mongoDB.js'
+import { hasNulls, arePositiveNumbers } from '../utils/dataCheck.js'
+import CustomError from '../Errors/CustomError.js'
 
 class Prediction extends Container {
     constructor() {
         super(Model)
     }
+    checkPredictionData(prediction) {
+        if(hasNulls([prediction.matchId, prediction.userGroupId, prediction.homeScore, prediction.awayScore])) return { check: false, error: 'Missing field' }
+        if(!arePositiveNumbers([parseInt(prediction.homeScore), parseInt(prediction.awayScore)])) return { check: false, error: 'Scores must be positive numbers' }
+        return { check: true }
+    }
     async createPrediction(data) {
-        try {
-            if(!data.matchId || !data.groupId || !data.homeScore || !data.awayScore) throw new Error('Missing fields')
-            const prediction = await this.getOne({matchId: data.matchId, userId: data.userId})
-            if(prediction) throw new Error('Prediction already exists')
-            return await this.create({
-                ...data,
-                homeScore: parseInt(data.homeScore),
-                awayScore: parseInt(data.awayScore)
-            })
-        } 
-        catch(err) {
-            return {error: err.message}
-        }
+        const check = this.checkPredictionData(data)
+        if(!check.check) throw new CustomError(406, check.error)
+        const prediction = await this.getOne({matchId: data.matchId, userId: data.userId})
+        if(prediction) return await this.editPrediction(prediction._id, data.userId, data)
+        return await this.create({
+            ...data,
+            homeScore: parseInt(data.homeScore),
+            awayScore: parseInt(data.awayScore)
+        })
     }
     async createMany(data) {
-        try {
-            const predictions = await this.getAllByUserInGroup(data.userId, data.groupId)
-            if(predictions.error) throw new Error(predictions.error.message)
-            const response = {
-                created: [],
-                errors: []
-            }
-            const validPredictions = []
-            await data.predictions.forEach(prediction => {
-                if (!prediction.matchId) 
-                    return response.errors.push({id: null, message: 'Missing matchId'})
-                if (!prediction.groupId || !prediction.homeScore || !prediction.awayScore) 
-                    return response.errors.push({id: prediction.matchId, message: 'Missing field'})
-                if (predictions.find(p => p.matchId === prediction.matchId))
-                    return response.errors.push({id: prediction.matchId, message: 'Prediction already exists'})
-                validPredictions.push({
-                    ...prediction,
-                    userId: data.userId,
-                    homeScore: parseInt(prediction.homeScore),
-                    awayScore: parseInt(prediction.awayScore)
-                })
+        const predictions = await this.getAllByUserInGroup(data.userId, data.userGroupId)
+        const response = {
+            created: [],
+            edited: [],
+            errors: []
+        }
+        const validPredictions = []
+        const predictionsToEdit = []
+        await data.predictions.forEach(prediction => {
+            const check = this.checkPredictionData(prediction)
+            if(!check.check) return response.errors.push({id: prediction.matchId, message: check.error})
+            const existing = predictions.find(p => p.matchId === prediction.matchId)
+            if(existing) return predictionsToEdit.push({data: {...prediction}, id: existing._id})
+            validPredictions.push({
+                ...prediction,
+                userId: data.userId,
+                homeScore: parseInt(prediction.homeScore),
+                awayScore: parseInt(prediction.awayScore)
             })
-            const created = await this.createMultiple(validPredictions)
-            if(created.error) throw new Error(created.error.message)
-            response.created = [...created]
-            return response
-        }
-        catch(err) {
-            return {error: err.message}
-        }
+        })
+        const created = await this.createMultiple(validPredictions)
+        response.created = [...created]
+        const edited = await this.editMany(data.userId, predictionsToEdit)
+        response.edited = edited.edited
+        response.errors = [...response.errors, ...edited.errors]
+        return response
     }
     async getAllByUser(userId) {
-        try {
-            const results = await this.getMany({userId: userId})
-            if (!results) return null;
-            return results;
-        }
-     catch (err) {
-            return {error: err.message}
-        }
+        if(hasNulls([userId])) throw new CustomError(406, 'User id is missing')
+        const results = await this.getMany({userId: userId})
+        if (!results) return null;
+        return results;
     }
-    async getAllInGroup(groupId) {
-        try {
-            const results = await this.getMany({groupId: groupId})
-            if (!results) return null;
-            return results;
-        }
-     catch (err) {
-            return {error: err.message}
-        }
+    async getAllInGroup(userGroupId) {
+        if(hasNulls([userGroupId])) throw new CustomError(406, 'User group id is missing')
+        const results = await this.getMany({userGroupId: userGroupId})
+        if (!results) return null;
+        return results;
     }
-    async getAllByUserInGroup(userId, groupId) {
-        try {
-            const results = await this.getMany({userId: userId, groupId: groupId})
-            if (!results) return null;
-            return results;
-        }
-        catch (err) {
-            return {error: err.message}
-        }
+    async getAllByUserInGroup(userId, userGroupId) {
+        if(hasNulls([userId, userGroupId])) throw new CustomError(406, 'Missing data')
+        const results = await this.getMany({userId: userId, userGroupId: userGroupId})
+        if (!results) return null;
+        return results;
+    }
+    async removeAllByUserInGroup(userId, userGroupId) {
+        if(hasNulls([userId, userGroupId])) throw new CustomError(406, 'Missing field')
+        const predictionsForGroup = await this.getMany({userId: userId, userGroupId: userGroupId}, '_id')
+        if(!predictionsForGroup) return
+        await this.model.deleteMany({'_id': {$in: predictionsForGroup}})
     }
     async editPrediction(id, userId, data) {
-        try {
-            if(!id || !userId || !data) throw new Error('Missing fields')
-            const original = await this.getById(id)
-            if(!original) throw new Error('Prediction not found')
-            if(original.userId != userId) throw new Error('User not allowed to edit this prediction')
-            return await this.update(id, {
-                homeScore: data.homeScore,
-                awayScore: data.awayScore,
-                edited: Date.now()
-            })
-        }
-     catch (err) {
-            return {error: err.message}
-        }
+        if(hasNulls([id, userId])) return { error: 'Missing field', code: 406 }
+        const check = this.checkPredictionData(data)
+        if(!check.check) return { error: check.error }
+        const original = await this.getById(id)
+        if(!original) return { error: 'Prediction not found', code: 404 }
+        if(original.userId != userId) return { error: 'User not allowed to edit this prediction', code: 401 }
+        return await this.update(id, {
+            homeScore: parseInt(data.homeScore),
+            awayScore: parseInt(data.awayScore),
+            edited: Date.now()
+        })
     }
     async editMany(userId, array) {
-        try {
-            const response = {
-                edited: [],
-                errors: []
-            };
-            for (let prediction of array) {
-                if(!prediction.id) {
-                    response.errors.push({id: null, message: 'Missing id'})
-                    continue
-                } 
-                let result = await this.editPrediction(prediction.id, userId, prediction.data);
-                if(!result) {
-                    response.errors.push({id: prediction.id, message: 'Prediction not found'})
-                    continue
-                }
-                if(result.error) {
-                    response.errors.push({id: prediction.id, message: result.error});
-                    continue
-                }
-                response.edited.push(prediction.id);
+        const response = {
+            edited: [],
+            errors: []
+        };
+        for (let prediction of array) {
+            if(!prediction.id) {
+                response.errors.push({id: null, message: 'Missing id'})
+                continue
+            } 
+            let result = await this.editPrediction(prediction.id, userId, prediction.data);
+            if(!result) {
+                response.errors.push({id: prediction.id, message: 'Prediction not found'})
+                continue
             }
-            return response;
+            if(result.error) {
+                response.errors.push({id: prediction.id, message: result.error});
+                continue
+            }
+            response.edited.push(prediction.id);
         }
-        catch(err) {
-            return {error: err.message}
-        }
+        return response;
     }
     async removePrediction(id, userId) {
-        try {
-            const original = await this.getById(id)
-            if(!original) throw new Error('Prediction not found')
-            if(original.userId != userId) throw new Error('User not allowed to remove this prediction')
-            return await this.delete(id)
-        }
-        catch(err) {
-            return {error: err.message}
-        }
+        if(hasNulls([id, userId])) throw new CustomError(406, 'Missing field')
+        const original = await this.getById(id)
+        if(!original) throw new CustomError(404, 'Prediction not found')
+        if(original.userId != userId) throw new CustomError(401, 'User not allowed to remove this prediction')
+        return await this.delete(id)
     }
     async checkPredictions(ids) {
-        try {
-            const updated = await this.model.updateMany({_id: {$in: ids}}, {checked: true})
-            if(!updated) throw new Error('Failed to check predictions')
-            return updated
-        }
-        catch(err) {
-            return {error: err.message}
-        }
+        if(hasNulls([ids]) || !id[0]) throw new CustomError(406, 'Missing ids')
+        const updated = await this.model.updateMany({_id: {$in: ids}}, {checked: true})
+        if(!updated) throw new CustomError(500, 'Failed to check predictions')
+        return updated
     }
 }
 

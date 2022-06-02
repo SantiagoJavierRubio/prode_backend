@@ -1,4 +1,17 @@
-const GROUP_CODES = {
+import 'dotenv/config';
+import { hasNulls } from './dataCheck.js'
+import CustomError from '../Errors/CustomError.js'
+
+const GROUP_CODES = process.env.MODO_PRUEBA ? {
+    A: '275075',
+    B: '275077',
+    C: '275079',
+    D: '275081',
+    E: '275083',
+    F: '275085',
+    G: '275087',
+    H: '275089'
+} : {
     A: '285065',
     B: '285066',
     C: '285067',
@@ -9,7 +22,14 @@ const GROUP_CODES = {
     H: '285072'
 }
 
-const STAGE_CODES = {
+const STAGE_CODES = process.env.MODO_PRUEBA ? {
+    GRUPOS: '275073',
+    OCTAVOS: '275093',
+    CUARTOS: '275095',
+    SEMIFINALES: '275097',
+    FINAL: '275101',
+    TERCER_PUESTO: '275099'
+} : {
     GRUPOS: '285063',
     OCTAVOS: '285073',
     CUARTOS: '285074',
@@ -19,14 +39,14 @@ const STAGE_CODES = {
 }
 
 export const getGroupCode = (input) => {
-    if(!input) return { error: 'No input' }
+    if(hasNulls([input])) throw new CustomError(406, 'No group code or name')
     const i = input.toUpperCase()
     if(GROUP_CODES[i]) return GROUP_CODES[i]
     return input
 }
 
 export const getStageCode = (input) => {
-    if(!input) return { error: 'No input' }
+    if(hasNulls([input])) throw new CustomError(406, 'No stage code or name')
     const i = input.toUpperCase()
     if(STAGE_CODES[i]) return STAGE_CODES[i]
     return input
