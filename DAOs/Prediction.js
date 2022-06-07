@@ -57,15 +57,19 @@ class Prediction extends Container {
         if (!results) return null;
         return results;
     }
-    async getAllInGroup(userGroupId) {
+    async getAllInGroup(userGroupId, checked = false) {
         if(hasNulls([userGroupId])) throw new CustomError(406, 'User group id is missing')
-        const results = await this.getMany({userGroupId: userGroupId})
+        const results = checked ?
+            await this.getMany({userGroupId: userGroupId}) :
+            await this.getMany({userGroupId: userGroupId, checked: true})
         if (!results) return null;
         return results;
     }
-    async getAllByUserInGroup(userId, userGroupId) {
+    async getAllByUserInGroup(userId, userGroupId, checked = false) {
         if(hasNulls([userId, userGroupId])) throw new CustomError(406, 'Missing data')
-        const results = await this.getMany({userId: userId, userGroupId: userGroupId})
+        const results = checked ?
+            await this.getMany({userId: userId, userGroupId: userGroupId}) :
+            await this.getMany({userId: userId, userGroupId: userGroupId, checked: true})
         if (!results) return null;
         return results;
     }
@@ -123,6 +127,13 @@ class Prediction extends Container {
         const updated = await this.model.updateMany({_id: {$in: ids}}, {checked: true})
         if(!updated) throw new CustomError(500, 'Failed to check predictions')
         return updated
+    }
+    async scorePrediction(id, score) {
+        if(hasNulls([id, score])) throw new CustomError(406, 'Missing field')
+        const original = await this.getById(id)
+        if(!original) throw new CustomError(404, 'Prediction not found')
+        if(original.checked) throw new CustomError(403, 'Prediction already checked')
+        return await this.update(id, {score: score, checked: true})
     }
 }
 

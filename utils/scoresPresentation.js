@@ -1,17 +1,37 @@
 import User from '../DAOs/User.js';
 import CustomError from '../Errors/CustomError.js';
 
-export const scoresWithUsername = async (scores) => {
-    if(!scores) throw new CustomError(406, 'Missing scores')
+const SCORE_VALUES = {
+    NONE: 0,
+    WINNER: 1,
+    FULL: 2
+}
+
+const addUserScores = (predictions, groupData) => {
+    let totalScore = 0;
+    predictions.forEach(prediction => {
+        if(prediction.score === SCORE_VALUES.WINNER) {
+            totalScore += groupData.rules.scoring.WINNER;
+        } 
+        else if(prediction.score === SCORE_VALUES.FULL) {
+            totalScore += groupData.rules.scoring.FULL;
+        }
+    })
+    return totalScore;
+}
+
+export const calculateScoresByUsername = async (predictions, groupData) => {
     const prettifiedScores = [];
-    const users = await User.getManyById(scores.map(score => score.userId), '_id name');
+    const users = await User.getManyById(groupData.members, '_id name');
     if(!users) throw new CustomError(500, 'Failed to get users');
-    scores.forEach(score => {
-        const user = users.find(user => user._id.toString() === score.userId.toString());
+    await users.forEach(user => {
+        const userPredictions = predictions.filter(prediction => prediction.userId.toString() === user._id.toString()) || [];
+        const userScore = addUserScores(userPredictions, groupData);
         prettifiedScores.push({
             user: user.name,
-            score: score.score
-        });
+            score: userScore
+        })
     })
-    return prettifiedScores
+    const prettyAndOrdered = prettifiedScores.sort((a, b) => b.score - a.score);
+    return prettyAndOrdered;
 }

@@ -1,6 +1,6 @@
 import Group from '../DAOs/Group.js'
 import User from '../DAOs/User.js'
-import { scoresWithUsername } from '../utils/scoresPresentation.js'
+import { calculateScoresByUsername } from '../utils/scoresPresentation.js'
 import getOwnerNames from '../utils/getOwnerNames.js'
 import CustomError from '../Errors/CustomError.js'
 import errorHandler from '../Errors/errorHandler.js'
@@ -31,8 +31,9 @@ export const join = async (req, res, next) => {
 export const getScores = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;
-        const result = await Group.getScores(groupName)
-        const scoresByUser = await scoresWithUsername(result)
+        const groupData = await Group.getOne({name: groupName.toUpperCase()})
+        const predictions = await Prediction.getAllInGroup(groupData._id, true)
+        const scoresByUser = await calculateScoresByUsername(predictions, groupData)
         res.status(200).json({
             group: groupName,
             scores: scoresByUser
@@ -54,6 +55,18 @@ export const leaveGroup = async (req, res, next) => {
         errorHandler(err, req, res, next)
     }
 }
+export const deleteGroup = async (req, res, next) => {  
+    try {
+        const userGroupId = req.query.userGroupId;
+        const user = await req.user;
+        await Group.deleteGroup(userGroupId, user._id);
+        res.json({message: 'Group deleted'})
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
+
 export const getGroupData = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;

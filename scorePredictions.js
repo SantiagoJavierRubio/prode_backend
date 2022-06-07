@@ -1,5 +1,4 @@
 import Prediction from "./DAOs/Prediction.js";
-import Score from "./DAOs/Scores.js";
 import Fifa from "./DAOs/Fifa.js";
 import config from './config.js';
 import mongoose from 'mongoose';
@@ -16,7 +15,7 @@ mongoose.connect(`${config.mongoUrl}`, MONGO_OPTIONS, (err) => {
 const SCORE_VALUES = {
     NONE: 0,
     WINNER: 1,
-    FULL: 3
+    FULL: 2
 }
 const MATCH_RESULT_TYPES = {
     HOME: 'home',
@@ -56,14 +55,19 @@ const calculateScore = async (predictionHomeScore, predictionAwayScore, matchHom
     if(predictionResult === matchResult) return SCORE_VALUES.WINNER;
     return SCORE_VALUES.NONE;
 }
+
 const scoreOnePrediction = async (prediction, matches) => {
     try {
         const match = matches.filter(match => match.id === prediction.matchId)[0];
         const score = await calculateScore(prediction.homeScore, prediction.awayScore, match.homeScore, match.awayScore);
-        if(score === 0) return false
-        const scored = await Score.addScore(prediction.userGroupId, prediction.userId, score)
-        if(scored.error) throw new Error(scored.error);
-        return prediction._id
+        const scored = await Prediction.scorePrediction(prediction._id, score);
+        if(scored) {
+            console.log(`Scored prediction ${prediction._id} with score ${score}`);
+            return true
+        }
+        else {
+            return false
+        }
     }
     catch(err) {
         return {error: err.message}
@@ -73,42 +77,26 @@ const addScores = async (predictions, matches) => {
     try {
         const results = {
             scored: [],
-            failed: []
+            errors: []
         }
-        await predictions.forEach(async prediction => {
-            const scoredPrediction = await scoreOnePrediction(prediction, matches);
-            if(scoredPrediction.error) results.failed.push({id: prediction._id, error: scoredPrediction.error});
-            else if (scoredPrediction) results.scored.push(scoredPrediction)
-        })
+        for (let prediction of predictions) {
+            const scored = await scoreOnePrediction(prediction, matches)
+            if(scored) results.scored.push(`${prediction._id}`)
+            else results.errors.push(`${prediction._id}`)
+        }
         return results
     }
     catch(err) {
         return { error: err.message }
     }
 }
-const scorePredictions = async () => {
+export const scorePredictions = async () => {
     try {
         const predictionData = await getUncheckedPredictions();
         if(predictionData.error) throw new Error(predictionData.error);
-        const scoredPredictions = await addScores(predictionData.predictions, predictionData.matches);
-        if(scoredPredictions.error) throw new Error(scoredPredictions.error);
-        if(scoredPredictions.failed.length > 0) console.warn('Failed to score predictions: ', scoredPredictions.failed)
-        if(scoredPredictions.scored.length === 0) throw new Error('No predictions scored');
-        const checkedPredictions = await Prediction.checkPredictions(scoredPredictions.scored);
-        if(checkedPredictions.error) throw new Error(checkedPredictions.error);
-        return checkedPredictions
+        return await addScores(predictionData.predictions, predictionData.matches);
     }
     catch(err) {
         return {error: err.message}
     }
 }
-
-scorePredictions()
-    .then((result) => {
-        console.log('<------ DONE ------> \n \n', result)
-        console.log('\n ----------------------')
-    })
-    .then(() => console.log('\n Exiting prediction scoring process'))
-    .finally(() => {
-        process.exit()
-    })

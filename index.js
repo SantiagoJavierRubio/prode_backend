@@ -63,6 +63,7 @@ app.use('/auth', authRoutes);
 app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
 app.use('/group', groupRoutes)
+import {scorePredictions} from './scorePredictions.js'
 app.get('/score-predictions', async (req, res) => {
   const result = await scorePredictions();
   console.log(result)

@@ -4,7 +4,17 @@ const GroupSchema = new mongoose.Schema({
     name: String,
     owner: String,
     members: [String],
-    rules: Object
+    rules: {
+        type: Object,
+        default: {
+            manifesto: '',
+            scoring: {
+                NONE: 0,
+                WINNER: 1,
+                FULL: 3
+            }
+        }
+    }
 }, {collection: 'groups'})
 
 GroupSchema.methods.addMember = function(id) {
