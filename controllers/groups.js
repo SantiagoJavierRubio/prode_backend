@@ -32,7 +32,7 @@ export const getScores = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;
         const groupData = await Group.getOne({name: groupName.toUpperCase()})
-        const predictions = await Prediction.getAllInGroup(groupData._id, true)
+        const predictions = await Prediction.getAllScoredInGroup(groupData._id)
         const scoresByUser = await calculateScoresByUsername(predictions, groupData)
         res.status(200).json({
             group: groupName,

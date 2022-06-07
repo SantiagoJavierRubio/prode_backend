@@ -57,19 +57,21 @@ class Prediction extends Container {
         if (!results) return null;
         return results;
     }
-    async getAllInGroup(userGroupId, checked = false) {
+    async getAllInGroup(userGroupId) {
         if(hasNulls([userGroupId])) throw new CustomError(406, 'User group id is missing')
-        const results = checked ?
-            await this.getMany({userGroupId: userGroupId}) :
-            await this.getMany({userGroupId: userGroupId, checked: true})
+        const results = await this.getMany({userGroupId: userGroupId})
         if (!results) return null;
         return results;
     }
-    async getAllByUserInGroup(userId, userGroupId, checked = false) {
+    async getAllByUserInGroup(userId, userGroupId) {
         if(hasNulls([userId, userGroupId])) throw new CustomError(406, 'Missing data')
-        const results = checked ?
-            await this.getMany({userId: userId, userGroupId: userGroupId}) :
-            await this.getMany({userId: userId, userGroupId: userGroupId, checked: true})
+        const results = await this.getMany({userId: userId, userGroupId: userGroupId})
+        if (!results) return null;
+        return results;
+    }
+    async getAllScoredInGroup(userGroupId) {
+        if(hasNulls([userGroupId])) throw new CustomError(406, 'User group id is missing')
+        const results = await this.getMany({userGroupId: userGroupId, checked: true})
         if (!results) return null;
         return results;
     }
