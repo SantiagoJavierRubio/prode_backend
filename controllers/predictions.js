@@ -67,6 +67,19 @@ export const getAll = async (req, res, next) => {
         errorHandler(err, req, res, next)
     }
 }
+export const getOtherUsers = async (req, res, next) => {
+    try {
+        const user = await req.user;
+        const userGroupId = req.query.userGroupId;
+        const profileUser = req.params.id
+        await Group.checkForUserInGroup(userGroupId, user._id)
+        const result = await Prediction.getAllByUserInGroup(profileUser, userGroupId)
+        return res.send(result)
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
 export const remove = async (req, res, next) => {
     try {
         const userId = await req.user._id

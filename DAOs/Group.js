@@ -61,6 +61,11 @@ class Group extends Container {
         const result = await this.getMany({members: user_id}, fields);
         return result
     }
+    async getCommonGroups(user_id, other_id) {
+        if(hasNulls([user_id, other_id])) throw new CustomError(406, 'Missing field')
+        const commonGroups = await this.getMany({members: {$all: [user_id, other_id]}}, 'name')
+        return commonGroups
+    }
     async checkForUserInGroup(id, user_id) {
         if(hasNulls([id, user_id])) throw new CustomError(406, 'Missing field')
         const group = await this.getOne({_id: id}, 'members')
