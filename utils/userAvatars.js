@@ -20,7 +20,9 @@ const getResources = async () => {
 }
 
 const transformUrl = (url) => {
-    return url.replace(/upload\/\w+\//, 'upload/c_thumb,h_200,w_200,r_max/')
+    const formatIndex = url.lastIndexOf('.')
+    const formatedUrl = url.slice(0, formatIndex) + '.png';
+    return formatedUrl.replace(/upload\/\w+\//, 'upload/c_thumb,h_200,w_200,r_max/')
 }
 
 const getAvatars = async () => {
