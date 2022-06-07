@@ -20,7 +20,12 @@ const config = {
   clientUrl: URLS.client,
   serverUrl: URLS.server,
   emailAccount: process.env.EMAIL_ACCOUNT,
-  emailPassword: process.env.EMAIL_PASSWORD
+  emailPassword: process.env.EMAIL_PASSWORD,
+  cloudinary: {
+    name: process.env.CLOUDINARY_NAME,
+    key: process.env.CLOUDINARY_KEY,
+    secret: process.env.CLOUDINARY_SECRET
+  }
 };
 
 export default config;

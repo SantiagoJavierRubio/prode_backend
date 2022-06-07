@@ -9,7 +9,7 @@ import errorHandler from '../Errors/errorHandler.js';
 
 export const getUserData = async (req, res, next) => {
   try {
-    const user = await User.getById(req.user._id, 'email name');
+    const user = await User.getById(req.user._id, 'email name avatar');
     if (!user) throw new CustomError(406, 'User not found');
     res.json({ user: user })
   }

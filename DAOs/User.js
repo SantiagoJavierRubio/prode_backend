@@ -20,49 +20,58 @@ class User extends Container {
     super(Model);
   }
   async findByEmail(email) {
-    if (hasNulls([email])) throw new CustomError(400, 'Email is required');
-    const user = await this.getOne({ email });
-    return user;
+  if (hasNulls([email])) throw new CustomError(400, 'Email is required');
+  const user = await this.getOne({ email });
+  return user;
   }
   async createWithEmail(data) {
-      if (hasNulls([data.email, data.password])) throw new CustomError(400, 'Email and password are required');
-      if (data.password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
-      let pwd = await hashPassword(data.password);
-      if (await this.getOne({ email: data.email }))
-        throw new CustomError(406, 'Email already in use');
-      const user = await this.create({ ...data, password: pwd, name: data.name || data.email?.split('@')[0] });
-      if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
-      return user;
+    if (hasNulls([data.email, data.password])) throw new CustomError(400, 'Email and password are required');
+    if (data.password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
+    let pwd = await hashPassword(data.password);
+    if (await this.getOne({ email: data.email }))
+      throw new CustomError(406, 'Email already in use');
+    const user = await this.create({ ...data, password: pwd, name: data.name || data.email?.split('@')[0] });
+    if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
+    return user;
   }
   async checkCredentials(email, password) {
-      if(hasNulls([email, password])) throw new CustomError(400, 'Email and password are required');
-      const user = await this.getOne({ email });
-      if (!user) throw new CustomError(404, 'User not found');
-      if(!user.password) throw new CustomError(406, 'User registered with google', 'Try to sign in with google')
-      const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) throw new CustomError(401, 'Invalid password');
-      return user;
+    if(hasNulls([email, password])) throw new CustomError(400, 'Email and password are required');
+    const user = await this.getOne({ email });
+    if (!user) throw new CustomError(404, 'User not found');
+    if(!user.password) throw new CustomError(406, 'User registered with google', 'Try to sign in with google')
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) throw new CustomError(401, 'Invalid password');
+    return user;
   }
   async createWithGoogle(data) {
-      if (hasNulls([data.email])) throw new CustomError(400, 'Email is required');
-      const userData = {
-        email: data.email,
-        name:
-          data.name ||
-          data.email?.split('@')[0],
-        verified: true
-      };
-      const user = await this.create(userData);
-      if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
-      return user;
+    if (hasNulls([data.email])) throw new CustomError(400, 'Email is required');
+    const userData = {
+      email: data.email,
+      name:
+        data.name ||
+        data.email?.split('@')[0],
+      verified: true
+    };
+    const user = await this.create(userData);
+    if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
+    return user;
   }
   async changePassword(user_id, password) {
-      if (hasNulls([password])) throw new CustomError(400, 'Password is required');
-      if (password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
-      let pwd = await hashPassword(password);
-      const updated = await this.update(user_id, { password: pwd });
-      if (!updated) throw new CustomError(500, 'Failed to update user', 'Something went wrong when updating this user data');
-      return true;
+    if (hasNulls([password])) throw new CustomError(400, 'Password is required');
+    if (password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
+    let pwd = await hashPassword(password);
+    const updated = await this.update(user_id, { password: pwd });
+    if (!updated) throw new CustomError(500, 'Failed to update user', 'Something went wrong when updating this user data');
+    return true;
+  }
+  async editProfile(user_id, data) {
+    const user = await this.getById(user_id);
+    if (!user) throw new CustomError(404, 'User not found');
+    const updated = await this.update(user_id, {
+      name: data.name || user.name,
+      avatar: data.avatar || user.avatar
+    });
+    return updated
   }
 }
 

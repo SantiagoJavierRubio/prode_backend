@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.js';
 import fifaRoutes from './routes/fifa.js';
 import predictionRoutes from './routes/predictions.js';
 import groupRoutes from './routes/groups.js';
+import userRoutes from './routes/user.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -63,6 +64,7 @@ app.use('/auth', authRoutes);
 app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
 app.use('/group', groupRoutes)
+app.use('/user', userRoutes)
 import {scorePredictions} from './scorePredictions.js'
 app.get('/score-predictions', async (req, res) => {
   const result = await scorePredictions();

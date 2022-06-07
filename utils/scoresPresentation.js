@@ -22,13 +22,14 @@ const addUserScores = (predictions, groupData) => {
 
 export const calculateScoresByUsername = async (predictions, groupData) => {
     const prettifiedScores = [];
-    const users = await User.getManyById(groupData.members, '_id name');
+    const users = await User.getManyById(groupData.members, '_id name avatar');
     if(!users) throw new CustomError(500, 'Failed to get users');
     await users.forEach(user => {
         const userPredictions = predictions.filter(prediction => prediction.userId.toString() === user._id.toString()) || [];
         const userScore = addUserScores(userPredictions, groupData);
         prettifiedScores.push({
             user: user.name,
+            avatar: user.avatar,
             score: userScore
         })
     })
