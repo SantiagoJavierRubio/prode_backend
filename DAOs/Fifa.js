@@ -40,7 +40,7 @@ class Fifa extends Container {
         return this.groupByGroup(matches)
     }
     async getOneGroup(id, lang='es') {
-        const data = await axios.get(`${this.apiUrl}calendar/matches?idSeason=${SEASON_ID}&idStage=285063&idGroup=${id}&count=100&language=${lang}`)
+        const data = await axios.get(`${this.apiUrl}calendar/matches?idSeason=${SEASON_ID}&idStage=${GROUP_STAGE}&idGroup=${id}&count=100&language=${lang}`)
         if(!data.data?.Results) throw new CustomError(503, 'Failed to obtain fixture', 'Fifa api did not respond as expected', {response: data})
         return this.normalizeMatches(data.data.Results)
     }
