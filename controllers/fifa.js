@@ -1,6 +1,8 @@
-import Fifa from '../DAOs/Fifa.js'
+import FifaRepository from '../DAOs/Repositories/FifaRepository.js';
 import { getGroupCode, getStageCode } from '../utils/traslateNamesToCodes.js';
 import errorHandler from '../Errors/errorHandler.js';
+
+const fifa = new FifaRepository();
 
 export const getFixture = async (req, res, next) => {
     try {
@@ -9,13 +11,13 @@ export const getFixture = async (req, res, next) => {
         const stageId = req.query.stageId || null;
         if(groupId) {
             const groupCode = getGroupCode(groupId)
-            payload.fixture = await Fifa.getOneGroup(groupCode)
+            payload.fixture = await fifa.getOneGroup(groupCode)
         }
         else if (stageId) {
             const stageCode = getStageCode(stageId)
-            payload.fixture = await Fifa.getOneStage(stageCode)
+            payload.fixture = await fifa.getOneStage(stageCode)
         } 
-        else payload.fixture = await Fifa.getAllStages()
+        else payload.fixture = await fifa.getAllStages()
         res.json(payload)
     } 
     catch (err) {
@@ -25,7 +27,7 @@ export const getFixture = async (req, res, next) => {
 
 export const getGroups = async (req, res, next) => {
     try {
-        const payload = { fixture: await Fifa.getAllGroups() }
+        const payload = { fixture: await fifa.getAllGroups() }
         res.json(payload)
     }
     catch(err) {

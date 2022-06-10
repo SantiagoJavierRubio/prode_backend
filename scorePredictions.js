@@ -1,7 +1,9 @@
 import Prediction from "./DAOs/Prediction.js";
-import Fifa from "./DAOs/Fifa.js";
+import FifaRepository from "./DAOs/Repositories/FifaRepository.js";
 import config from './config.js';
 import mongoose from 'mongoose';
+
+const fifa = new FifaRepository();
 
 console.log('Initializing prediction scoring process...')
 const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };
@@ -26,7 +28,7 @@ const MATCH_RESULT_TYPES = {
 const getUncheckedPredictions = async () => {
     try {
         const now = new Date();
-        const matches = await Fifa.getAllMatches();
+        const matches = await fifa.getAllMatches();
         const previousMatchesIds = matches.map(match => {
             let matchDate = new Date(match.date);
             if(matchDate < now && match.status === 0) return match.id;
