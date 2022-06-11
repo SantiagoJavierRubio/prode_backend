@@ -67,6 +67,8 @@ class User extends Container {
   async editProfile(user_id, data) {
     const user = await this.getById(user_id);
     if (!user) throw new CustomError(404, 'User not found');
+    const exists = await this.getOne({ name: data.name });
+    if (exists && exists._id != user_id) throw new CustomError(406, 'User name already in use');
     const updated = await this.update(user_id, {
       name: data.name || user.name,
       avatar: data.avatar || user.avatar
