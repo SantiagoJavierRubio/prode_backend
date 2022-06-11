@@ -45,3 +45,25 @@ export const filterForOneGroup = async (predictions, groupId) => {
     //if(predictionsByStage.length === 0) throw new CustomError(404, 'No predictions for this group');
     return predictionsByStage;
 }
+
+export const matchPredictionsToMatches = async (predictions) => {
+    if(hasNulls([predictions])) throw new CustomError(406, 'Missing field')
+    const matchIds =  await predictions.map((prediction) => prediction.matchId)
+    const matches = await Fifa.getMatchesById(matchIds);
+    const result = await predictions.map(prediction => {
+        const match = matches.filter(match => match.id === prediction.matchId)[0];
+        return {
+            matchId: prediction.matchId,
+            date: match.date,
+            away: match.away,
+            home: match.home,
+            homeScore: prediction.homeScore,
+            awayScore: prediction.awayScore,
+            checked: prediction.checked,
+            score: prediction.score,
+            userGroupId: prediction.userGroupId,
+            userId: prediction.userId
+        }
+    })
+    return result
+}

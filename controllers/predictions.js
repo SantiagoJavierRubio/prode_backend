@@ -1,7 +1,7 @@
 import Prediction from '../DAOs/Prediction.js'
 import Group from '../DAOs/Group.js'
 import { getStageCode, getGroupCode } from '../utils/traslateNamesToCodes.js'
-import { predictionsByStage, filterForOneGroup, filterForOneStage } from '../utils/predictionPresentation.js'
+import { predictionsByStage, filterForOneGroup, filterForOneStage, matchPredictionsToMatches } from '../utils/predictionPresentation.js'
 import CustomError from '../Errors/CustomError.js'
 import errorHandler from '../Errors/errorHandler.js'
 
@@ -73,7 +73,8 @@ export const getOtherUsers = async (req, res, next) => {
         const userGroupId = req.query.userGroupId;
         const profileUser = req.params.id
         await Group.checkForUserInGroup(userGroupId, user._id)
-        const result = await Prediction.getAllByUserInGroup(profileUser, userGroupId)
+        const predictions = await Prediction.getAllByUserInGroup(profileUser, userGroupId)
+        const result = await matchPredictionsToMatches(predictions)
         return res.send(result)
     }
     catch(err) {
