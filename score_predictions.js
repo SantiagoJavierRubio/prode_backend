@@ -91,7 +91,7 @@ const addScores = async (predictions, matches) => {
         return { error: err.message }
     }
 }
-export const scorePredictions = async () => {
+const scorePredictions = async () => {
     try {
         const predictionData = await getUncheckedPredictions();
         if(predictionData.error) throw new Error(predictionData.error);
@@ -102,10 +102,14 @@ export const scorePredictions = async () => {
     }
 }
 
-const start = process.hrtime();
-const result = scorePredictions();
-const end = process.hrtime(start);
-const time = (end[0] * 1e9 + end[1])/1e9;
-if(result.scored) console.log(`Scored ${result.scored.length} predictions in ${time} seconds`);
-else console.log(result)
-process.exit()
+const main = async () => {
+    const start = process.hrtime();
+    const result = await scorePredictions();
+    const end = process.hrtime(start);
+    const time = (end[0] * 1e9 + end[1])/1e9;
+    if(result.scored) console.log(`Scored ${result.scored.length} predictions in ${time} seconds`);
+    else console.log(result)
+    process.exit()
+}
+
+main()
