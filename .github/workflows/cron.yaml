@@ -1,7 +1,7 @@
 name: score-every-15
 on:
   schedule:
-    - cron: '* * * * *'
+    - cron: '* * * * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
