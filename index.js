@@ -72,13 +72,13 @@ app.get('/', (req, res) => {
   res.send('Welcome to the back end!');
 });
 app.post('/score-predictions', async (req, res) => {
-  // if(req.body.password === config.scoringPassword) {
+  if(req.body.password === config.scoringPassword) {
     fork('scorePredictions.js');
     res.send('server received scoring command')
-  // }
-  // else {
-  //   res.send('incorrect password')
-  // }
+  }
+  else {
+    res.send('incorrect password')
+  }
 })
 app.use('/auth', authRoutes);
 app.use('/fifa', fifaRoutes)

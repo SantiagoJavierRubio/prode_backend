@@ -1,12 +1,13 @@
 name: score-every-15
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/1 * * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Call our API route
+      - name: Call server to update scores
         run: |
           curl --request POST \
           --url 'https://prode-mundial-backend.herokuapp.com/score-predictions' \
+          --data '{ password: ${{ secrets.SCORE_PREDICTIONS_PASSWORD }} }'
