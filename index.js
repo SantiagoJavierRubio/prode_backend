@@ -105,7 +105,6 @@ const server = app.listen(PORT, () => {
 });
 server.on('connection', async () => {
   fork('scorePredictions.js');
-  console.log(result)
 })
 server.on('error', (err) => {
   console.error('Server error: ', err);
