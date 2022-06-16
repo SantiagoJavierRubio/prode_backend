@@ -1,5 +1,6 @@
 import User from '../DAOs/User.js';
 import Group from '../DAOs/Group.js';
+import i18n from 'i18n';
 import CustomError from '../Errors/CustomError.js';
 import errorHandler from '../Errors/errorHandler.js';
 import getAvatars from '../utils/userAvatars.js';
@@ -25,7 +26,7 @@ export const editProfile = async (req, res, next) => {
         const user = req.user;
         const updated = await User.editProfile(user._id, userInput);
         if (!updated) throw new CustomError(403, 'User not updated');
-        res.json({ message: 'Profile updated' });
+        res.json({ message: i18n.__('Profile updated') });
     }
     catch(err) {
         errorHandler(err, req, res, next)

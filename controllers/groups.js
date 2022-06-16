@@ -1,5 +1,6 @@
 import Group from '../DAOs/Group.js'
 import User from '../DAOs/User.js'
+import i18n from 'i18n'
 import { calculateScoresByUsername } from '../utils/scoresPresentation.js'
 import getOwnerNames from '../utils/getOwnerNames.js'
 import CustomError from '../Errors/CustomError.js'
@@ -32,6 +33,7 @@ export const getScores = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;
         const groupData = await Group.getOne({name: groupName.toUpperCase()})
+        if(groupData===null) throw new CustomError(404, 'Group not found')
         const predictions = await Prediction.getAllScoredInGroup(groupData._id)
         const scoresByUser = await calculateScoresByUsername(predictions, groupData)
         const ownerName = await User.getById(groupData.owner, 'name')
@@ -53,7 +55,7 @@ export const leaveGroup = async (req, res, next) => {
         const user = await req.user
         const userGroupId = await Group.removeMember(groupName, user._id)
         await Prediction.removeAllByUserInGroup(user._id, userGroupId)
-        res.json({message: 'User removed from group'})
+        res.json({message: i18n.__('User removed from group')})
     }
     catch(err) {
         errorHandler(err, req, res, next)
@@ -64,7 +66,7 @@ export const deleteGroup = async (req, res, next) => {
         const userGroupId = req.query.userGroupId;
         const user = await req.user;
         await Group.deleteGroup(userGroupId, user._id);
-        res.json({message: 'Group deleted'})
+        res.json({message: i18n.__('Group deleted')})
     }
     catch(err) {
         errorHandler(err, req, res, next)

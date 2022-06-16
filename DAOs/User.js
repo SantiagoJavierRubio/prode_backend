@@ -30,6 +30,8 @@ class User extends Container {
     let pwd = await hashPassword(data.password);
     if (await this.getOne({ email: data.email }))
       throw new CustomError(406, 'Email already in use');
+    if (await this.getOne( { name: data.name }))
+      throw new CustomError(406, "User name already in use")
     const user = await this.create({ ...data, password: pwd, name: data.name || data.email?.split('@')[0] });
     if (!user) throw new CustomError(500, 'Failed to create user', 'Something went wrong when creating a new user');
     return user;

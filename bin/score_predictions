@@ -1,6 +1,8 @@
-import Prediction from "./DAOs/Prediction.js";
-import FifaRepository from "./DAOs/Repositories/FifaRepository.js";
-import config from './config.js';
+#! /app/.heroku/node/bin/score_predictions
+
+import Prediction from "../DAOs/Prediction.js";
+import FifaRepository from "../DAOs/Repositories/FifaRepository.js";
+import config from '../config.js';
 import mongoose from 'mongoose';
 
 const fifa = new FifaRepository();
@@ -64,7 +66,6 @@ const scoreOnePrediction = async (prediction, matches) => {
         const score = await calculateScore(prediction.homeScore, prediction.awayScore, match.homeScore, match.awayScore);
         const scored = await Prediction.scorePrediction(prediction._id, score);
         if(scored) {
-            console.log(`Scored prediction ${prediction._id} with score ${score}`);
             return true
         }
         else {
@@ -102,3 +103,11 @@ export const scorePredictions = async () => {
         return {error: err.message}
     }
 }
+
+const start = process.hrtime();
+const result = scorePredictions();
+const end = process.hrtime(start);
+const time = (end[0] * 1e9 + end[1])/1e9;
+if(result.scored) console.log(`Scored ${result.scored.length} predictions in ${time} seconds`);
+else console.log(result)
+process.exit()

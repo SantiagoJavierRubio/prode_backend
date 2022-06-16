@@ -1,5 +1,6 @@
 import Model from '../Models/Prediction.js'
 import Container from '../Containers/mongoDB.js'
+import i18n from 'i18n'
 import { hasNulls, arePositiveNumbers } from '../utils/dataCheck.js'
 import CustomError from '../Errors/CustomError.js'
 
@@ -8,8 +9,8 @@ class Prediction extends Container {
         super(Model)
     }
     checkPredictionData(prediction) {
-        if(hasNulls([prediction.matchId, prediction.userGroupId, prediction.homeScore, prediction.awayScore])) return { check: false, error: 'Missing field' }
-        if(!arePositiveNumbers([parseInt(prediction.homeScore), parseInt(prediction.awayScore)])) return { check: false, error: 'Scores must be positive numbers' }
+        if(hasNulls([prediction.matchId, prediction.userGroupId, prediction.homeScore, prediction.awayScore])) return { check: false, error: i18n.__('Missing field') }
+        if(!arePositiveNumbers([parseInt(prediction.homeScore), parseInt(prediction.awayScore)])) return { check: false, error: i18n.__('Scores must be positive numbers') }
         return { check: true }
     }
     async createPrediction(data) {
@@ -82,12 +83,12 @@ class Prediction extends Container {
         await this.model.deleteMany({'_id': {$in: predictionsForGroup}})
     }
     async editPrediction(id, userId, data) {
-        if(hasNulls([id, userId])) return { error: 'Missing field', code: 406 }
+        if(hasNulls([id, userId])) return { error: i18n.__('Missing field'), code: 406 }
         const check = this.checkPredictionData(data)
         if(!check.check) return { error: check.error }
         const original = await this.getById(id)
-        if(!original) return { error: 'Prediction not found', code: 404 }
-        if(original.userId != userId) return { error: 'User not allowed to edit this prediction', code: 401 }
+        if(!original) return { error: i18n.__('Prediction not found'), code: 404 }
+        if(original.userId != userId) return { error: i18n.__('User not allowed to edit this prediction'), code: 401 }
         return await this.update(id, {
             homeScore: parseInt(data.homeScore),
             awayScore: parseInt(data.awayScore),
@@ -101,12 +102,12 @@ class Prediction extends Container {
         };
         for (let prediction of array) {
             if(!prediction.id) {
-                response.errors.push({id: null, message: 'Missing id'})
+                response.errors.push({id: null, message: i18n.__('Missing id')})
                 continue
             } 
             let result = await this.editPrediction(prediction.id, userId, prediction.data);
             if(!result) {
-                response.errors.push({id: prediction.id, message: 'Prediction not found'})
+                response.errors.push({id: prediction.id, message: i18n.__('Prediction not found')})
                 continue
             }
             if(result.error) {

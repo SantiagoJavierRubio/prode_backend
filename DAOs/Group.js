@@ -10,6 +10,7 @@ class Group extends Container {
     async createGroup(data, user) {
         if(hasNulls([data.name, user._id])) throw new CustomError(406, 'Missing data')
         if(data.name.length > 20) throw new CustomError(406, 'Group name is too long', 'Group name must be less than 21 characters')
+        if(!(/[a-zA-Z0-9]/).test(data.name)) throw new CustomError(406, 'Group name not valid', 'Group name must contain at least one letter or number')
         const nameExists = await this.getOne({name: data.name.toUpperCase()})
         if(nameExists) throw new CustomError(409, 'Group name already in use')
         const newGroup = await this.create({

@@ -3,6 +3,8 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport';
+import path from 'path';
+import i18n from 'i18n';
 import config from './config.js';
 import authRoutes from './routes/auth.js';
 import fifaRoutes from './routes/fifa.js';
@@ -17,7 +19,10 @@ import './authentication/passportStrategies.js';
 import 'dotenv/config';
 
 const app = express();
-
+i18n.configure({
+  locales: config.langs,
+  directory: path.join(process.cwd(), 'locales')
+})
 // MIDDLEWARES
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -51,6 +56,11 @@ app.use(
     })
   );
   app.use(helmet());
+  app.use((req, res, next) => {
+    const l = req.get('accept-language')
+    i18n.setLocale(l)
+    next()
+  })
   app.use(errorHandler);
 
 // AUTHENTICATION SETUP
@@ -65,12 +75,15 @@ app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
 app.use('/group', groupRoutes)
 app.use('/user', userRoutes)
-import {scorePredictions} from './scorePredictions.js'
-app.get('/score-predictions', async (req, res) => {
-  const result = await scorePredictions();
-  console.log(result)
-  res.send('Scored predictions');
-})
+// import {scorePredictions} from './scorePredictions.js'
+// app.get('/score-predictions', async (req, res) => {
+//   const start = process.hrtime();
+//   const result = await scorePredictions();
+//   const end = process.hrtime(start);
+//   const time = (end[0] * 1e9 + end[1])/1e9;
+//   if(result.scored) res.send(`Scored ${result.scored.length} predictions in ${time} seconds`);
+//   else res.send(result)
+// })
 
 // DB INITIALIZE
 const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };
