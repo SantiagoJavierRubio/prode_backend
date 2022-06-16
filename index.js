@@ -58,7 +58,7 @@ app.use(
   );
   app.use(helmet());
   app.use((req, res, next) => {
-    const l = req.get('accept-language')
+    const l = req.get('accept-language') || null
     if(l) i18n.setLocale(l)
     next()
   })

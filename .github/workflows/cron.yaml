@@ -6,11 +6,9 @@ jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Announce oneself
-        run: echo "Running cron job..."
       - name: Call server to update scores
         run: |
           curl --request POST \
           --url 'https://prode-mundial-backend.herokuapp.com/score-predictions' \
-          --header 'authorization: ${{ secrets.SCORE_PREDICTIONS_PASSWORD }}'
+          --header 'authorization: ${{ secrets.SCORE_PREDICTIONS_PASSWORD }}' \
           --header 'accept-language: es'
