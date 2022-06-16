@@ -1,11 +1,13 @@
 name: score-every-15
 on:
   schedule:
-    - cron: '0-59 * * * *'
+    - cron: '*/5 * * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
+      - name: Announce oneself
+        run: echo "Running cron job..."
       - name: Call server to update scores
         run: |
           curl --request POST \
