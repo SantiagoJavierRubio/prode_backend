@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import passport from 'passport';
 import path from 'path';
 import i18n from 'i18n';
+import { fork } from 'child_process'
 import config from './config.js';
 import authRoutes from './routes/auth.js';
 import fifaRoutes from './routes/fifa.js';
@@ -102,10 +103,10 @@ const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   console.log(`Server para el prode mundial corriendo en el puerto ${PORT} en modo ${process.env.NODE_ENV || 'development'}`);
 });
-// server.on('connection', async () => {
-//   const result = await scorePredictions();
-//   console.log(result)
-// })
+server.on('connection', async () => {
+  fork('scorePredictions.js');
+  console.log(result)
+})
 server.on('error', (err) => {
   console.error('Server error: ', err);
 });

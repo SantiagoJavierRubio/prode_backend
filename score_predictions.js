@@ -1,8 +1,6 @@
-#! /app/.heroku/node/bin/score_predictions
-
-import Prediction from "../DAOs/Prediction.js";
-import FifaRepository from "../DAOs/Repositories/FifaRepository.js";
-import config from '../config.js';
+import Prediction from "./DAOs/Prediction.js";
+import FifaRepository from "./DAOs/Repositories/FifaRepository.js";
+import config from './config.js';
 import mongoose from 'mongoose';
 
 const fifa = new FifaRepository();
