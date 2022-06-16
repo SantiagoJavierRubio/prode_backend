@@ -59,7 +59,7 @@ app.use(
   app.use(helmet());
   app.use((req, res, next) => {
     const l = req.get('accept-language')
-    i18n.setLocale(l)
+    if(l) i18n.setLocale(l)
     next()
   })
   app.use(errorHandler);
@@ -72,7 +72,8 @@ app.get('/', (req, res) => {
   res.send('Welcome to the back end!');
 });
 app.post('/score-predictions', async (req, res) => {
-  if(req.body.password === config.scoringPassword) {
+  console.log(config.scoringPassword)
+  if(req.headers.authorization == config.scoringPassword) {
     fork('scorePredictions.js');
     res.send('server received scoring command')
   }

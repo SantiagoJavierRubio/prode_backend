@@ -1,7 +1,7 @@
 name: score-every-15
 on:
   schedule:
-    - cron: '*/1 * * * *'
+    - cron: '0-59 * * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
@@ -10,4 +10,5 @@ jobs:
         run: |
           curl --request POST \
           --url 'https://prode-mundial-backend.herokuapp.com/score-predictions' \
-          --data '{ password: ${{ secrets.SCORE_PREDICTIONS_PASSWORD }} }'
+          --header 'authorization: ${{ secrets.SCORE_PREDICTIONS_PASSWORD }}'
+          --header 'accept-language: es'
