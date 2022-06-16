@@ -72,8 +72,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to the back end!');
 });
 app.post('/score-predictions', async (req, res) => {
-  console.log(config.scoringPassword)
-  if(req.headers.authorization == config.scoringPassword) {
+  if(`${req.headers.authorization}` === `${config.scoringPassword}`) {
     fork('scorePredictions.js');
     res.send('server received scoring command')
   }
