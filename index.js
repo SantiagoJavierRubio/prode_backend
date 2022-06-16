@@ -71,6 +71,15 @@ app.use(passport.initialize());
 app.get('/', (req, res) => {
   res.send('Welcome to the back end!');
 });
+app.post('/score-predictions', async (req, res) => {
+  // if(req.body.password === config.scoringPassword) {
+    fork('scorePredictions.js');
+    res.send('server received scoring command')
+  // }
+  // else {
+  //   res.send('incorrect password')
+  // }
+})
 app.use('/auth', authRoutes);
 app.use('/fifa', fifaRoutes)
 app.use('/predictions', predictionRoutes)
@@ -103,9 +112,6 @@ const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
   console.log(`Server para el prode mundial corriendo en el puerto ${PORT} en modo ${process.env.NODE_ENV || 'development'}`);
 });
-server.on('connection', async () => {
-  fork('scorePredictions.js');
-})
 server.on('error', (err) => {
   console.error('Server error: ', err);
 });
