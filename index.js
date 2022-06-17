@@ -12,6 +12,7 @@ import fifaRoutes from './routes/fifa.js';
 import predictionRoutes from './routes/predictions.js';
 import groupRoutes from './routes/groups.js';
 import userRoutes from './routes/user.js';
+import fakeRoutes from './routes/fake.js'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -81,19 +82,11 @@ app.post('/score-predictions', async (req, res) => {
   }
 })
 app.use('/auth', authRoutes);
-app.use('/fifa', fifaRoutes)
-app.use('/predictions', predictionRoutes)
-app.use('/group', groupRoutes)
-app.use('/user', userRoutes)
-// import {scorePredictions} from './scorePredictions.js'
-// app.get('/score-predictions', async (req, res) => {
-//   const start = process.hrtime();
-//   const result = await scorePredictions();
-//   const end = process.hrtime(start);
-//   const time = (end[0] * 1e9 + end[1])/1e9;
-//   if(result.scored) res.send(`Scored ${result.scored.length} predictions in ${time} seconds`);
-//   else res.send(result)
-// })
+app.use('/fifa', fifaRoutes);
+app.use('/predictions', predictionRoutes);
+app.use('/group', groupRoutes);
+app.use('/user', userRoutes);
+app.use('/fake', fakeRoutes);
 
 // DB INITIALIZE
 const MONGO_OPTIONS = { useNewUrlParser: true, useUnifiedTopology: true };

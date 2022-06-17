@@ -46,7 +46,7 @@ class FakeMatchGenerator {
     constructor() {
         this.fakeMatches = []
         this.lastId = 100000
-        this.lastDate = Date.now() + 1000 * 60 * 60 * 24
+        this.lastDate = Date.now() - 1000 * 60 * 60 * 24 * 7
         this.fakeStadiums = FAKE_STADIUMS
         this.fakeTeams = createTeamData()
         this.groups = []
@@ -68,7 +68,8 @@ class FakeMatchGenerator {
             stadiumId: stadium.id,
             stadium: stadium.name,
             date: date.toISOString(),
-            status: 1
+            status: 1,
+            winner: null
         }
         this.lastDate = date.getTime();
         this.fakeMatches.push(match)
@@ -92,6 +93,10 @@ class FakeMatchGenerator {
             groups.push(group)
         })
         this.groups = groups
+        fs.writeFileSync('fakeGroups.json', JSON.stringify(this.groups))
+    }
+    saveData() {
+        fs.writeFileSync('fakeMatches.json', JSON.stringify(this.fakeMatches))
     }
     createFakeGroupStage() {
         this.createFakeGroups()
@@ -104,17 +109,107 @@ class FakeMatchGenerator {
             }
             this.generateFakeMatch('Fase de grupos', '111111', group.name, group.id, group.teams[2], group.teams[3])
         })
+        this.saveData()
     }
-    saveData() {
-        fs.writeFileSync('fakeMatches.json', JSON.stringify(this.fakeMatches))
+    getMatchData() {
+        const data = fs.readFileSync(`${process.cwd()}/fakeMatches.json`, 'utf-8')
+        return JSON.parse(data)
+    }
+    getGroupsData() {
+        const data = fs.readFileSync(`${process.cwd()}/fakeGroups.json`, 'utf-8')
+        return JSON.parse(data)
+    }
+    getPreviousStageMatches(prevStageId) {
+        const allMatches = this.getMatchData();
+        return allMatches.filter(match => match.stageId === prevStageId)
+    }
+    calculateGroupClassifications() {
+        const groupPhaseMatches = this.getPreviousStageMatches('111111')
+        const groups = this.getGroupsData()
+        const groupScores = {}
+        groups.forEach(group => {
+            groupScores[group.name] = {}
+            group.teams.forEach(team => {
+                groupScores[group.name][team.id] = { ...team, score: 0 }
+            })
+        })
+        groupPhaseMatches.forEach(match => {
+            if(match.winner) {
+                groupScores[match.group][match.winner].score += 3
+            }
+            else {
+                groupScores[match.group][match.away.id].score += 1
+                groupScores[match.group][match.home.id].score += 1
+            }
+        })
+        const clasifications = {}
+        groups.forEach(group => {
+            clasifications[group.name] = Object.keys(groupScores[group.name]).map(team => groupScores[group.name][team]).sort((a,b) => b.score - a.score)
+        })
+        return clasifications
+    }
+    createFakeOctavosStage() {
+        const clasifications = this.calculateGroupClassifications()
+        // this.lastDate = Date.now()
+        this.fakeMatches = this.getMatchData()
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo B'][0], clasifications['Grupo A'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo A'][0], clasifications['Grupo B'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo D'][0], clasifications['Grupo C'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo C'][0], clasifications['Grupo D'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo H'][0], clasifications['Grupo G'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo G'][0], clasifications['Grupo H'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo F'][0], clasifications['Grupo E'][1]);
+        this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo E'][0], clasifications['Grupo F'][1]);
+        this.saveData()
+    }
+    createFakeQuartersStage() {
+        // this.lastDate = Date.now()
+        this.fakeMatches = this.getMatchData()
+        const matchesOctavos = this.getPreviousStageMatches('222222')
+        const clasified = matchesOctavos.map(match => {
+            if(!match.winner) return null
+            if(match.winner === match.home.id) return match.home
+            else return match.away
+        })
+        this.generateFakeMatch('Cuartos', '333333', null, null, clasified[0], clasified[2])
+        this.generateFakeMatch('Cuartos', '333333', null, null, clasified[6], clasified[4])
+        this.generateFakeMatch('Cuartos', '333333', null, null, clasified[1], clasified[3])
+        this.generateFakeMatch('Cuartos', '333333', null, null, clasified[7], clasified[5])
+        this.saveData()
+    }
+    createFakeSemisStage() {
+        // this.lastDate = Date.now()
+        this.fakeMatches = this.getMatchData()
+        const matchesCuartos = this.getPreviousStageMatches('333333')
+        const clasified = matchesCuartos.map(match => {
+            if(!match.winner) return null
+            if(match.winner === match.home.id) return match.home
+            else return match.away
+        })
+        this.generateFakeMatch('Semifinales', '444444', null, null, clasified[0], clasified[2])
+        this.generateFakeMatch('Semifinales', '444444', null, null, clasified[1], clasified[3])
+        this.saveData()
+    }
+    createFakeFinalsStage() {
+        // this.lastDate = Date.now()
+        this.fakeMatches = this.getMatchData()
+        const matchesSemis = this.getPreviousStageMatches('444444')
+        const clasified = []
+        matchesSemis.forEach((match, index) => {
+            if(!match.winner) return null
+            if(match.winner === match.home.id) {
+                clasified[index] = match.home;
+                clasified[index+2] = match.away;
+            }
+            else {
+                clasified[index] = match.away;
+                clasified[index+2] = match.home;
+            }
+        })
+        this.generateFakeMatch('Final', '555555', null, null, clasified[0], clasified[1])
+        this.generateFakeMatch('Tercer puesto', '666666', null, null, clasified[2], clasified[3])
+        this.saveData()
     }
 }
 
-const generateFakeData = () => {
-    const generator = new FakeMatchGenerator()
-    generator.createFakeGroupStage()
-    generator.saveData()
-    // console.log(generator.fakeMatches)
-}
-
-generateFakeData()
+export default FakeMatchGenerator;

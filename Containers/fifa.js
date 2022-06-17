@@ -24,7 +24,8 @@ class Container {
                     away: this.normalizeTeams(match.Away) || match.PlaceHolderB,
                     homeScore: match.HomeTeamScore,
                     awayScore: match.AwayTeamScore,
-                    status: match.MatchStatus
+                    status: match.MatchStatus,
+                    winner: match.Winner
                 }
             })
         }

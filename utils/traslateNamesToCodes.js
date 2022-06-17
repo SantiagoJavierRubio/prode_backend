@@ -22,20 +22,47 @@ const GROUP_CODES = process.env.MODO_PRUEBA ? {
     H: '285072'
 }
 
-const STAGE_CODES = process.env.MODO_PRUEBA ? {
-    GRUPOS: '275073',
-    OCTAVOS: '275093',
-    CUARTOS: '275095',
-    SEMIFINALES: '275097',
-    FINAL: '275101',
-    TERCER_PUESTO: '275099'
-} : {
-    GRUPOS: '285063',
-    OCTAVOS: '285073',
-    CUARTOS: '285074',
-    SEMIFINALES: '285075',
-    FINAL: '285077',
-    TERCER_PUESTO: '285076'
+// const STAGE_CODES = process.env.MODO_PRUEBA ? {
+//     GRUPOS: '275073',
+//     OCTAVOS: '275093',
+//     CUARTOS: '275095',
+//     SEMIFINALES: '275097',
+//     FINAL: '275101',
+//     TERCER_PUESTO: '275099'
+// } : {
+//     GRUPOS: '285063',
+//     OCTAVOS: '285073',
+//     CUARTOS: '285074',
+//     SEMIFINALES: '285075',
+//     FINAL: '285077',
+//     TERCER_PUESTO: '285076'
+// }
+
+const STAGE_CODES = {}
+switch(process.env.MODO_PRUEBA) {
+    case 'FAKE_DATA':
+        STAGE_CODES.GRUPOS = '111111',
+        STAGE_CODES.OCTAVOS = '222222',
+        STAGE_CODES.CUARTOS = '333333',
+        STAGE_CODES.SEMIFINAL = '444444',
+        STAGE_CODES.FINAL = '555555',
+        STAGE_CODES.TERCER_PUESTO = '666666'
+        break;
+    case 'RUSIA':
+        STAGE_CODES.GRUPOS = '275073',
+        STAGE_CODES.OCTAVOS = '275093',
+        STAGE_CODES.CUARTOS = '275095',
+        STAGE_CODES.SEMIFINAL = '275097',
+        STAGE_CODES.FINAL = '275101',
+        STAGE_CODES.TERCER_PUESTO = '275099'
+        break;
+    default:
+        STAGE_CODES.GRUPOS = '285063',
+        STAGE_CODES.OCTAVOS = '285073',
+        STAGE_CODES.CUARTOS = '285074',
+        STAGE_CODES.SEMIFINAL = '285075',
+        STAGE_CODES.FINAL = '285077',
+        STAGE_CODES.TERCER_PUESTO = '285076'
 }
 
 export const getGroupCode = (input) => {
