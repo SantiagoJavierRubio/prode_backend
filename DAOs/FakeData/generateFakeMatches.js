@@ -46,7 +46,7 @@ class FakeMatchGenerator {
     constructor() {
         this.fakeMatches = []
         this.lastId = 100000
-        this.lastDate = Date.now() - 1000 * 60 * 60 * 24 * 7
+        this.lastDate = Date.now()
         this.fakeStadiums = FAKE_STADIUMS
         this.fakeTeams = createTeamData()
         this.groups = []
@@ -98,8 +98,9 @@ class FakeMatchGenerator {
     saveData() {
         fs.writeFileSync('fakeMatches.json', JSON.stringify(this.fakeMatches))
     }
-    createFakeGroupStage() {
+    createFakeGroupStage(startDate) {
         this.createFakeGroups()
+        this.lastDate = startDate ? new Date(startDate) : Date.now()
         this.groups.forEach(group => {
             for(let i=1; i<4; i++) {
                 this.generateFakeMatch('Fase de grupos', '111111', group.name, group.id, group.teams[0], group.teams[i])
@@ -134,6 +135,7 @@ class FakeMatchGenerator {
             })
         })
         groupPhaseMatches.forEach(match => {
+            if(match.status !== 0) throw new Error('Fase no finalizada')
             if(match.winner) {
                 groupScores[match.group][match.winner].score += 3
             }
@@ -148,9 +150,9 @@ class FakeMatchGenerator {
         })
         return clasifications
     }
-    createFakeOctavosStage() {
+    createFakeOctavosStage(startDate) {
         const clasifications = this.calculateGroupClassifications()
-        // this.lastDate = Date.now()
+        this.lastDate = startDate ? new Date(startDate) : Date.now()
         this.fakeMatches = this.getMatchData()
         this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo B'][0], clasifications['Grupo A'][1]);
         this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo A'][0], clasifications['Grupo B'][1]);
@@ -162,12 +164,12 @@ class FakeMatchGenerator {
         this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo E'][0], clasifications['Grupo F'][1]);
         this.saveData()
     }
-    createFakeQuartersStage() {
-        // this.lastDate = Date.now()
+    createFakeQuartersStage(startDate) {
+        this.lastDate = startDate ? new Date(startDate) : Date.now()
         this.fakeMatches = this.getMatchData()
         const matchesOctavos = this.getPreviousStageMatches('222222')
         const clasified = matchesOctavos.map(match => {
-            if(!match.winner) return null
+            if(!match.winner) throw new Error('Fase no finalizada')
             if(match.winner === match.home.id) return match.home
             else return match.away
         })
@@ -177,12 +179,12 @@ class FakeMatchGenerator {
         this.generateFakeMatch('Cuartos', '333333', null, null, clasified[7], clasified[5])
         this.saveData()
     }
-    createFakeSemisStage() {
-        // this.lastDate = Date.now()
+    createFakeSemisStage(startDate) {
+        this.lastDate = startDate ? new Date(startDate) : Date.now()
         this.fakeMatches = this.getMatchData()
         const matchesCuartos = this.getPreviousStageMatches('333333')
         const clasified = matchesCuartos.map(match => {
-            if(!match.winner) return null
+            if(!match.winner) throw new Error('Fase no finalizada')
             if(match.winner === match.home.id) return match.home
             else return match.away
         })
@@ -190,13 +192,13 @@ class FakeMatchGenerator {
         this.generateFakeMatch('Semifinales', '444444', null, null, clasified[1], clasified[3])
         this.saveData()
     }
-    createFakeFinalsStage() {
-        // this.lastDate = Date.now()
+    createFakeFinalsStage(startDate) {
+        this.lastDate = startDate ? new Date(startDate) : Date.now()
         this.fakeMatches = this.getMatchData()
         const matchesSemis = this.getPreviousStageMatches('444444')
         const clasified = []
         matchesSemis.forEach((match, index) => {
-            if(!match.winner) return null
+            if(!match.winner) throw new Error('Fase no finalizada')
             if(match.winner === match.home.id) {
                 clasified[index] = match.home;
                 clasified[index+2] = match.away;

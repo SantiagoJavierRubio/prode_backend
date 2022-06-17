@@ -9,7 +9,8 @@ const fifa = new FifaRepository()
 
 export const createFakeGroupMatches = async (req, res, next) => {
     try {
-        matchGenerator.createFakeGroupStage()
+        const startDate = req.body.startDate || null
+        matchGenerator.createFakeGroupStage(startDate)
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }
@@ -20,7 +21,8 @@ export const createFakeGroupMatches = async (req, res, next) => {
 
 export const createFakeOctavos = async (req, res, next) => {
     try {
-        matchGenerator.createFakeOctavosStage()
+        const startDate = req.body.startDate || null
+        matchGenerator.createFakeOctavosStage(startDate)
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }
@@ -31,7 +33,8 @@ export const createFakeOctavos = async (req, res, next) => {
 
 export const createFakeCuartos = async (req, res, next) => {
     try {
-        matchGenerator.createFakeQuartersStage()
+        const startDate = req.body.startDate || null
+        matchGenerator.createFakeQuartersStage(startDate)
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }
@@ -42,7 +45,8 @@ export const createFakeCuartos = async (req, res, next) => {
 
 export const createFakeSemis = async (req, res, next) => {
     try {
-        matchGenerator.createFakeSemisStage()
+        const startDate = req.body.startDate || null
+        matchGenerator.createFakeSemisStage(startDate)
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }
@@ -53,7 +57,8 @@ export const createFakeSemis = async (req, res, next) => {
 
 export const createFakeFinals = async (req, res, next) => {
     try {
-        matchGenerator.createFakeFinalsStage()
+        const startDate = req.body.startDate || null
+        matchGenerator.createFakeFinalsStage(startDate)
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }
