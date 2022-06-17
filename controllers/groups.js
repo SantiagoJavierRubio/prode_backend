@@ -77,7 +77,7 @@ export const getGroupData = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;
         if(groupName) {
-            const result = await Group.getOne({name: groupName}, 'name members owner')
+            const result = await Group.getOne({name: groupName}, 'name members owner rules')
             if(!result) throw new CustomError(404, 'No groups found')
             if(!result.members.includes(req.user._id)) throw new CustomError(401, 'You are not a member of this group')
             const members = await User.getManyById(result.members, 'name email avatar')

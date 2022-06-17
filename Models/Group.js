@@ -12,7 +12,8 @@ const GroupSchema = new mongoose.Schema({
                 NONE: 0,
                 WINNER: 1,
                 FULL: 3
-            }
+            },
+            timeLimit: 0
         }
     }
 }, {collection: 'groups'})

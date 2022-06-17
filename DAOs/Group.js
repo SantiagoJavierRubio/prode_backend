@@ -1,7 +1,7 @@
 import Model from '../Models/Group.js'
 import Container from '../Containers/mongoDB.js'
 import CustomError from '../Errors/CustomError.js'
-import { hasNulls } from '../utils/dataCheck.js'
+import { hasNulls, arePositiveNumbers } from '../utils/dataCheck.js'
 
 class Group extends Container {
     constructor() {
@@ -11,6 +11,7 @@ class Group extends Container {
         if(hasNulls([data.name, user._id])) throw new CustomError(406, 'Missing data')
         if(data.name.length > 20) throw new CustomError(406, 'Group name is too long', 'Group name must be less than 21 characters')
         if(!(/[a-zA-Z0-9]/).test(data.name)) throw new CustomError(406, 'Group name not valid', 'Group name must contain at least one letter or number')
+        if(data.timeLimit && !arePositiveNumbers([data.timeLimit])) throw new CustomError(406, 'Time prediction limit must be a positive number')
         const nameExists = await this.getOne({name: data.name.toUpperCase()})
         if(nameExists) throw new CustomError(409, 'Group name already in use')
         const newGroup = await this.create({
@@ -38,7 +39,7 @@ class Group extends Container {
     }
     async getGroups(user_id) {
         if(hasNulls([user_id])) throw new CustomError(406, 'No user id provided')
-        const groups = await this.getMany({}, 'members name owner')
+        const groups = await this.getMany({}, 'members name owner rules')
         if(!groups) throw new CustomError(404, 'Groups not found')
         return groups.filter(group => group.members.includes(user_id))
     }

@@ -14,7 +14,8 @@ const getOwnerNames = async (groups) => {
             id: group._id,
             name: group.name,
             members: group.members,
-            owner: owner.name
+            owner: owner.name,
+            rules: group.rules
         }
     })
 }

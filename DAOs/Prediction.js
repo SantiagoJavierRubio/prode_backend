@@ -3,6 +3,7 @@ import Container from '../Containers/mongoDB.js'
 import i18n from 'i18n'
 import { hasNulls, arePositiveNumbers } from '../utils/dataCheck.js'
 import CustomError from '../Errors/CustomError.js'
+import { validatePredictions } from '../utils/predictionValidate.js'
 
 class Prediction extends Container {
     constructor() {
@@ -17,6 +18,8 @@ class Prediction extends Container {
         const check = this.checkPredictionData(data)
         if(!check.check) throw new CustomError(406, check.error)
         const prediction = await this.getOne({matchId: data.matchId, userId: data.userId})
+        const validation = await validatePredictions([data], data.userGroupId)
+        if(validation.valid.length < 1) throw new CustomError(406, 'Your time to edit this prediction has expired')
         if(prediction) return await this.editPrediction(prediction._id, data.userId, data)
         return await this.create({
             ...data,
@@ -33,7 +36,9 @@ class Prediction extends Container {
         }
         const validPredictions = []
         const predictionsToEdit = []
-        await data.predictions.forEach(prediction => {
+        const validation = await validatePredictions(data.predictions, data.userGroupId)
+        validation.expired.forEach(p => response.errors.push({id: p.matchId, message: i18n.__('Your time to edit this prediction has expired')}))
+        await validation.valid.forEach(prediction => {
             const check = this.checkPredictionData(prediction)
             if(!check.check) return response.errors.push({id: prediction.matchId, message: check.error})
             const existing = predictions.find(p => p.matchId === prediction.matchId)
@@ -89,6 +94,8 @@ class Prediction extends Container {
         const original = await this.getById(id)
         if(!original) return { error: i18n.__('Prediction not found'), code: 404 }
         if(original.userId != userId) return { error: i18n.__('User not allowed to edit this prediction'), code: 401 }
+        const validation = await validatePredictions([data], data.userGroupId)
+        if(validation.valid.length < 1) return { error: i18n.__('Your time to edit this prediction has expired'), code: 406 }
         return await this.update(id, {
             homeScore: parseInt(data.homeScore),
             awayScore: parseInt(data.awayScore),
