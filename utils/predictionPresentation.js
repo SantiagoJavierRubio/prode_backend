@@ -50,7 +50,7 @@ export const matchPredictionsToMatches = async (predictions) => {
     const matchIds =  await predictions.map((prediction) => prediction.matchId)
     const matches = await fifa.getMatchesById(matchIds);
     const result = await predictions.map(prediction => {
-        const match = matches.filter(match => match.id === prediction.matchId)[0];
+        const match = matches.find(match => `${match.id}` === `${prediction.matchId}`);
         return {
             matchId: prediction.matchId,
             date: match.date,

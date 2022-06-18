@@ -22,22 +22,6 @@ const GROUP_CODES = process.env.MODO_PRUEBA ? {
     H: '285072'
 }
 
-// const STAGE_CODES = process.env.MODO_PRUEBA ? {
-//     GRUPOS: '275073',
-//     OCTAVOS: '275093',
-//     CUARTOS: '275095',
-//     SEMIFINALES: '275097',
-//     FINAL: '275101',
-//     TERCER_PUESTO: '275099'
-// } : {
-//     GRUPOS: '285063',
-//     OCTAVOS: '285073',
-//     CUARTOS: '285074',
-//     SEMIFINALES: '285075',
-//     FINAL: '285077',
-//     TERCER_PUESTO: '285076'
-// }
-
 const STAGE_CODES = {}
 switch(process.env.MODO_PRUEBA) {
     case 'FAKE_DATA':

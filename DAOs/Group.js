@@ -17,7 +17,8 @@ class Group extends Container {
         const newGroup = await this.create({
             name: data.name.toUpperCase(),
             owner: user._id,
-            members: [user._id]
+            members: [user._id],
+            rules: {...data.rules}
         })
         if(!newGroup) throw new CustomError(500, 'Failed to create group')
         return newGroup

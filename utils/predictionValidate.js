@@ -7,7 +7,7 @@ export const validatePredictions = async (predictions, userGroupId) => {
     const matchIds = await predictions.map(prediction => prediction.matchId)
     const matches = await fifa.getMatchesById(matchIds)
     const groupRules = await GroupDAO.getById(userGroupId, 'rules')
-    const maxDateAcceptable = Date.now() + groupRules.rules.timeLimit
+    const maxDateAcceptable = Date.now() + parseInt(groupRules.rules.timeLimit)
     const validMatchIds = await matches.map(match => {
         const date = new Date(match.date)
         if(maxDateAcceptable < date) return match.id

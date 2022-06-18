@@ -2,5 +2,10 @@
 	"Group name already in use": "Group name already in use",
 	"Missing field": "Missing field",
 	"Your tune to edit this prediction has expired": "Your tune to edit this prediction has expired",
-	"Your time to edit this prediction has expired": "Your time to edit this prediction has expired"
+	"Your time to edit this prediction has expired": "Your time to edit this prediction has expired",
+	"Group not found": "Group not found",
+	"Profile updated": "Profile updated",
+	"Group name not valid": "Group name not valid",
+	"Group name must contain at least one letter or number": "Group name must contain at least one letter or number",
+	"Cannot remove admin from group": "Cannot remove admin from group"
 }
