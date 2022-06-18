@@ -18,6 +18,17 @@ export const create = async (req, res, next) => {
         errorHandler(err, req, res, next)
     }
 }
+export const getGroupRules = async (req, res, next) => {
+    try {
+        const groupName = req.query.groupName;
+        const groupInfo = await Group.getOne({ name: groupName }, 'rules')
+        if(!groupInfo) throw new CustomError(404, 'Group not found');
+        res.status(200).json(groupInfo.rules);
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
 export const join = async (req, res, next) => {
     try {
         const groupName = req.query.groupName;

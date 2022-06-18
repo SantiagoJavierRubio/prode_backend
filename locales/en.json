@@ -7,5 +7,8 @@
 	"Profile updated": "Profile updated",
 	"Group name not valid": "Group name not valid",
 	"Group name must contain at least one letter or number": "Group name must contain at least one letter or number",
-	"Cannot remove admin from group": "Cannot remove admin from group"
+	"Cannot remove admin from group": "Cannot remove admin from group",
+	"User removed from group": "User removed from group",
+	"You are not a member of this group": "You are not a member of this group",
+	"User already in group": "User already in group"
 }

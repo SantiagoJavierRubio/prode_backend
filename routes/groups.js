@@ -6,7 +6,8 @@ import {
     getScores,
     leaveGroup,
     getGroupData,
-    deleteGroup
+    deleteGroup,
+    getGroupRules
 } from '../controllers/groups.js';
 
 const router = Router();
@@ -18,5 +19,6 @@ router.get('/score', getScores);
 router.post('/leave', leaveGroup);
 router.delete('/delete', deleteGroup);
 router.get('/', getGroupData);
+router.get('/rules', getGroupRules);
 
 export default router
