@@ -93,7 +93,12 @@ export const getGroupData = async (req, res, next) => {
             if(!result.members.includes(req.user._id)) throw new CustomError(401, 'You are not a member of this group')
             const members = await User.getManyById(result.members, 'name email avatar')
             if(!members) throw new CustomError(404, 'No members found')
-            const payload = {name: result.name, members, owner: members.filter(member => member._id == result.owner)[0]}
+            const payload = {
+                name: result.name,
+                members,
+                owner: members.filter(member => member._id == result.owner)[0],
+                rules: result.rules
+            }
             res.json({groupData: payload})
         } 
         else {

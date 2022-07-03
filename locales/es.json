@@ -34,5 +34,7 @@
 	"Invalid token": "Token incorrecto",
 	"Token expired": "Tu token expiró",
 	"User is not verified": "Usuario no verificado",
-	"Campo vacío": "Campo vacío"
+	"Campo vacío": "Campo vacío",
+	"You are not a member of this group": "You are not a member of this group",
+	"No groups found": "No groups found"
 }
