@@ -23,8 +23,9 @@ import 'dotenv/config';
 const app = express();
 i18n.configure({
   locales: config.langs,
-  directory: path.join(process.cwd(), 'locales')
+  directory: path.join(process.cwd(), 'locales'),
 })
+
 // MIDDLEWARES
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,8 +59,9 @@ app.use(
     })
   );
   app.use(helmet());
+  app.use(i18n.init)
   app.use((req, res, next) => {
-    const l = req.get('accept-language') || null
+    const l = i18n.getLocale(req)
     if(l) i18n.setLocale(l)
     next()
   })

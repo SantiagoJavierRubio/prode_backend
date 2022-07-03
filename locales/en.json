@@ -10,5 +10,6 @@
 	"Cannot remove admin from group": "Cannot remove admin from group",
 	"User removed from group": "User removed from group",
 	"You are not a member of this group": "You are not a member of this group",
-	"User already in group": "User already in group"
+	"User already in group": "User already in group",
+	"User not in group": "User not in group"
 }
