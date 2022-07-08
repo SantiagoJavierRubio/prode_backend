@@ -7,10 +7,34 @@ const matchGenerator = new FakeMatchGenerator();
 const resultGenerator = new FakeResultGenerator();
 const fifa = new FifaRepository()
 
+export const createFakeTeams = async (req, res, next) => {
+    try {
+        await matchGenerator.createFakeTeams()
+        setTimeout(() => {
+            res.send('ok')
+        }, 1000)
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
+
+
+export const createGroups = async (req, res, next) => {
+    try {
+        await matchGenerator.createFakeGroups();
+        const matches = await fifa.getAllMatches()
+        res.send(matches)
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
+
 export const createFakeGroupMatches = async (req, res, next) => {
     try {
         const startDate = req.body.startDate || null
-        matchGenerator.createFakeGroupStage(startDate)
+        await matchGenerator.createFakeGroupStage(startDate)
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }

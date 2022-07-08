@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import config from '../config.js';
 import { createFakeGroupMatches, createFakeResults, createFakeOctavos,
-createFakeCuartos, createFakeSemis, createFakeFinals } from '../controllers/fake.js';
+createFakeCuartos, createFakeSemis, createFakeFinals, createFakeTeams, createGroups } from '../controllers/fake.js';
 
 const router = Router();
 
@@ -13,7 +13,9 @@ router.use(async (req, res, next) => {
     }
     next()
 })
-router.post('/generate/groups', createFakeGroupMatches)
+router.post('/generate/teams', createFakeTeams)
+router.post('/generate/groups', createGroups)
+router.post('/generate/groupStage', createFakeGroupMatches)
 router.post('/generate/results', createFakeResults)
 router.post('/generate/octavos', createFakeOctavos)
 router.post('/generate/cuartos', createFakeCuartos)

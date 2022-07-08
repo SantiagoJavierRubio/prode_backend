@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "start:beta": "MODO_PRUEBA=FAKE_DATA BETA_TEST=TRUE node index.js",
     "dev": "nodemon index.js",
-    "dev:beta": "MODO_PRUEBA=FAKE_DATA node index.js",
+    "dev:beta": "MODO_PRUEBA=FAKE_DATA BETA_TEST=true nodemon index.js",
     "dev:prueba": "MODO_PRUEBA=RUSIA nodemon index.js",
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix"

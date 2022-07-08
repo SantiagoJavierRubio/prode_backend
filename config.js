@@ -13,7 +13,7 @@ else {
 }
 
 const config = {
-  mongoUrl: process.env.MONGO_URL,
+  mongoUrl: process.env.BETA_TEST ? process.env.BETA_MONGO_URL : process.env.MONGO_URL,
   sessionSecret: process.env.SESSION_SECRET,
   googleClientId: process.env.GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,

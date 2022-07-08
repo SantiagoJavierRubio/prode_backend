@@ -1,30 +1,41 @@
-import Container from '../Containers/fifa.js'
-import fs from 'fs'
+import Container from '../Containers/fifa.js';
+import FakeMatch from './FakeData/FakeModels/fakeMatch.js';
 
-const fakeData = fs.readFileSync(`${process.cwd()}/fakeMatches.json`, 'utf8')
+class FakeMatchDTO {
+    constructor(data) {
+        this.id = data.id || `${data._id}`;
+        this.stage = data.stage;
+        this.stageId = data.stageId;
+        this.group = data.group;
+        this.groupId = data.groupId;
+        this.home = data.home;
+        this.away = data.away;
+        this.homeScore = data.homeScore;
+        this.awayScore = data.awayScore;
+        this.stadiumId = data.stadiumId;
+        this.stadium = data.stadium;
+        this.date = data.date;
+        this.status = data.status;
+        this.winner = data.winner;
+    }
+}
 
 class FakeFifaDAO extends Container {
     constructor() {
         super()
-        this.matches = JSON.parse(fakeData)
         this.GROUP_STAGE = '111111' 
     }
-    update() {
-        const data = fs.readFileSync(`${process.cwd()}/fakeMatches.json`, 'utf8')
-        this.matches = JSON.parse(data)
-    }
     async getAllMatches(lang) {
-        this.update()
-        return this.matches
+        const matches = await FakeMatch.find().lean();
+        return matches.map(match => new FakeMatchDTO(match))
     }
     async getMatchesById(ids, lang) {
-        this.update()
-        const response = this.matches.filter(match => ids.includes(match.id))
-        return response
+        const matches = await FakeMatch.find({ '_id': { $in: ids } }).lean()
+        return matches.map(match => new FakeMatchDTO(match))
     }
     async getAllStages(lang) {
-        this.update()
-        const stages = this.groupByStage(this.matches)
+        const matches = await FakeMatch.find().lean();
+        const stages = this.groupByStage(matches)
         let indexGroups = stages.findIndex(stage => stage.id === this.GROUP_STAGE)
         if(indexGroups === -1) throw new CustomError(500, 'Failed to arrange stage', 'This error should not happen')
         stages[indexGroups].groups = this.groupByGroup(stages[indexGroups].matches)
@@ -32,19 +43,16 @@ class FakeFifaDAO extends Container {
         return stages
     }
     async getOneStage(id, lang) {
-        this.update()
-        const response = this.matches.filter(match => match.stageId === id)
-        return response
+        const matches = await FakeMatch.find({ stageId: id }).lean();
+        return matches.map(match => new FakeMatchDTO(match));
     }
     async getAllGroups(lang) {
-        this.update()
-        const response = this.matches.filter(match => match.stageId === this.GROUP_STAGE)
-        return this.groupByGroup(response)
+        const response = await this.getOneStage(this.GROUP_STAGE)
+        return this.groupByGroup(response);
     }
     async getOneGroup(id, lang) {
-        this.update()
-        const response = this.matches.filter(match => match.groupId === id)
-        return response
+        const matches = await FakeMatch.find({ groupId: id }).lean();
+        return matches.map(match => new FakeMatchDTO(match));
     }
 }
 

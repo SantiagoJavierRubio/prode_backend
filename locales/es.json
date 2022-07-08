@@ -36,5 +36,6 @@
 	"User is not verified": "Usuario no verificado",
 	"Campo vacío": "Campo vacío",
 	"You are not a member of this group": "You are not a member of this group",
-	"No groups found": "No groups found"
+	"No groups found": "No groups found",
+	"No stage code or name": "No stage code or name"
 }
