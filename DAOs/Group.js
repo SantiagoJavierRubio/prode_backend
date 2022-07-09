@@ -8,14 +8,15 @@ class Group extends Container {
         super(Model)
     }
     async createGroup(data, user) {
+        data.name = data.name.trim().toUpperCase();
         if(hasNulls([data.name, user._id])) throw new CustomError(406, 'Missing data')
         if(data.name.length > 20) throw new CustomError(406, 'Group name is too long', 'Group name must be less than 21 characters')
         if(!(/[a-zA-Z0-9]/).test(data.name)) throw new CustomError(406, 'Group name not valid', 'Group name must contain at least one letter or number')
         if(data.timeLimit && !arePositiveNumbers([data.timeLimit])) throw new CustomError(406, 'Time prediction limit must be a positive number')
-        const nameExists = await this.getOne({name: data.name.toUpperCase()})
+        const nameExists = await this.getOne({name: data.name})
         if(nameExists) throw new CustomError(409, 'Group name already in use')
         const newGroup = await this.create({
-            name: data.name.toUpperCase(),
+            name: data.name,
             owner: user._id,
             members: [user._id],
             rules: {...data.rules}
