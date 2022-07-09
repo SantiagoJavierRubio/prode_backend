@@ -1,5 +1,6 @@
 import Prediction from "./DAOs/Prediction.js";
 import FifaRepository from "./DAOs/Repositories/FifaRepository.js";
+import Group from "./DAOs/Group.js";
 import config from './config.js';
 import mongoose from 'mongoose';
 
@@ -14,16 +15,13 @@ mongoose.connect(`${config.mongoUrl}`, MONGO_OPTIONS, (err) => {
   }
 });
 
-const SCORE_VALUES = {
-    NONE: 0,
-    WINNER: 1,
-    FULL: 2
-}
 const MATCH_RESULT_TYPES = {
     HOME: 'home',
     AWAY: 'away',
     DRAW: 'draw'
 }
+
+const userGroupsScoringValues = {}
 
 const getUncheckedPredictions = async () => {
     try {
@@ -50,18 +48,24 @@ const calculateResult = (awayScore, homeScore) => {
     if(awayScore > homeScore) return MATCH_RESULT_TYPES.AWAY;
     return MATCH_RESULT_TYPES.HOME;
 }
-const calculateScore = async (predictionHomeScore, predictionAwayScore, matchHomeScore, matchAwayScore) => {
-    if(predictionAwayScore === matchAwayScore && predictionHomeScore === matchHomeScore) return SCORE_VALUES.FULL;
+const calculateScore = async (predictionHomeScore, predictionAwayScore, matchHomeScore, matchAwayScore, scoringValues) => {
+    if(predictionAwayScore === matchAwayScore && predictionHomeScore === matchHomeScore) return scoringValues.FULL;
     const predictionResult = calculateResult(predictionAwayScore, predictionHomeScore);
     const matchResult = calculateResult(matchAwayScore, matchHomeScore);
-    if(predictionResult === matchResult) return SCORE_VALUES.WINNER;
-    return SCORE_VALUES.NONE;
+    if(predictionResult === matchResult) return scoringValues.WINNER;
+    return scoringValues.NONE;
 }
 
 const scoreOnePrediction = async (prediction, matches) => {
     try {
         const match = matches.filter(match => match.id === prediction.matchId)[0];
-        const score = await calculateScore(prediction.homeScore, prediction.awayScore, match.homeScore, match.awayScore);
+        const score = await calculateScore(
+            prediction.homeScore,
+            prediction.awayScore,
+            match.homeScore,
+            match.awayScore,
+            userGroupsScoringValues[prediction.userGroupId]
+        );
         const scored = await Prediction.scorePrediction(prediction._id, score);
         if(scored) {
             return true
@@ -91,10 +95,18 @@ const addScores = async (predictions, matches) => {
         return { error: err.message }
     }
 }
+const getGroupRules = async (predictions) => {
+    const uniqueGroups = [ ...new Set(predictions.map(p => p.userGroupId)) ];
+    const groups = await Group.getManyById(uniqueGroups, 'rules');
+    groups.forEach(group => {
+        userGroupsScoringValues[`${group._id}`] = group.rules.scoring;
+    })
+}
 const scorePredictions = async () => {
     try {
         const predictionData = await getUncheckedPredictions();
         if(predictionData.error) throw new Error(predictionData.error);
+        await getGroupRules(predictionData.predictions)
         return await addScores(predictionData.predictions, predictionData.matches);
     }
     catch(err) {

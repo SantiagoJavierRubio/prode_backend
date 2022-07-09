@@ -49,9 +49,11 @@ export const matchPredictionsToMatches = async (predictions) => {
     if(hasNulls([predictions])) throw new CustomError(406, 'Missing field')
     const matchIds =  await predictions.map((prediction) => prediction.matchId)
     const matches = await fifa.getMatchesById(matchIds);
-    const result = await predictions.map(prediction => {
+    const result = []
+    predictions.forEach(prediction => {
         const match = matches.find(match => `${match.id}` === `${prediction.matchId}`);
-        return {
+        if (!match) return;
+        result.push({
             matchId: prediction.matchId,
             date: match.date,
             away: match.away,
@@ -62,7 +64,7 @@ export const matchPredictionsToMatches = async (predictions) => {
             score: prediction.score,
             userGroupId: prediction.userGroupId,
             userId: prediction.userId
-        }
+        })
     })
     return result
 }
