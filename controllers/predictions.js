@@ -1,7 +1,13 @@
 import Prediction from '../DAOs/Prediction.js'
 import Group from '../DAOs/Group.js'
 import { getStageCode, getGroupCode } from '../utils/traslateNamesToCodes.js'
-import { predictionsByStage, filterForOneGroup, filterForOneStage, matchPredictionsToMatches } from '../utils/predictionPresentation.js'
+import { 
+    predictionsByStage,
+    filterForOneGroup, 
+    filterForOneStage,
+    matchPredictionsToMatches,
+    getPredictionQuantityForStages
+} from '../utils/predictionPresentation.js'
 import CustomError from '../Errors/CustomError.js'
 import errorHandler from '../Errors/errorHandler.js'
 
@@ -62,6 +68,23 @@ export const getAll = async (req, res, next) => {
         if (stageId) result = await filterForOneStage(result, stageId)
         else if (groupId) result = await filterForOneGroup(result, groupId)
         return res.send(result)
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
+export const getLengthOfUserPredictions = async (req, res, next) => {
+    try {
+        const user = await req.user
+        const userGroupId = req.query.userGroupId || null
+        let predictions
+        if (userGroupId) {
+            await Group.checkForUserInGroup(userGroupId, user._id)
+            predictions = await Prediction.getAllByUserInGroup(user._id, userGroupId);
+        }
+        else predictions = await Prediction.getAllByUser(user._id)
+        const payload = await getPredictionQuantityForStages(predictions)
+        return res.send(payload)
     }
     catch(err) {
         errorHandler(err, req, res, next)

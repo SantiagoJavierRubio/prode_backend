@@ -2,6 +2,7 @@ import FifaRepository from '../DAOs/Repositories/FifaRepository.js';
 import Group from '../DAOs/Group.js';
 import CustomError from '../Errors/CustomError.js';
 import { hasNulls } from './dataCheck.js';
+import { getStageCode } from './traslateNamesToCodes.js';
 
 const fifa = new FifaRepository();
 
@@ -67,4 +68,25 @@ export const matchPredictionsToMatches = async (predictions) => {
         })
     })
     return result
+}
+
+const calculateCompletedPredictionsByStage = (predictions, stageMatches) => {
+    const included = stageMatches.filter(match => predictions.includes(match.id))
+    return {
+        predicted: included.length,
+        total: stageMatches.length
+    }
+}
+
+export const getPredictionQuantityForStages = async (predictions) => {
+    const stageNames = ['GRUPOS', 'OCTAVOS', 'CUARTOS', 'SEMIFINAL', 'FINAL', 'TERCER_PUESTO']
+    const stageCodes = Object.fromEntries(stageNames.map(name => [getStageCode(name), name]))
+    const stages = await fifa.getAllStages();
+    const predictionMatchIds = predictions.map(prediction => prediction.matchId)
+    const matchesByStage = stages.map(stage => {
+        if (stage.matches) return [stageCodes[stage.id], calculateCompletedPredictionsByStage(predictionMatchIds, stage.matches)];
+        const groupStageMatches = stage.groups.map(group => group.matches).flat();
+        return [stageCodes[stage.id], calculateCompletedPredictionsByStage(predictionMatchIds, groupStageMatches)]
+    })
+    return Object.fromEntries(matchesByStage);
 }
