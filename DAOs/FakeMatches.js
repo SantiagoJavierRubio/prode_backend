@@ -38,9 +38,14 @@ class FakeFifaDAO extends Container {
         const stages = this.groupByStage(matches)
         let indexGroups = stages.findIndex(stage => stage.id === this.GROUP_STAGE)
         if(indexGroups === -1) throw new CustomError(500, 'Failed to arrange stage', 'This error should not happen')
-        stages[indexGroups].groups = this.groupByGroup(stages[indexGroups].matches)
+        const normalizedMatches = stages[indexGroups].matches.map(match => new FakeMatchDTO(match))
+        stages[indexGroups].groups = this.groupByGroup(normalizedMatches)
         delete stages[indexGroups].matches
-        return stages
+        const normalizedMatchesStages = stages.map(stage => {
+            if (stage.groups) return stage;
+            return { ...stage, matches: stage.matches.map(match => new FakeMatchDTO(match)) }
+        })
+        return normalizedMatchesStages;
     }
     async getOneStage(id, lang) {
         const matches = await FakeMatch.find({ stageId: id }).lean();

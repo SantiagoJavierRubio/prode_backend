@@ -20,7 +20,7 @@ export const create = async (req, res, next) => {
 }
 export const getGroupRules = async (req, res, next) => {
     try {
-        const groupName = req.query.groupName;
+        const groupName = req.query.groupName.toUpperCase();
         const groupInfo = await Group.getOne({ name: groupName }, 'rules')
         if(!groupInfo) throw new CustomError(404, 'Group not found');
         res.status(200).json(groupInfo.rules);
@@ -31,7 +31,7 @@ export const getGroupRules = async (req, res, next) => {
 }
 export const join = async (req, res, next) => {
     try {
-        const groupName = req.query.groupName;
+        const groupName = req.query.groupName.toUpperCase();
         const user = await req.user
         const result = await Group.addMember(groupName, user)
         res.status(200).json(result)
@@ -42,8 +42,8 @@ export const join = async (req, res, next) => {
 }
 export const getScores = async (req, res, next) => {
     try {
-        const groupName = req.query.groupName;
-        const groupData = await Group.getOne({name: groupName.toUpperCase()})
+        const groupName = req.query.groupName.toUpperCase();
+        const groupData = await Group.getOne({name: groupName})
         if(groupData===null) throw new CustomError(404, 'Group not found')
         const predictions = await Prediction.getAllScoredInGroup(groupData._id)
         const scoresByUser = await calculateScoresByUsername(predictions, groupData)
@@ -62,7 +62,7 @@ export const getScores = async (req, res, next) => {
 }
 export const leaveGroup = async (req, res, next) => {
     try {
-        const groupName = req.query.groupName;
+        const groupName = req.query.groupName.toUpperCase();
         const user = await req.user
         const userGroupId = await Group.removeMember(groupName, user._id)
         await Prediction.removeAllByUserInGroup(user._id, userGroupId)
@@ -86,7 +86,7 @@ export const deleteGroup = async (req, res, next) => {
 
 export const getGroupData = async (req, res, next) => {
     try {
-        const groupName = req.query.groupName;
+        const groupName = req.query.groupName.toUpperCase();
         if(groupName) {
             const result = await Group.getOne({name: groupName}, 'name members owner rules')
             if(!result) throw new CustomError(404, 'No groups found')
