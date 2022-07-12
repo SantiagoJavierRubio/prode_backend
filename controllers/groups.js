@@ -86,7 +86,7 @@ export const deleteGroup = async (req, res, next) => {
 
 export const getGroupData = async (req, res, next) => {
     try {
-        const groupName = req.query.groupName.toUpperCase();
+        const groupName = req.query.groupName?.toUpperCase();
         if(groupName) {
             const result = await Group.getOne({name: groupName}, 'name members owner rules')
             if(!result) throw new CustomError(404, 'No groups found')
