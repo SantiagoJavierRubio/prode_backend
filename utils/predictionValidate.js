@@ -7,10 +7,11 @@ export const validatePredictions = async (predictions, userGroupId) => {
     const matchIds = await predictions.map(prediction => prediction.matchId)
     const matches = await fifa.getMatchesById(matchIds)
     const groupRules = await GroupDAO.getById(userGroupId, 'rules')
-    const maxDateAcceptable = Date.now() + parseInt(groupRules.rules.timeLimit || 0)
+    const now = Date.now();
+    const groupRuleMargin = parseInt(groupRules.rules.timeLimit || 0)
     const validMatchIds = await matches.map(match => {
-        const date = new Date(match.date)
-        if(maxDateAcceptable < date) return match.id
+        const date = new Date(match.date).getTime()
+        if((now + groupRuleMargin) < date) return match.id
     })
     const result = { valid: [], expired: [] }
     await predictions.forEach(prediction => {
