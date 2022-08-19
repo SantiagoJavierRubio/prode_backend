@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getFixture, getGroups, getLocaleLanguage } from '../controllers/fifa.js'
+import { getFixture, getGroups, getLocaleLanguage, getFixtureStatus } from '../controllers/fifa.js'
 
 const router = Router()
 
@@ -9,5 +9,6 @@ router.get('/', (req, res) => {
 })
 router.get('/fixture', getFixture)
 router.get('/fixture/groups', getGroups)
+router.get('/fixture-status', getFixtureStatus)
 
 export default router
