@@ -1,7 +1,7 @@
 import i18n from 'i18n';
 import FifaRepository from '../DAOs/Repositories/FifaRepository.js';
 import { getGroupCode, getStageCode } from '../utils/traslateNamesToCodes.js';
-import { retrieveFixtureStatus } from '../utils/fixtureStatus.js';
+import { checkFixtureStatus } from '../utils/fixtureStatus.js';
 import errorHandler from '../Errors/errorHandler.js';
 
 const fifa = new FifaRepository();
@@ -45,7 +45,7 @@ export const getGroups = async (req, res, next) => {
 
 export const getFixtureStatus = async (req, res, next) => {
     try {
-        const payload = await retrieveFixtureStatus();
+        const payload = await checkFixtureStatus();
         res.json(payload)
     }
     catch(err) {
