@@ -8,6 +8,7 @@ import {
     matchPredictionsToMatches,
     getPredictionQuantityForStages
 } from '../utils/predictionPresentation.js'
+import { randomUnpredictedMatch } from '../utils/randomUnpredictedMatch.js'
 import CustomError from '../Errors/CustomError.js'
 import errorHandler from '../Errors/errorHandler.js'
 
@@ -120,6 +121,32 @@ export const getPreviousForStage = async (req, res, next) => {
         const stageId = getStageCode(req.query.stageId)
         const predictions = await Prediction.getAllByUser(user._id)
         const result = await predictionsByStage(predictions, stageId)
+        res.send(result)
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}
+
+const filterRandomUnpredictedByGroup = async (groups, userID) => {
+    const userGroups = [...groups]
+    for (let i=0; i<userGroups.length+1; i++) {
+        const randIndex = Math.floor(Math.random()*userGroups.length)
+        const randGroup = userGroups[randIndex]
+        userGroups.splice(randIndex, 1)
+        const predicted = await Prediction.getAllByUserInGroup(userID, randGroup._id, '-_id matchId')
+        const result = await randomUnpredictedMatch(predicted, randGroup.rules.timeLimit)
+        if (result) return { group: randGroup, match: result }
+    }
+    return null;
+}
+
+export const getRandomUnpredictedMatch = async (req, res, next) => {
+    try {
+        const user = await req.user
+        const userGroups = await Group.getAllForUser(user._id, 'name rules')
+        const result = await filterRandomUnpredictedByGroup(userGroups, user._id);
+        if(!result) return res.sendStatus(404);
         res.send(result)
     }
     catch(err) {

@@ -35,8 +35,8 @@
 	"Token expired": "Tu token expiró",
 	"User is not verified": "Usuario no verificado",
 	"Campo vacío": "Campo vacío",
-	"You are not a member of this group": "You are not a member of this group",
-	"No groups found": "No groups found",
-	"No stage code or name": "No stage code or name",
-	"Your time to edit this prediction has expired": "Your time to edit this prediction has expired"
+	"You are not a member of this group": "No eres miembro de este grupo",
+	"No groups found": "Grupo no encontrado",
+	"No stage code or name": "Faltan stage y/o code",
+	"Your time to edit this prediction has expired": "Ya no puedes editar esta predicción"
 }

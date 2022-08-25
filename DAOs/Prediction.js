@@ -69,9 +69,9 @@ class Prediction extends Container {
         if (!results) return null;
         return results;
     }
-    async getAllByUserInGroup(userId, userGroupId) {
+    async getAllByUserInGroup(userId, userGroupId, fields=null) {
         if(hasNulls([userId, userGroupId])) throw new CustomError(406, 'Missing data')
-        const results = await this.getMany({userId: userId, userGroupId: userGroupId})
+        const results = await this.getMany({userId: userId, userGroupId: userGroupId}, fields)
         if (!results) return null;
         return results;
     }
