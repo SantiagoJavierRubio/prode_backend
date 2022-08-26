@@ -13,5 +13,6 @@
 	"User not in group": "User not in group",
 	"No groups found": "No groups found",
 	"Failed to obtain element": "Failed to obtain element",
-	"User not found": "User not found"
+	"User not found": "User not found",
+	"Scores must be positive numbers": "Scores must be positive numbers"
 }

@@ -145,6 +145,7 @@ export const getRandomUnpredictedMatch = async (req, res, next) => {
     try {
         const user = await req.user
         const userGroups = await Group.getAllForUser(user._id, 'name rules')
+        if (userGroups.length < 1) throw new CustomError(404, 'No groups found');
         const result = await filterRandomUnpredictedByGroup(userGroups, user._id);
         if(!result) return res.sendStatus(404);
         res.send(result)
