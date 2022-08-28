@@ -35,6 +35,7 @@ export const createFakeGroupMatches = async (req, res, next) => {
     try {
         const startDate = req.body.startDate || null
         await matchGenerator.createFakeGroupStage(startDate)
+        await matchGenerator.createFakeEmptyLaterStages();
         const matches = await fifa.getAllMatches()
         res.send(matches)
     }

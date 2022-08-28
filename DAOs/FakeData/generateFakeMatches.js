@@ -134,6 +134,9 @@ class FakeMatchGenerator {
             }
             this.generateFakeMatch('Fase de grupos', '111111', group.name, group.id, group.teams[2], group.teams[3])
         })
+    }
+
+    async createFakeEmptyLaterStages() {
         await this.generateFakeEmptyOctavosStage();
         await this.generateFakeEmptyQuartersStage();
         await this.generateFakeEmptySemisStage();
