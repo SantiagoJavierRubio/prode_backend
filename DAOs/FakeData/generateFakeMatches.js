@@ -81,6 +81,21 @@ class FakeMatchGenerator {
         
     }
 
+    async createFakeEmptyMatch(stage, stageId, names, date) {
+        const stadium = this.fakeStadiums[Math.floor(Math.random() * this.fakeStadiums.length)]
+        const match = new FakeMatch({
+            stage,
+            stageId: `${stageId}`,
+            home: names[0],
+            away: names[1],
+            stadiumId: stadium.id,
+            stadium: stadium.name,
+            date: date.toISOString(),
+            status: 1
+        })
+        await match.save();
+    }
+
     async createFakeTeams() {
         await FakeTeam.collection.drop();
         await createTeamData();
@@ -119,6 +134,10 @@ class FakeMatchGenerator {
             }
             this.generateFakeMatch('Fase de grupos', '111111', group.name, group.id, group.teams[2], group.teams[3])
         })
+        await this.generateFakeEmptyOctavosStage();
+        await this.generateFakeEmptyQuartersStage();
+        await this.generateFakeEmptySemisStage();
+        await this.generateFakeEmptyFinalsStage();
     }
 
     async getPreviousStageMatches(prevStageId) {
@@ -171,6 +190,7 @@ class FakeMatchGenerator {
     }
 
     async createFakeOctavosStage(startDate) {
+        await FakeMatch.deleteMany({stageId: '222222'});
         const clasifications = await this.calculateGroupClassifications()
         this.lastDate = startDate ? new Date(startDate) : Date.now()
         this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo B'][0], clasifications['Grupo A'][1]);
@@ -182,7 +202,20 @@ class FakeMatchGenerator {
         this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo F'][0], clasifications['Grupo E'][1]);
         this.generateFakeMatch('Octavos', '222222', null, null, clasifications['Grupo E'][0], clasifications['Grupo F'][1]);
     }
+    async generateFakeEmptyOctavosStage() {
+        const oneHour = 1000 * 60 * 60;
+        const oneWeek = 1000 * 60 * 60 * 24 * 7;
+        this.createFakeEmptyMatch('Octavos', '222222', ['1A', '2B'], new Date(this.lastDate + oneWeek + oneHour));
+        this.createFakeEmptyMatch('Octavos', '222222', ['1C', '2D'], new Date(this.lastDate + oneWeek + (oneHour * 2)));
+        this.createFakeEmptyMatch('Octavos', '222222', ['1E', '2F'], new Date(this.lastDate + oneWeek + (oneHour * 3)));
+        this.createFakeEmptyMatch('Octavos', '222222', ['1G', '2H'], new Date(this.lastDate + oneWeek + (oneHour * 4)));
+        this.createFakeEmptyMatch('Octavos', '222222', ['2A', '1B'], new Date(this.lastDate + oneWeek + (oneHour * 5)));
+        this.createFakeEmptyMatch('Octavos', '222222', ['2C', '1D'], new Date(this.lastDate + oneWeek + (oneHour * 6)));
+        this.createFakeEmptyMatch('Octavos', '222222', ['2E', '1F'], new Date(this.lastDate + oneWeek + (oneHour * 7)));
+        this.createFakeEmptyMatch('Octavos', '222222', ['2G', '1H'], new Date(this.lastDate + oneWeek + (oneHour * 8)));
+    }
     async createFakeQuartersStage(startDate) {
+        await FakeMatch.deleteMany({stageId: '333333'});
         this.lastDate = startDate ? new Date(startDate) : Date.now()
         const matchesOctavos = await this.getPreviousStageMatches('222222')
         const clasified = matchesOctavos.map(match => {
@@ -195,7 +228,16 @@ class FakeMatchGenerator {
         this.generateFakeMatch('Cuartos', '333333', null, null, clasified[1], clasified[3])
         this.generateFakeMatch('Cuartos', '333333', null, null, clasified[7], clasified[5])
     }
+    async generateFakeEmptyQuartersStage() {
+        const oneHour = 1000 * 60 * 60;
+        const oneWeekAndHalf = 1000 * 60 * 60 * 24 * 11;
+        this.createFakeEmptyMatch('Cuartos', '333333', ['W49', 'W50'], new Date(this.lastDate + oneWeekAndHalf + oneHour));
+        this.createFakeEmptyMatch('Cuartos', '333333', ['W53', 'W54'], new Date(this.lastDate + oneWeekAndHalf + (oneHour * 2)));
+        this.createFakeEmptyMatch('Cuartos', '333333', ['W51', 'W52'], new Date(this.lastDate + oneWeekAndHalf + (oneHour * 3)));
+        this.createFakeEmptyMatch('Cuartos', '333333', ['W55', 'W56'], new Date(this.lastDate + oneWeekAndHalf + (oneHour * 4)));
+    }
     async createFakeSemisStage(startDate) {
+        await FakeMatch.deleteMany({stageId: '444444'});
         this.lastDate = startDate ? new Date(startDate) : Date.now()
         const matchesCuartos = await this.getPreviousStageMatches('333333')
         const clasified = matchesCuartos.map(match => {
@@ -206,7 +248,15 @@ class FakeMatchGenerator {
         this.generateFakeMatch('Semifinales', '444444', null, null, clasified[0], clasified[2])
         this.generateFakeMatch('Semifinales', '444444', null, null, clasified[1], clasified[3])
     }
+    async generateFakeEmptySemisStage() {
+        const oneHour = 1000 * 60 * 60;
+        const twoWeeks = 1000 * 60 * 60 * 24 * 14;
+        this.createFakeEmptyMatch('Semifinales', '444444', ['W57', 'W58'], new Date(this.lastDate + twoWeeks + oneHour));
+        this.createFakeEmptyMatch('Semifinales', '444444', ['W59', 'W60'], new Date(this.lastDate + twoWeeks + (oneHour * 2)));
+    }
     async createFakeFinalsStage(startDate) {
+        await FakeMatch.deleteMany({stageId: '555555'});
+        await FakeMatch.deleteMany({stageId: '666666'});
         this.lastDate = startDate ? new Date(startDate) : Date.now()
         const matchesSemis = await this.getPreviousStageMatches('444444')
         const clasified = []
@@ -223,6 +273,12 @@ class FakeMatchGenerator {
         })
         this.generateFakeMatch('Final', '555555', null, null, clasified[0], clasified[1])
         this.generateFakeMatch('Tercer puesto', '666666', null, null, clasified[2], clasified[3])
+    }
+    async generateFakeEmptyFinalsStage() {
+        const oneHour = 1000 * 60 * 60;
+        const twoWeeksAndHalf = 1000 * 60 * 60 * 24 * 18;
+        this.createFakeEmptyMatch('Final', '555555', ['W61', 'W62'], new Date(this.lastDate + twoWeeksAndHalf + oneHour * 6));
+        this.createFakeEmptyMatch('Tercer puesto', '666666', ['RU61', 'RU62'], new Date(this.lastDate + twoWeeksAndHalf + oneHour));
     }
 }
 
