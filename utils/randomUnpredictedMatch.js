@@ -13,7 +13,6 @@ export const randomUnpredictedMatch = async (predictions, timeLimit) => {
         ((now + parseInt(timeLimit || 0)) < matchDate) &&
         !predictionMatchIds.includes(match.id))
     })
-    console.log(validFutureMatches.length)
     if (validFutureMatches.length === 0) return null
     return validFutureMatches[Math.floor(Math.random()*validFutureMatches.length)]
 }
