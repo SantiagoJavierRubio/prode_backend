@@ -154,3 +154,14 @@ export const getRandomUnpredictedMatch = async (req, res, next) => {
         errorHandler(err, req, res, next)
     }
 }
+
+export const getUserPredictionLength = async (req, res, next) => {
+    try {
+        const user = await req.user
+        const result = await Prediction.model.countDocuments({ userId: user._id })
+        res.json({ userPredictions: result });
+    }
+    catch(err) {
+        errorHandler(err, req, res, next)
+    }
+}

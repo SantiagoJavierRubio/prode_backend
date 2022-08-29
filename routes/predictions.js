@@ -10,6 +10,7 @@ import {
   getOtherUsers,
   getLengthOfUserPredictions,
   getRandomUnpredictedMatch,
+  getUserPredictionLength
 } from '../controllers/predictions.js';
 
 const router = Router();
@@ -17,6 +18,7 @@ const router = Router();
 router.use(passport.authenticate('jwt', { session: false }));
 router.post('/', create);
 router.get('/', getAll);
+router.get('/length', getUserPredictionLength)
 router.get('/percentage', getLengthOfUserPredictions);
 router.get('/profile/:id', getOtherUsers);
 router.put('/:id', edit);
