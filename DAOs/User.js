@@ -60,6 +60,9 @@ class User extends Container {
   }
   async changePassword(user_id, password) {
     if (hasNulls([password])) throw new CustomError(400, 'Password is required');
+    const user = await this.getById(user_id);
+    if (!user) throw new CustomError(404, 'User not found');
+    if(!user.password) throw new CustomError(406, 'User registered with google', 'Try to sign in with google')
     if (password.length < 6) throw new CustomError(400, 'Password too short', 'Password must be at least 6 characters');
     let pwd = await hashPassword(password);
     const updated = await this.update(user_id, { password: pwd });
