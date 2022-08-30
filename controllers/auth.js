@@ -85,6 +85,7 @@ export const requirePasswordChange = async (req, res, next) => {
   try {
     const email = req.body.email || null;
     const user = await User.findByEmail(email);
+    if (!user) throw new CustomError(404, 'User not found');
     if (!user.password) throw new CustomError(406, 'User registered with google', 'Try to sign in with google')
     await sendPasswordChangeEmail(user);
     res.sendStatus(200)
