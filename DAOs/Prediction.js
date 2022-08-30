@@ -17,7 +17,7 @@ class Prediction extends Container {
     async createPrediction(data) {
         const check = this.checkPredictionData(data)
         if(!check.check) throw new CustomError(406, check.error)
-        const prediction = await this.getOne({matchId: data.matchId, userId: data.userId})
+        const prediction = await this.getOne({matchId: data.matchId, userId: data.userId, userGroupId: data.userGroupId})
         const validation = await validatePredictions([data], data.userGroupId)
         if(validation.valid.length < 1) throw new CustomError(406, 'Your time to edit this prediction has expired')
         if(prediction) return await this.editPrediction(prediction._id, data.userId, data)
