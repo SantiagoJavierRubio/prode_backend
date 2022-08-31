@@ -97,8 +97,9 @@ export const getOtherUsers = async (req, res, next) => {
         const userGroupId = req.query.userGroupId;
         const profileUser = req.params.id
         await Group.checkForUserInGroup(userGroupId, user._id)
+        const groupRules = await Group.getById(userGroupId, '-_id rules');
         const predictions = await Prediction.getAllByUserInGroup(profileUser, userGroupId)
-        const result = await matchPredictionsToMatches(predictions)
+        const result = await matchPredictionsToMatches(predictions, groupRules.rules)
         return res.send(result)
     }
     catch(err) {

@@ -46,14 +46,16 @@ export const filterForOneGroup = async (predictions, groupId) => {
     return predictionsByStage;
 }
 
-export const matchPredictionsToMatches = async (predictions) => {
+export const matchPredictionsToMatches = async (predictions, groupRules) => {
     if(hasNulls([predictions])) throw new CustomError(406, 'Missing field')
     const matchIds =  await predictions.map((prediction) => prediction.matchId)
     const matches = await fifa.getMatchesById(matchIds);
+    const now = Date.now();
     const result = []
     predictions.forEach(prediction => {
         const match = matches.find(match => `${match.id}` === `${prediction.matchId}`);
         if (!match) return;
+        if (Date.parse(match.date) > (now + parseInt(groupRules.timeLimit))) return;
         result.push({
             matchId: prediction.matchId,
             date: match.date,
