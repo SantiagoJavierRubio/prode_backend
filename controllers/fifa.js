@@ -67,7 +67,7 @@ export const getNextMatches = async (req, res, next) => {
       )
       .sort((a, b) => a.date > b.date)
       .slice(0, quantity);
-    res.json(nextMatches);
+    res.json({fixture: nextMatches});
   }
   catch (err) {
     errorHandler(err, req, res, next);
