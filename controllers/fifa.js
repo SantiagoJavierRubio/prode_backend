@@ -55,7 +55,7 @@ export const getFixtureStatus = async (req, res, next) => {
 
 export const getNextMatches = async (req, res, next) => {
   try {
-    const quantity = parseInt(req.query.cant) || 5;
+    const quantity = parseInt(req.query.quantity) || 5;
     const allMatches = await fifa.getAllMatches();
     const now = Date.now();
     const nextMatches = allMatches
@@ -65,7 +65,7 @@ export const getNextMatches = async (req, res, next) => {
           match?.away?.name &&
           now < Date.parse(match?.date)
       )
-      .sort((a, b) => a.date > b.date)
+      .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
       .slice(0, quantity);
     res.json({fixture: nextMatches});
   }
