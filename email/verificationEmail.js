@@ -25,8 +25,8 @@ export const sendVerificationEmail = async (user) => {
     const link = `${config.serverUrl}/auth/email/verify?token=${token}&user_id=${user._id}`;
     const mail = await transporter.sendMail({
       to: user.email,
-      from: `Admin Prode Mundial <${config.emailAccount}>`,
-      subject: 'Bienvenido a ProdeMundial, verifica tu cuenta',
+      from: `Chumbazo <${config.emailAccount}>`,
+      subject: 'Bienvenido a Chumbazo, verifica tu cuenta',
       html: verificationEmailTemplate(link)
     });
     if (!mail.accepted.length > 0) throw new Error('Failed to send email');
@@ -42,7 +42,7 @@ export const sendPasswordChangeEmail = async (user) => {
     const link = `${config.serverUrl}/auth/change-password?token=${token}&user_id=${user._id}`;
     const mail = await transporter.sendMail({
       to: user.email,
-      from: `Admin Prode Mundial <${config.emailAccount}>`,
+      from: `Chumbazo <${config.emailAccount}>`,
       subject: 'Cambia tu contraseña',
       html: changePasswordEmailTemplate(link)
     });
