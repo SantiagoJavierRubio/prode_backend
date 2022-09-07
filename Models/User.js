@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -7,13 +7,13 @@ const UserSchema = new mongoose.Schema(
     password: String,
     verified: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    avatar: String
+    avatar: String,
   },
-  { collection: 'users' }
+  { collection: "users" }
 );
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model("User", UserSchema);
 
 export default User;

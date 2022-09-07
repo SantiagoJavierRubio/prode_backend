@@ -1,22 +1,29 @@
-import { v4 as uuid } from 'uuid';
-import VerificationToken from '../Models/VerificationToken.js';
-import transporter from './nodemailer.js';
-import { verificationEmailTemplate, changePasswordEmailTemplate } from './templates/templates.js';
-import config from '../config.js';
-import CustomError from '../Errors/CustomError.js';
+import { v4 as uuid } from "uuid";
+import VerificationToken from "../Models/VerificationToken.js";
+import transporter from "./nodemailer.js";
+import {
+  verificationEmailTemplate,
+  changePasswordEmailTemplate,
+} from "./templates/templates.js";
+import config from "../config.js";
+import CustomError from "../Errors/CustomError.js";
 
 const generateVerificationToken = async (user_id) => {
   try {
     const token = uuid();
     const newVerification = new VerificationToken({
       user_id,
-      token
+      token,
     });
     await newVerification.save();
     return token;
-  }
- catch (err) {
-    throw new CustomError(500, 'Failed to create verification token', err.message, err);
+  } catch (err) {
+    throw new CustomError(
+      500,
+      "Failed to create verification token",
+      err.message,
+      err
+    );
   }
 };
 export const sendVerificationEmail = async (user) => {
@@ -26,14 +33,13 @@ export const sendVerificationEmail = async (user) => {
     const mail = await transporter.sendMail({
       to: user.email,
       from: `Chumbazo <${config.emailAccount}>`,
-      subject: 'Bienvenido a Chumbazo, verifica tu cuenta',
-      html: verificationEmailTemplate(link)
+      subject: "Bienvenido a Chumbazo, verifica tu cuenta",
+      html: verificationEmailTemplate(link),
     });
-    if (!mail.accepted.length > 0) throw new Error('Failed to send email');
+    if (!mail.accepted.length > 0) throw new Error("Failed to send email");
     return { success: true };
-  }
- catch (err) {
-    throw new CustomError(500, 'Failed to send email', err.message, err);
+  } catch (err) {
+    throw new CustomError(500, "Failed to send email", err.message, err);
   }
 };
 export const sendPasswordChangeEmail = async (user) => {
@@ -43,13 +49,17 @@ export const sendPasswordChangeEmail = async (user) => {
     const mail = await transporter.sendMail({
       to: user.email,
       from: `Chumbazo <${config.emailAccount}>`,
-      subject: 'Cambia tu contraseña',
-      html: changePasswordEmailTemplate(link)
+      subject: "Cambia tu contraseña",
+      html: changePasswordEmailTemplate(link),
     });
-    if (!mail.accepted.length > 0) throw new Error('Email rejected');
+    if (!mail.accepted.length > 0) throw new Error("Email rejected");
     return { success: true };
+  } catch (err) {
+    throw new CustomError(
+      500,
+      "Failed to send password change email",
+      err.message,
+      err
+    );
   }
- catch (err) {
-    throw new CustomError(500, 'Failed to send password change email', err.message, err);
-  }
-}
+};

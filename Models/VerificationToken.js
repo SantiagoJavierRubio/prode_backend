@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const VerificationSchema = new mongoose.Schema(
   {
@@ -6,14 +6,14 @@ const VerificationSchema = new mongoose.Schema(
     token: String,
     expiration: {
       type: Date,
-      default: Date.now() + 1000 * 60 * 60 * 24
-    }
+      default: Date.now() + 1000 * 60 * 60 * 24,
+    },
   },
-  { collection: 'verifications' }
+  { collection: "verifications" }
 );
 
 const VerificationToken = mongoose.model(
-  'VerificationToken',
+  "VerificationToken",
   VerificationSchema
 );
 

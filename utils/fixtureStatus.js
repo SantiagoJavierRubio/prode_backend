@@ -1,5 +1,5 @@
-import FifaRepository from '../DAOs/Repositories/FifaRepository.js';
-import { getStageCode } from '../utils/traslateNamesToCodes.js';
+import FifaRepository from "../DAOs/Repositories/FifaRepository.js";
+import { getStageCode } from "../utils/traslateNamesToCodes.js";
 
 const fifa = new FifaRepository();
 
@@ -17,9 +17,9 @@ export const checkFixtureStatus = async () => {
     SEMIFINAL: false,
     FINAL: false,
     TERCER_PUESTO: false,
-  }
+  };
   for (let name of Object.keys(payload)) {
     if (activeStages.includes(getStageCode(name))) payload[name] = true;
   }
   return payload;
-}
+};

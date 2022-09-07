@@ -1,21 +1,20 @@
-import nodemailer from 'nodemailer';
-import config from '../config.js';
+import nodemailer from "nodemailer";
+import config from "../config.js";
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   port: 587,
   auth: {
     user: config.emailAccount,
-    pass: config.emailPassword
-  }
+    pass: config.emailPassword,
+  },
 });
 transporter.verify((err) => {
   if (err) {
-    console.log('Failed to connect to mail server');
+    console.log("Failed to connect to mail server");
     console.error(err);
-  }
- else {
-    console.log('Connected to mail server');
+  } else {
+    console.log("Connected to mail server");
   }
 });
 

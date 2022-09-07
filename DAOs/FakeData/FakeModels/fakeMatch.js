@@ -1,6 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const FakeMatchSchema = new mongoose.Schema({
+const FakeMatchSchema = new mongoose.Schema(
+  {
     stage: String,
     stageId: String,
     group: String,
@@ -13,9 +14,11 @@ const FakeMatchSchema = new mongoose.Schema({
     stadium: String,
     date: Date,
     status: Number,
-    winner: String
-}, {collection: 'fake_matches'});
+    winner: String,
+  },
+  { collection: "fake_matches" }
+);
 
-const FakeMatch = mongoose.model('FakeMatch', FakeMatchSchema);
+const FakeMatch = mongoose.model("FakeMatch", FakeMatchSchema);
 
 export default FakeMatch;

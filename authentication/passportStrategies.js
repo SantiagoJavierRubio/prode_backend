@@ -1,8 +1,8 @@
-import config from '../config.js';
-import passport from 'passport';
+import config from "../config.js";
+import passport from "passport";
 // import GoogleStrategy from 'passport-google-oauth20';
-import JWTStrategy from 'passport-jwt';
-import User from '../DAOs/User.js';
+import JWTStrategy from "passport-jwt";
+import User from "../DAOs/User.js";
 
 passport.use(
   new JWTStrategy.Strategy(
@@ -14,13 +14,12 @@ passport.use(
         }
         return token;
       },
-      secretOrKey: config.sessionSecret
+      secretOrKey: config.sessionSecret,
     },
     async (jwtPayload, done) => {
       if (!jwtPayload) {
-        return done('No token found...');
-      }
- else {
+        return done("No token found...");
+      } else {
         const user = await User.getOne({ email: jwtPayload.email });
         if (!user) return done(null, false);
         return done(null, jwtPayload);
@@ -35,5 +34,5 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   const user = await User.getById(id);
   if (user) return done(null, user);
-  return done(new Error('User not found'));
+  return done(new Error("User not found"));
 });
