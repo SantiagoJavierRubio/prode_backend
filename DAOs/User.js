@@ -14,6 +14,23 @@ const hashPassword = async (password) => {
   }
 };
 
+const isValidUsername = (name) => {
+  if (name.length > 20) {
+    throw new CustomError(
+      400,
+      "Username too long",
+      "Usernames should be 20 characters or less"
+    );
+  }
+  if (/([^A-Za-z0-9])/.test(name)) {
+    throw new CustomError(
+      400,
+      "Invalid username",
+      "Only alphanumeric characters allowed"
+    );
+  }
+};
+
 class User extends Container {
   constructor() {
     super(Model);
@@ -32,6 +49,7 @@ class User extends Container {
         "Password too short",
         "Password must be at least 6 characters"
       );
+    isValidUsername(data.name);
     let pwd = await hashPassword(data.password);
     if (await this.getOne({ email: data.email }))
       throw new CustomError(406, "Email already in use");
@@ -40,7 +58,7 @@ class User extends Container {
     const user = await this.create({
       ...data,
       password: pwd,
-      name: data.name || data.email?.split("@")[0],
+      name: data.name || data.email,
     });
     if (!user)
       throw new CustomError(
@@ -69,7 +87,7 @@ class User extends Container {
     if (hasNulls([data.email])) throw new CustomError(400, "Email is required");
     const userData = {
       email: data.email,
-      name: data.name || data.email?.split("@")[0],
+      name: data.email,
       verified: true,
     };
     const user = await this.create(userData);
@@ -114,6 +132,7 @@ class User extends Container {
     const exists = await this.getOne({ name: data.name });
     if (exists && exists._id != user_id)
       throw new CustomError(406, "User name already in use");
+    isValidUsername(data.name);
     const updated = await this.update(user_id, {
       name: data.name || user.name,
       avatar: data.avatar || user.avatar,

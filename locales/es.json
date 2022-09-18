@@ -38,5 +38,9 @@
 	"You are not a member of this group": "No eres miembro de este grupo",
 	"No groups found": "Grupo no encontrado",
 	"No stage code or name": "Faltan stage y/o code",
-	"Your time to edit this prediction has expired": "Ya no puedes editar esta predicción"
+	"Your time to edit this prediction has expired": "Ya no puedes editar esta predicción",
+	"Invalid username": "Nombre de usuario no válido",
+	"Only alphanumeric characters allowed": "Solo se permiten caracteres alfanuméricos",
+	"Username too long": "Nombre de usuario demasiado largo",
+	"Usernames should be 20 characters or less": "Los nombres de usuario deben tener hasta 20 caracteres"
 }

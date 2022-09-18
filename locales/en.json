@@ -20,5 +20,9 @@
 	"Your time to edit this prediction has expired": "Your time to edit this prediction has expired",
 	"User name already in use": "User name already in use",
 	"Email already in use": "Email already in use",
-	"Invalid token": "Invalid token"
+	"Invalid token": "Invalid token",
+	"Invalid username": "Invalid username",
+	"Only alphanumeric characters allowed": "Only alphanumeric characters allowed",
+	"Username too long": "Username too long",
+	"Usernames should be 20 characters or less": "Usernames should be 20 characters or less"
 }

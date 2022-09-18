@@ -1,7 +1,7 @@
 {
     "editor.formatOnSave": false,
     "prettier.semi": true,
-    "prettier.singleQuote": true,
+    "prettier.singleQuote": false,
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
