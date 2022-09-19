@@ -100,13 +100,15 @@ class FakeMatchGenerator {
       this.fakeStadiums[Math.floor(Math.random() * this.fakeStadiums.length)];
     const A = new TeamDTO(teamA);
     const B = new TeamDTO(teamB);
-    const date = new Date((this.lastDate += 1000 * 60 * 60 * 3)).setMinutes(0);
+    const date = new Date((this.lastDate += 1000 * 60 * 60 * 3));
     const dateHours = date.getHours();
-    if (dateHours > 22) date.setHours(22);
-    else if (dateHours < 9) date.setHours(13);
-    else if (dateHours < 13) date.setHours(14);
-    else if (dateHours < 16) date.setHours(16);
-    else if (dateHours < 19) date.setHours(19);
+    this.lastDate = date.getTime();
+
+    if (dateHours > 19) date.setHours(22);
+    else if (dateHours <= 9) date.setHours(13);
+    else if (dateHours <= 13) date.setHours(14);
+    else if (dateHours <= 16) date.setHours(16);
+    else if (dateHours <= 19) date.setHours(19);
 
     const isAHome = Math.random() > 0.5;
     const match = new FakeMatch({
@@ -121,7 +123,6 @@ class FakeMatchGenerator {
       date: date.toISOString(),
       status: 1,
     });
-    this.lastDate = date.getTime();
     await match.save();
   }
 
