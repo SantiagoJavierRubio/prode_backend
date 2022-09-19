@@ -51,8 +51,10 @@ export const loginWithEmail = async (req, res, next) => {
       req.body.password || null
     );
     if (!user.verified) throw new CustomError(401, "User is not verified");
+    if (!user) throw new CustomError(401, "User not found");
+    console.log(user);
     const token = generateJwtToken(user);
-    res.cookie("jwt", token, { sameSite: "none", secure: true });
+    res.cookie("jwt", token, { sameSite: "None", secure: true });
     res.status(200).json({ user_id: user._id });
   } catch (err) {
     errorHandler(err, req, res, next);

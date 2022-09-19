@@ -27,7 +27,7 @@ const config = {
     key: process.env.CLOUDINARY_KEY,
     secret: process.env.CLOUDINARY_SECRET,
   },
-  langs: ["en", "es"],
+  langs: ["es"],
   scoringPassword: process.env.SCORING_PASSWORD,
 };
 
