@@ -56,6 +56,7 @@ app.use(
   cors({
     credentials: true,
     origin: config.clientUrl,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(helmet());

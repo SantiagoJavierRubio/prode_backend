@@ -52,10 +52,9 @@ export const loginWithEmail = async (req, res, next) => {
     );
     if (!user.verified) throw new CustomError(401, "User is not verified");
     if (!user) throw new CustomError(401, "User not found");
-    console.log(user);
     const token = generateJwtToken(user);
-    res.cookie("jwt", token, { sameSite: "None", secure: true });
-    res.status(200).json({ user_id: user._id });
+    // res.cookie("jwt", token, { sameSite: "None", secure: true });
+    res.status(200).json({ user_id: user._id, token });
   } catch (err) {
     errorHandler(err, req, res, next);
   }
@@ -64,8 +63,8 @@ export const googleVerified = async (req, res, next) => {
   try {
     const user = await verifyGoogle(req.body.token);
     const token = generateJwtToken(user);
-    res.cookie("jwt", token, { sameSite: "none", secure: true });
-    res.sendStatus(200);
+    // res.cookie("jwt", token, { sameSite: "none", secure: true });
+    res.status(200).json({ token });
   } catch (err) {
     errorHandler(err, req, res, next);
   }
@@ -109,8 +108,7 @@ export const grantTemporaryVerification = async (req, res, next) => {
     const user = await User.getById(user_id);
     await VerificationToken.findByIdAndRemove(verificationToken._id);
     const jwt = generateJwtToken(user);
-    res.cookie("jwt", jwt, { sameSite: "none", secure: true });
-    res.redirect(`${config.clientUrl}/auth/change-password`);
+    res.redirect(`${config.clientUrl}/auth/change-password/${jwt}`);
   } catch (err) {
     errorHandler(err, req, res, next);
   }
@@ -118,7 +116,7 @@ export const grantTemporaryVerification = async (req, res, next) => {
 export const changePassword = async (req, res, next) => {
   try {
     const newPassword = req.body.password || null;
-    await User.changePassword(req.body.user_id, newPassword);
+    await User.changePassword(req.user._id, newPassword);
     req.logOut();
     res.clearCookie("jwt", { path: "/", sameSite: "none", secure: true });
     res.clearCookie("connect.sid", { path: "/" });
