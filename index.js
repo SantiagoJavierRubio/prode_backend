@@ -59,6 +59,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(helmet());
 app.use(i18n.init);
 app.use((req, res, next) => {
