@@ -55,7 +55,7 @@ app.set("trust proxy", 1);
 app.use(
   cors({
     credentials: true,
-    origin: config.clientUrl,
+    origin: [config.clientUrl, "https://prodetest.vercel.app"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );

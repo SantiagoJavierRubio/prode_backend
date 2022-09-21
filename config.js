@@ -4,9 +4,7 @@ const URLS = {
   server: "",
 };
 if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
-  (URLS.client = process.env.local
-    ? "http://localhost:3000"
-    : "https://prodetest.vercel.app"),
+  (URLS.client = "http://localhost:3000"),
     (URLS.server = "http://localhost:8080");
 } else {
   (URLS.client = process.env.CLIENT_URL),
