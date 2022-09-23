@@ -2,6 +2,7 @@ import { CustomError } from "../../Errors/CustomError";
 import { Container } from "../Containers/Mongo.container";
 import { UserDocument, User, UserT } from "../Models/User.model";
 import { Model, LeanDocument } from "mongoose";
+import { genSalt, hash } from "bcryptjs"
 
 interface UserCreate {
   email: UserT["email"];
@@ -18,6 +19,26 @@ interface UserEdit {
 export class UserDAO extends Container<UserDocument> {
   constructor() {
     super(new Model(User));
+  }
+  async hashPassword(password: string): Promise<string> {
+    const salt = await genSalt(10);
+    return await hash(password, salt)
+  }
+  validateUsername(name: string): void {
+    if (name.length > 20) {
+      throw new CustomError(
+        400,
+        "Username too long",
+        "Usernames should be 20 characters or less"
+      );
+    }
+    if (/([^A-Za-z0-9])/.test(name)) {
+      throw new CustomError(
+        400,
+        "Invalid username",
+        "Only alphanumeric characters allowed"
+      );
+    }
   }
   async findByEmail(email: string): Promise<LeanDocument<UserDocument> | null> {
     return await this.getOne({ email });
