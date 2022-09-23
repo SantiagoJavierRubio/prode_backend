@@ -2,7 +2,7 @@ import { CustomError } from "../../Errors/CustomError";
 import { Container } from "../Containers/Mongo.container";
 import { UserDocument, User, UserT } from "../Models/User.model";
 import { Model, LeanDocument } from "mongoose";
-import { genSalt, hash } from "bcryptjs"
+import { genSalt, hash, compare } from "bcryptjs";
 
 interface UserCreate {
   email: UserT["email"];
@@ -22,38 +22,41 @@ export class UserDAO extends Container<UserDocument> {
   }
   async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(10);
-    return await hash(password, salt)
-  }
-  validateUsername(name: string): void {
-    if (name.length > 20) {
-      throw new CustomError(
-        400,
-        "Username too long",
-        "Usernames should be 20 characters or less"
-      );
-    }
-    if (/([^A-Za-z0-9])/.test(name)) {
-      throw new CustomError(
-        400,
-        "Invalid username",
-        "Only alphanumeric characters allowed"
-      );
-    }
+    return await hash(password, salt);
   }
   async findByEmail(email: string): Promise<LeanDocument<UserDocument> | null> {
     return await this.getOne({ email });
   }
-  async createWithEmail(userData: UserCreate): Promise<LeanDocument<UserDocument> | null> {
-    return await this.create(userData);
+  async createWithEmail(
+    userData: UserCreate
+  ): Promise<LeanDocument<UserDocument> | null> {
+    if (!userData.password) throw new CustomError(400, "Password is required");
+    const pwd = await this.hashPassword(userData.password);
+    if (await this.getOne({ email: userData.email }))
+      throw new CustomError(406, "Email already in use");
+    if (await this.getOne({ name: userData.name }))
+      throw new CustomError(406, "Username already in use");
+    return await this.create({...userData, password: pwd });
   }
   async checkCredentials(
     email: string,
     password: string
   ): Promise<LeanDocument<UserDocument> | null> {
     const user = await this.getOne({ email });
+    if (!user) throw new CustomError(404, "User not found");
+    if (!user?.password)
+      throw new CustomError(
+        406,
+        "User registered with Google",
+        "Try to sign in with Google"
+      );
+    if (!(await compare(password, user.password)))
+      throw new CustomError(401, "Invalid password");
     return user;
   }
-  async createWithGoogle(email: string): Promise<LeanDocument<UserDocument> | null> {
+  async createWithGoogle(
+    email: string
+  ): Promise<LeanDocument<UserDocument> | null> {
     const user = await this.create({
       email: email,
       name: email,
@@ -63,7 +66,15 @@ export class UserDAO extends Container<UserDocument> {
   }
   async changePassword(userId: string, password: string): Promise<boolean> {
     const user = await this.getById(userId);
-    const updated = await this.update(user?._id, { password: password });
+    if (!user) throw new CustomError(404, "User not found");
+    if (!user?.password)
+    throw new CustomError(
+      406,
+      "User registered with Google",
+      "Try to sign in with Google"
+    );
+    const pwd = await this.hashPassword(password);
+    await this.update(user?._id, { password: pwd });
     return true;
   }
   async editProfile(userId: string, data: UserEdit): Promise<boolean> {
@@ -72,9 +83,9 @@ export class UserDAO extends Container<UserDocument> {
     const exists = await this.getOne({ name: data.name });
     if (exists && exists._id !== userId)
       throw new CustomError(406, "User name already in use");
-    const updated = await this.update(userId, {
-        name: data.name || user.name,
-        avatar: data.avatar || user.avatar
+    await this.update(userId, {
+      name: data.name || user.name,
+      avatar: data.avatar || user.avatar,
     });
     return true;
   }

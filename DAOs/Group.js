@@ -34,7 +34,7 @@ class Group extends Container {
       name: data.name,
       owner: user._id,
       members: [user._id],
-      rules: { ...data.rules },
+      rules: { ...data.rules, timeLimit: parseInt(data.rules.timeLimit) },
     });
     if (!newGroup) throw new CustomError(500, "Failed to create group");
     return newGroup;
