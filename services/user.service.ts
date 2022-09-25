@@ -1,4 +1,4 @@
-import { CustomError } from "../Errors/CustomError";
+import { CustomError } from "../Middleware/Errors/CustomError";
 import { UserDAO } from "../Persistence/DAOS/User.dao";
 import { UserEditProfile, UserProfileDTO } from "../DTOS/User/profile.user.dto";
 import { Validated } from "./validated.util";
@@ -52,3 +52,6 @@ export class UserService extends Validated {
     return await cloudinary.getAvatars();
   }
 }
+
+
+export const userService = new UserService();

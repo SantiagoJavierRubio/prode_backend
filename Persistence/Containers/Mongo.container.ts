@@ -1,9 +1,9 @@
-import { CustomError } from "../../Errors/CustomError";
+import { CustomError } from "../../Middleware/Errors/CustomError";
 import { Model, Document, LeanDocument } from "mongoose";
 
 
 export class Container<T extends Document> {
-  constructor(private _model: Model<Document>) {}
+  constructor(private _model: Model<any>) {}
 
   async getById(id: string, fields?: string | null): Promise<LeanDocument<T> | null> {
     try {
@@ -79,7 +79,7 @@ export class Container<T extends Document> {
   async createMultiple(data: object[]): Promise<LeanDocument<T>[] | null> {
     try {
       const inserted = await this._model.insertMany(data);
-      return await this.getManyById(inserted.map(i => i._id))
+      return await this.getManyById(inserted.map(i => `${i._id}`))
     } catch (err) {
       throw new CustomError(
         500,

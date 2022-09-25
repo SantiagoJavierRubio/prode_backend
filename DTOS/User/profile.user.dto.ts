@@ -8,7 +8,7 @@ export class UserProfileDTO {
   avatar: UserT["avatar"];
   email: UserT["email"];
   constructor(userData: LeanDocument<UserDocument> | null) {
-    if (!userData || userData._id) throw Error("");
+    if (!userData) throw Error("");
     this.id = userData.id || `${userData._id}`;
     this.name = userData.name;
     this.avatar = userData.avatar || '';

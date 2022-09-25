@@ -1,4 +1,4 @@
-import { CustomError } from "../../Errors/CustomError";
+import { CustomError } from "../../Middleware/Errors/CustomError";
 import { Container } from "../Containers/Mongo.container";
 import { UserDocument, User, UserT } from "../Models/User.model";
 import { Model, LeanDocument } from "mongoose";
@@ -18,7 +18,7 @@ interface UserEdit {
 
 export class UserDAO extends Container<UserDocument> {
   constructor() {
-    super(new Model(User));
+    super(User);
   }
   async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(10);
