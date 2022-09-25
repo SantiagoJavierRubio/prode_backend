@@ -3,12 +3,7 @@ import { Container } from "../Containers/Mongo.container";
 import { UserDocument, User, UserT } from "../Models/User.model";
 import { Model, LeanDocument } from "mongoose";
 import { genSalt, hash, compare } from "bcryptjs";
-
-interface UserCreate {
-  email: UserT["email"];
-  password: UserT["password"];
-  name: UserT["name"];
-}
+import { UserCreateDTO } from "../../DTOS/User/auth.user.dto";
 
 interface UserEdit {
   email?: UserT["email"];
@@ -28,7 +23,7 @@ export class UserDAO extends Container<UserDocument> {
     return await this.getOne({ email });
   }
   async createWithEmail(
-    userData: UserCreate
+    userData: UserCreateDTO
   ): Promise<LeanDocument<UserDocument> | null> {
     if (!userData.password) throw new CustomError(400, "Password is required");
     const pwd = await this.hashPassword(userData.password);
@@ -41,7 +36,7 @@ export class UserDAO extends Container<UserDocument> {
   async checkCredentials(
     email: string,
     password: string
-  ): Promise<LeanDocument<UserDocument> | null> {
+  ): Promise<LeanDocument<UserDocument>> {
     const user = await this.getOne({ email });
     if (!user) throw new CustomError(404, "User not found");
     if (!user?.password)
@@ -50,6 +45,7 @@ export class UserDAO extends Container<UserDocument> {
         "User registered with Google",
         "Try to sign in with Google"
       );
+    if (!user.verified) throw new CustomError(401, "User is not verified");
     if (!(await compare(password, user.password)))
       throw new CustomError(401, "Invalid password");
     return user;
@@ -57,12 +53,11 @@ export class UserDAO extends Container<UserDocument> {
   async createWithGoogle(
     email: string
   ): Promise<LeanDocument<UserDocument> | null> {
-    const user = await this.create({
+    return await this.create({
       email: email,
       name: email,
       verified: true,
     });
-    return user;
   }
   async changePassword(userId: string, password: string): Promise<boolean> {
     const user = await this.getById(userId);
