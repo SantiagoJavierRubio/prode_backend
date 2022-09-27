@@ -1,14 +1,8 @@
 import mongoose from "mongoose";
 
-interface VerificationToken {
-  user_id: string;
-  token: string;
-  expiration: Date;
-}
-
-const VerificationSchema = new mongoose.Schema<VerificationToken>(
+const VerificationSchema = new mongoose.Schema(
   {
-    user_id: { type: String, required: true },
+    user_id: { type: String, required: true, unique: true },
     token: { type: String, required: true },
     expiration: {
       type: Date,
@@ -18,7 +12,12 @@ const VerificationSchema = new mongoose.Schema<VerificationToken>(
   { collection: "verifications" }
 );
 
-export const VerificationToken = mongoose.model<VerificationToken>(
+export type VerificationTokenT = mongoose.InferSchemaType<
+  typeof VerificationSchema
+>;
+export type VerificationTokenDocument = VerificationTokenT & mongoose.Document;
+
+export const VerificationToken = mongoose.model(
   "VerificationToken",
   VerificationSchema
 );

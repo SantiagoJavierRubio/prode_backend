@@ -6,6 +6,8 @@ import { CustomError } from "../Middleware/Errors/CustomError";
 import { UserCreateDTO, UserCreate } from "../DTOS/User/auth.user.dto";
 import { generateJwtToken } from "../utils/jwtToken";
 import { googleClient } from "../Middleware/Google/googleVerification";
+import { VerificationTokenDAO } from "../Persistence/DAOS/VerificationToken.dao";
+import { mailer } from "../Middleware/Nodemailer/mailer.middleware";
 
 interface IUserData {
   user: LeanDocument<UserDocument>;
@@ -22,6 +24,7 @@ interface IGoogleToken {
 
 export class AuthService extends Validated {
   users = new UserDAO();
+  verificationTokens = new VerificationTokenDAO();
   constructor() {
     super();
   }
@@ -43,12 +46,27 @@ export class AuthService extends Validated {
     const user = await this.users.createWithEmail(new UserCreateDTO(input));
     if (!user)
       throw new CustomError(500, "Something went wrong while creating user");
-    // TODO: Implement sendVerificationEmail
+    const verificationToken = await this.verificationTokens.generate(user._id);
+    if (
+      !(await mailer.sendVerificationEmail(
+        user._id,
+        user.email,
+        verificationToken
+      ))
+    )
+      throw new CustomError(500, "Failed to send verification email");
     return { user: user };
   }
   async checkVerification(token: string, userId: string): Promise<boolean> {
-    // TODO: Implement
-    return false;
+    const userToken = await this.verificationTokens.findByUserId(userId);
+    if (!userToken) throw new CustomError(404, "Token not found");
+    if (userToken.token !== token) throw new CustomError(406, "Invalid token");
+    if (Date.now() > userToken.expiration.getTime())
+      throw new CustomError(406, "Token expired");
+    await this.users.update(userId, { verified: true });
+    if (!(await this.verificationTokens.remove(userToken._id)))
+      throw new CustomError(500, "Failed to remove used token");
+    return true;
   }
   async checkEmailCredentials(userData: UserCreate): Promise<IValidatedUser> {
     if (this.hasNulls([userData.email, userData.password]))
@@ -82,8 +100,42 @@ export class AuthService extends Validated {
         "User registered with Google",
         "Try to sign in with Google"
       );
-    // TODO: -> await sendPasswordChaingEmail(user)
+    const temporaryToken = await this.verificationTokens.generate(user._id);
+    if (
+      !(await mailer.sendPasswordChangeEmail(
+        user._id,
+        user.email,
+        temporaryToken
+      ))
+    )
+      throw new CustomError(500, "Failed to send password change email");
     return true;
+  }
+  async verifyTemporaryToken(
+    token: string | undefined,
+    userId: string | undefined
+  ): Promise<string> {
+    if (!userId || !token)
+      throw new CustomError(
+        400,
+        "Missing fields",
+        "User id and token are required"
+      );
+    const userToken = await this.verificationTokens.findByUserId(userId);
+    if (!userToken) throw new CustomError(404, "Token not found");
+    if (userToken.token !== token) throw new CustomError(406, "Invalid token");
+    if (Date.now() > userToken.expiration.getTime())
+      throw new CustomError(406, "Token expired");
+    if (!(await this.verificationTokens.remove(userToken._id)))
+      throw new CustomError(500, "Failed to remove used token");
+    const user = await this.users.getById(userId);
+    if (!user) throw new CustomError(404, "User not found");
+    return generateJwtToken(user);
+  }
+  async updatePassword(userId: string, password: string): Promise<boolean> {
+    if (this.hasNulls([userId, password]))
+      throw new CustomError(400, "User id and password are required");
+    return await this.users.changePassword(userId, password);
   }
 }
 

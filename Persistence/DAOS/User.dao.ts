@@ -1,7 +1,7 @@
 import { CustomError } from "../../Middleware/Errors/CustomError";
 import { Container } from "../Containers/Mongo.container";
 import { UserDocument, User, UserT } from "../Models/User.model";
-import { Model, LeanDocument } from "mongoose";
+import { LeanDocument } from "mongoose";
 import { genSalt, hash, compare } from "bcryptjs";
 import { UserCreateDTO } from "../../DTOS/User/auth.user.dto";
 
@@ -31,7 +31,7 @@ export class UserDAO extends Container<UserDocument> {
       throw new CustomError(406, "Email already in use");
     if (await this.getOne({ name: userData.name }))
       throw new CustomError(406, "Username already in use");
-    return await this.create({...userData, password: pwd });
+    return await this.create({ ...userData, password: pwd });
   }
   async checkCredentials(
     email: string,
@@ -63,11 +63,11 @@ export class UserDAO extends Container<UserDocument> {
     const user = await this.getById(userId);
     if (!user) throw new CustomError(404, "User not found");
     if (!user?.password)
-    throw new CustomError(
-      406,
-      "User registered with Google",
-      "Try to sign in with Google"
-    );
+      throw new CustomError(
+        406,
+        "User registered with Google",
+        "Try to sign in with Google"
+      );
     const pwd = await this.hashPassword(password);
     await this.update(user?._id, { password: pwd });
     return true;
