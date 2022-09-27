@@ -44,6 +44,7 @@ export class UserService extends Validated {
   ): Promise<ProfileEditReturn> {
     if (this.hasNulls([userId]))
       throw new CustomError(400, "Missing fields", "user ID is required");
+    if (input.name) this.validateUserName(input.name);
     await this.users.editProfile(userId, input);
     const profile = await this.users.getById(userId, "name avatar");
     return { message: "Profile updated", profile: new UserProfileDTO(profile) };
@@ -52,6 +53,5 @@ export class UserService extends Validated {
     return await cloudinary.getAvatars();
   }
 }
-
 
 export const userService = new UserService();

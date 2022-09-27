@@ -43,6 +43,7 @@ export class AuthService extends Validated {
         "Missing fields",
         "Name, email and password are required"
       );
+    this.validateUserName(input.name);
     const user = await this.users.createWithEmail(new UserCreateDTO(input));
     if (!user)
       throw new CustomError(500, "Something went wrong while creating user");
