@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
-import { fifaService } from "../Services/fifa.service";
+import { fifaService } from "../services/fifa.service";
 
 class FifaController {
   async getFixture(req: Request, res: Response, next: NextFunction) {

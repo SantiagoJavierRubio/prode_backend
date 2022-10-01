@@ -14,6 +14,17 @@ class FifaService {
   async fetchGroups() {
     return await this.fifa.getAllGroups();
   }
+  async checkFixtureStatus() {
+    const payload = {
+      GRUPOS: false,
+      OCTAVOS: false,
+      CUARTOS: false,
+      SEMIFINAL: false,
+      FINAL: false,
+      TERCER_PUESTO: false,
+    };
+    const stages = await this.fifa.getAllStages();
+  }
   async fetchNextMatches(quantity: number) {
     const allMatches = await this.fifa.getAllMatches();
     const now = Date.now();
