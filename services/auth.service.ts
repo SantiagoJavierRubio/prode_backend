@@ -5,7 +5,7 @@ import { LeanDocument } from "mongoose";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { UserCreateDTO, UserCreate } from "../DTOS/User/auth.user.dto";
 import { generateJwtToken } from "../utils/jwtToken";
-import { googleClient } from "../Middleware/Google/googleVerification";
+import { googleClient } from "../Middleware/Google/google.middleware";
 import { VerificationTokenDAO } from "../Persistence/DAOS/VerificationToken.dao";
 import { mailer } from "../Middleware/Nodemailer/mailer.middleware";
 
