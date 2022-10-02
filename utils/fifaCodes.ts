@@ -1,4 +1,6 @@
 import { FifaDAO } from "../Persistence/DAOS/Fifa.dao";
+import { Stage } from "../Persistence/DAOS/Fifa.dao";
+import { CustomError } from "../Middleware/Errors/CustomError";
 import "dotenv/config";
 
 interface Codes {
@@ -12,12 +14,16 @@ class FifaCodes {
 
   constructor(actual: boolean) {
     this.fifa = new FifaDAO(actual);
-    this._getGroupCodes();
-    this._getStageCodes();
+    this._getCodes();
   }
 
-  private async _getStageCodes() {
+  private async _getCodes(): Promise<void> {
     const stages = await this.fifa.getAllStages("en");
+    await this._getGroupCodes(stages);
+    await this._getStageCodes(stages);
+  }
+
+  private async _getStageCodes(stages: Stage[]): Promise<void> {
     stages.forEach((stage) => {
       if (stage.groups) this._STAGE_CODES.GRUPOS = stage.id;
       else
@@ -39,8 +45,7 @@ class FifaCodes {
         }
     });
   }
-  private async _getGroupCodes() {
-    const stages = await this.fifa.getAllStages("en");
+  private async _getGroupCodes(stages: Stage[]): Promise<void> {
     const groupStage = stages.filter((stage) => stage.groups)[0];
     groupStage.groups?.forEach((group) => {
       const name = group.name.slice(-1);
@@ -49,11 +54,13 @@ class FifaCodes {
   }
 
   getGroupCode(input: string): string {
+    if (!input) throw new CustomError(400, "Missing code");
     const i = input.toUpperCase();
     if (this._GROUP_CODES[i]) return this._GROUP_CODES[i];
     return input;
   }
   getStageCode(input: string): string {
+    if (!input) throw new CustomError(400, "Missing code");
     const i = input.toUpperCase();
     if (this._STAGE_CODES[i]) return this._STAGE_CODES[i];
     return input;

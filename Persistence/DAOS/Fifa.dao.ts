@@ -3,7 +3,7 @@ import { FifaContainer, MatchesByCategory } from "../Containers/Fifa.container";
 import { Match } from "../../DTOS/Fixture/fifa.match.dto";
 import { CustomError } from "../../Middleware/Errors/CustomError";
 
-interface Stage {
+export interface Stage {
   id: string;
   name: string;
   matches: Match[] | null;
