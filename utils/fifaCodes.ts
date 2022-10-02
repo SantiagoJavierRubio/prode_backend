@@ -65,6 +65,13 @@ class FifaCodes {
     if (this._STAGE_CODES[i]) return this._STAGE_CODES[i];
     return input;
   }
+  getStageName(code: string): string {
+    if (!code) throw new CustomError(400, "Missing code");
+    for (let [key, value] of Object.entries(this._STAGE_CODES)) {
+      if (value === code) return key;
+    }
+    return code;
+  }
 }
 
 export const fifaCodes = new FifaCodes(!(process.env.MODO_PRUEBA === "RUSIA"));

@@ -3,6 +3,7 @@ import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
 import { fifaService } from "../services/fifa.service";
 
 class FifaController {
+  // TODO: Add locale management for applying language requests to API
   async getFixture(req: Request, res: Response, next: NextFunction) {
     try {
       const groupId = req.query.groupId ? `${req.query.groupId}` : null;
@@ -23,12 +24,17 @@ class FifaController {
   }
   async getFixtureStatus(req: Request, res: Response, next: NextFunction) {
     try {
+      const payload = await fifaService.checkFixtureStatus();
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }
   }
   async getNextMatches(req: Request, res: Response, next: NextFunction) {
     try {
+      const quantity = parseInt(`${req.query.quantity}`) || 5;
+      const response = await fifaService.fetchNextMatches(quantity);
+      res.json({ fixture: response });
     } catch (err) {
       errorHandler(err, req, res, next);
     }
