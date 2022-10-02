@@ -27,4 +27,16 @@ export class Validated {
       );
     }
   }
+  arePositiveNumbers(data: any[]): boolean {
+    if (!(data instanceof Array)) return false;
+    if (
+      data.some((item) => {
+        if (isNaN(item)) return true;
+        if (item < 0) return true;
+        return false;
+      })
+    )
+      return false;
+    return true;
+  }
 }

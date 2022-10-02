@@ -10,14 +10,24 @@ interface UserGroupRules {
   timeLimit: number;
 }
 
-export interface UserGroup {
+export type GroupT = {
   name: string;
   owner: string;
   members: string[];
   rules: UserGroupRules | undefined;
+};
+
+interface IUserGroupMethods {
+  addMember(id: string): string[];
 }
 
-const GroupSchema = new mongoose.Schema<UserGroup>(
+type UserGroupModel = mongoose.Model<GroupT, {}, IUserGroupMethods>;
+
+const GroupSchema = new mongoose.Schema<
+  GroupT,
+  UserGroupModel,
+  IUserGroupMethods
+>(
   {
     name: { type: String, required: true },
     owner: { type: String, required: true },
@@ -39,9 +49,11 @@ const GroupSchema = new mongoose.Schema<UserGroup>(
   { collection: "groups" }
 );
 
-GroupSchema.methods.addMember = function (id: string): string[] {
+GroupSchema.method("addMember", function (id: string): string[] {
   this.members.push(id);
   return this.members;
-};
+});
 
-export const Group = mongoose.model<UserGroup>("Group", GroupSchema);
+export type GroupDocument = GroupT & mongoose.Document;
+
+export const Group = mongoose.model("Group", GroupSchema);
