@@ -3,7 +3,7 @@ import { fifaController } from "../controllers/fifa.controller";
 
 export const fifaRoutes = Router();
 
-// router.use(getLocaleLanguage);
+// TODO implementar => router.use(getLocaleLanguage);
 fifaRoutes.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });

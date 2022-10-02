@@ -31,7 +31,7 @@ export class UserService extends Validated {
       );
     const profile = await this.users.getOne({ name: name }, "name avatar");
     if (!profile) throw new CustomError(404, "User not found");
-    // const commonGroups = await groups.getCommonGroups(userId, profile.id);
+    // TODO => const commonGroups = await groups.getCommonGroups(userId, profile.id);
     return {
       profile: new UserProfileDTO(
         profile
