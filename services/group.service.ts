@@ -1,8 +1,6 @@
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { GroupDAO, GroupCreate } from "../Persistence/DAOS/Group.dao";
-import { UserDocument } from "../Persistence/Models/User.model";
-import { LeanDocument } from "mongoose";
 
 class GroupService extends Validated {
   groups = new GroupDAO();

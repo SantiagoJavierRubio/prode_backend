@@ -1,7 +1,6 @@
 import { CustomError } from "../../Middleware/Errors/CustomError";
 import { Container } from "../Containers/Mongo.container";
 import { GroupT, Group, GroupDocument } from "../Models/Group.model";
-import { UserDocument } from "../Models/User.model";
 import { LeanDocument } from "mongoose";
 
 interface GroupRules {
