@@ -16,7 +16,35 @@ class GroupController {
       errorHandler(err, req, res, next);
     }
   }
-  async XXXX(req: Request, res: Response, next: NextFunction) {
+  async join(req: Request, res: Response, next: NextFunction) {
+    try {
+      const groupName = req.query.groupName?.toString().toUpperCase();
+      const user = req.user;
+      const payload = await groupService.joinGroup(groupName, user?._id);
+      res.json(payload);
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
+  async getGroupRules(req: Request, res: Response, next: NextFunction) {
+    try {
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
+  async getScores(req: Request, res: Response, next: NextFunction) {
+    try {
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
+  async leaveGroup(req: Request, res: Response, next: NextFunction) {
+    try {
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
+  async getGroupData(req: Request, res: Response, next: NextFunction) {
     try {
     } catch (err) {
       errorHandler(err, req, res, next);

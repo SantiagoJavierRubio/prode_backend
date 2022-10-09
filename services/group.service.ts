@@ -8,7 +8,7 @@ class GroupService extends Validated {
     super();
   }
   async validateCreateReturn(data: GroupCreate, userId: string) {
-    data.name = data.name.trim().toUpperCase();
+    data.name = data.name?.trim().toUpperCase();
     if (this.hasNulls([data.name, userId]))
       throw new CustomError(400, "Missing data");
     if (data.name.length > 20)
@@ -32,6 +32,15 @@ class GroupService extends Validated {
         "Time prediction limit must be a positive number"
       );
     return this.groups.createGroup(data, userId);
+  }
+  async joinGroup(groupName: string | undefined, userId: string) {
+    if (!groupName || !userId)
+      throw new CustomError(
+        400,
+        "Missing field",
+        "Group name and user are required"
+      );
+    return this.groups.addMember(groupName.toUpperCase(), userId);
   }
 }
 
