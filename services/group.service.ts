@@ -34,7 +34,7 @@ class GroupService extends Validated {
     return this.groups.createGroup(data, userId);
   }
   async joinGroup(groupName: string | undefined, userId: string) {
-    if (!groupName || !userId)
+    if (!groupName || !userId || this.hasNulls([groupName, userId]))
       throw new CustomError(
         400,
         "Missing field",
@@ -42,6 +42,24 @@ class GroupService extends Validated {
       );
     return this.groups.addMember(groupName.toUpperCase(), userId);
   }
+  async removeFromGroup(groupName: string | undefined, userId: string) {
+    if (!groupName || !userId || this.hasNulls([groupName, userId]))
+      throw new CustomError(
+        400,
+        "Missing field",
+        "Group name and user are required"
+      );
+    const groupId = await this.groups.removeMember(
+      groupName.toUpperCase(),
+      userId
+    );
+    if (!groupId)
+      throw new CustomError(500, "Failed to remove user from group");
+    // TODO: implement remove predictions by this user
+    return groupId;
+  }
+  async fetchGroupData(groupName: string | undefined) {}
+  async removeGroup(groupId: string | undefined, userId: string) {}
 }
 
 export const groupService = new GroupService();

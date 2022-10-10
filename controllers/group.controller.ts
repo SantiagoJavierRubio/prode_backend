@@ -40,6 +40,22 @@ class GroupController {
   }
   async leaveGroup(req: Request, res: Response, next: NextFunction) {
     try {
+      const groupName = req.query.groupName?.toString();
+      const user = req.user;
+      const removedId = await groupService.removeFromGroup(
+        groupName,
+        user?._id
+      );
+      res.json({
+        message: "User removed from group",
+        group_id: removedId,
+      });
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
+  async deleteGroup(req: Request, res: Response, next: NextFunction) {
+    try {
     } catch (err) {
       errorHandler(err, req, res, next);
     }
