@@ -84,4 +84,10 @@ export class UserDAO extends Container<UserDocument> {
     });
     return true;
   }
+  async verifyUser(userId: string): Promise<void> {
+    const user = await this.getById(userId);
+    if (!user) throw new CustomError(404, "User not found");
+    if (user.verified) throw new CustomError(406, "User already verified");
+    return this.update(userId, { verified: true });
+  }
 }

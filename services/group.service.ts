@@ -26,8 +26,8 @@ class GroupService extends Validated {
         "Group name must contain at least one letter or number"
       );
     if (
-      data.rules.timeLimit &&
-      !this.arePositiveNumbers([data.rules.timeLimit])
+      data.rules?.timeLimit &&
+      !this.arePositiveNumbers([data.rules?.timeLimit])
     )
       throw new CustomError(
         400,

@@ -64,7 +64,7 @@ export class AuthService extends Validated {
     if (userToken.token !== token) throw new CustomError(406, "Invalid token");
     if (Date.now() > userToken.expiration.getTime())
       throw new CustomError(406, "Token expired");
-    await this.users.update(userId, { verified: true });
+    await this.users.verifyUser(userId);
     if (!(await this.verificationTokens.remove(userToken._id)))
       throw new CustomError(500, "Failed to remove used token");
     return true;

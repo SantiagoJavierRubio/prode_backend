@@ -3,18 +3,9 @@ import { Container } from "../Containers/Mongo.container";
 import { GroupT, Group, GroupDocument } from "../Models/Group.model";
 import { LeanDocument } from "mongoose";
 
-export interface GroupRules {
-  timeLimit: number;
-  manifesto: string;
-  scoring: {
-    NONE: number;
-    WINNER: number;
-    FULL: number;
-  };
-}
 export interface GroupCreate {
-  name: string;
-  rules: GroupRules;
+  name: GroupT["name"];
+  rules: GroupT["rules"];
 }
 
 export class GroupDAO extends Container<GroupDocument> {
@@ -92,7 +83,7 @@ export class GroupDAO extends Container<GroupDocument> {
     const group = await this.getOne({ name: groupName });
     if (!group) throw new CustomError(404, "Group not found");
     if (!group.members.includes(userId))
-      throw new CustomError(406, "User not in group");
+      throw new CustomError(404, "User not in group");
     if (group.owner === userId) {
       if (group.members.length === 1)
         throw new CustomError(406, "Cannot remove admin from group", group._id);

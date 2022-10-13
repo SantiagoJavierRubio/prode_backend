@@ -1,17 +1,6 @@
 import mongoose from "mongoose";
 
-interface Prediction {
-  matchId: string;
-  userId: string;
-  userGroupId: string;
-  homeScore: number;
-  awayScore: number;
-  edited: Date;
-  checked: boolean;
-  score: number;
-}
-
-const predictionSchema = new mongoose.Schema<Prediction>(
+const PredictionSchema = new mongoose.Schema(
   {
     matchId: { type: String, required: true },
     userId: { type: String, required: true },
@@ -34,4 +23,7 @@ const predictionSchema = new mongoose.Schema<Prediction>(
   { collection: "predictions" }
 );
 
-export const Prediction = mongoose.model<Prediction>("Predictions", predictionSchema);
+export type PredictionT = mongoose.InferSchemaType<typeof PredictionSchema>;
+export type PredictionDocument = PredictionT & mongoose.Document;
+
+export const Prediction = mongoose.model("Predictions", PredictionSchema);
