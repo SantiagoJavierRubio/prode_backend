@@ -28,10 +28,14 @@ class GroupController {
   }
   async getGroupRules(req: Request, res: Response, next: NextFunction) {
     try {
+      const groupName = req.query.groupName?.toString();
+      const payload = await groupService.fetchGroupRules(groupName);
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }
   }
+  // TODO: implement
   async getScores(req: Request, res: Response, next: NextFunction) {
     try {
     } catch (err) {
@@ -56,12 +60,21 @@ class GroupController {
   }
   async deleteGroup(req: Request, res: Response, next: NextFunction) {
     try {
+      const userGroupId = req.query.userGroupId?.toString();
+      await groupService.removeGroup(userGroupId, req.user?._id);
+      res.json({ message: "Group deleted" });
     } catch (err) {
       errorHandler(err, req, res, next);
     }
   }
   async getGroupData(req: Request, res: Response, next: NextFunction) {
     try {
+      const groupName = req.query.groupName?.toString();
+      const payload = await groupService.fetchGroupData(
+        groupName,
+        req.user?._id
+      );
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }

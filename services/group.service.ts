@@ -1,9 +1,11 @@
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { GroupDAO, GroupCreate } from "../Persistence/DAOS/Group.dao";
+import { GroupAndUsers } from "../Persistence/Repositories/GroupAndUsers.repository";
 
 class GroupService extends Validated {
   groups = new GroupDAO();
+  groupsAndUsers = new GroupAndUsers();
   constructor() {
     super();
   }
@@ -58,8 +60,31 @@ class GroupService extends Validated {
     // TODO: implement remove predictions by this user
     return groupId;
   }
-  async fetchGroupData(groupName: string | undefined) {}
-  async removeGroup(groupId: string | undefined, userId: string) {}
+  async fetchGroupData(groupName: string | undefined, userId: string) {
+    if (groupName) return this.groupsAndUsers.getGroupWithUsers(groupName);
+    if (!userId)
+      throw new CustomError(400, "Missing data", "Group name or user required");
+    return this.groupsAndUsers.getGroupsWithOwnernames(userId);
+  }
+  async removeGroup(groupId: string | undefined, userId: string) {
+    if (!groupId || !userId || this.hasNulls([groupId, userId]))
+      throw new CustomError(
+        400,
+        "Missing field",
+        "Group id and user are required"
+      );
+    return this.groups.deleteGroup(groupId, userId);
+  }
+  async fetchGroupRules(groupName: string | undefined) {
+    if (!groupName)
+      throw new CustomError(400, "Missing data", "Group name required");
+    const groupData = await this.groups.getOne(
+      { name: groupName.toUpperCase() },
+      "rules"
+    );
+    if (!groupData) throw new CustomError(404, "Group not found");
+    return groupData.rules;
+  }
 }
 
 export const groupService = new GroupService();

@@ -3,7 +3,7 @@ import { Container } from "../Containers/Mongo.container";
 import { GroupT, Group, GroupDocument } from "../Models/Group.model";
 import { LeanDocument } from "mongoose";
 
-interface GroupRules {
+export interface GroupRules {
   timeLimit: number;
   manifesto: string;
   scoring: {
