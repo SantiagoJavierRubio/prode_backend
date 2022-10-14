@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
-import { CustomError } from "../Middleware/Errors/CustomError";
 import { groupService } from "../services/group.service";
 
 class GroupController {

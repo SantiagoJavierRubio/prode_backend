@@ -1,5 +1,5 @@
 import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
-import { Request, Response, NextFunction } from "express-serve-static-core";
+import { Request, Response, NextFunction } from "express";
 import { UserDocument } from "../Persistence/Models/User.model";
 import { LeanDocument } from "mongoose";
 import { userService } from "../services/user.service";
