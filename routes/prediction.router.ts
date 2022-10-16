@@ -5,13 +5,18 @@ import passport from "passport";
 export const predictionRoutes = Router();
 
 predictionRoutes.use(passport.authenticate("jwt", { session: false }));
-predictionRoutes.post("/");
-predictionRoutes.get("/");
-predictionRoutes.get("/length");
-predictionRoutes.get("/percentage");
-predictionRoutes.get("/profile/:id");
-predictionRoutes.put("/:id");
-predictionRoutes.post("/edit-multiple");
-predictionRoutes.delete("/:id");
-predictionRoutes.get("/history");
-predictionRoutes.get("/random-missing");
+predictionRoutes.post("/", predictionController.create);
+predictionRoutes.get("/", predictionController.getAll);
+predictionRoutes.get("/length", predictionController.getUserPredictionLength);
+predictionRoutes.get(
+  "/percentage",
+  predictionController.getLengthOfUserPredictions
+);
+predictionRoutes.get("/profile/:id", predictionController.getOtherUsers);
+predictionRoutes.put("/:id", predictionController.edit);
+predictionRoutes.delete("/:id", predictionController.remove);
+predictionRoutes.get("/history", predictionController.getPreviousForStage);
+predictionRoutes.get(
+  "/random-missing",
+  predictionController.getRandomUnpredictedMatch
+);

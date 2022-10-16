@@ -23,12 +23,12 @@ class PredictionController {
   }
   async edit(req: Request, res: Response, next: NextFunction) {
     try {
-    } catch (err) {
-      errorHandler(err, req, res, next);
-    }
-  }
-  async editMany(req: Request, res: Response, next: NextFunction) {
-    try {
+      const editedId = await predictionService.editPrediction(
+        req.params.id,
+        req.body,
+        req.user?._id
+      );
+      res.json({ edited: editedId });
     } catch (err) {
       errorHandler(err, req, res, next);
     }

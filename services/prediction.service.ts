@@ -125,6 +125,42 @@ class PredictionService extends Validated {
       errors,
     };
   }
+  async editPrediction(
+    predictionId: string | undefined,
+    predictionData: PredictionT,
+    userId: string
+  ): Promise<string> {
+    if (
+      !userId ||
+      !predictionData.matchId ||
+      !predictionData.userGroupId ||
+      !predictionId
+    )
+      throw new CustomError(400, "Missing data");
+    if (
+      !this.arePositiveNumbers([
+        predictionData.awayScore,
+        predictionData.homeScore,
+      ])
+    )
+      throw new CustomError(400, "Scores must be positive numbers");
+    if (
+      !(await this.validator.validateSinglePrediction(
+        predictionData.matchId,
+        predictionData.userGroupId
+      ))
+    )
+      throw new CustomError(
+        406,
+        "Your time to edit this prediction has expired"
+      );
+    const edited = await this.predictions.editPrediction(
+      predictionId,
+      predictionData
+    );
+    if (!edited) throw new CustomError(500, "Failed to edit prediction");
+    return edited;
+  }
 }
 
 export const predictionService = new PredictionService();
