@@ -1,12 +1,13 @@
 import { Container } from "../Containers/Mongo.container";
 import { LeanDocument } from "mongoose";
-import {
-  PredictionT,
-  Prediction,
-  PredictionDocument,
-} from "../Models/Prediction.model";
+import { Prediction, PredictionDocument } from "../Models/Prediction.model";
 import { PredictionDTO } from "../../DTOS/Prediction/PredictionPost.dto";
 import { CustomError } from "../../Middleware/Errors/CustomError";
+
+interface ICreateManyResponse {
+  created: LeanDocument<PredictionDocument>[];
+  edited: LeanDocument<PredictionDocument>[];
+}
 
 export class PredictionDAO extends Container<PredictionDocument> {
   constructor() {
@@ -24,6 +25,32 @@ export class PredictionDAO extends Container<PredictionDocument> {
       await this.update(prediction._id, data);
       return this.getById(prediction._id);
     } else return this.create(data);
+  }
+  async createMany(data: PredictionDTO[]): Promise<ICreateManyResponse> {
+    const matchIds = data.map((prediction) => prediction.matchId);
+    const existing = await this.getMany(
+      {
+        userId: data[0].userId,
+        userGroupId: data[0].userGroupId,
+        matchId: { $in: matchIds },
+      },
+      "matchId"
+    );
+    let edited: LeanDocument<PredictionDocument>[] = [];
+    existing?.forEach(async (existingPrediction) => {
+      const newData = data.find(
+        (prediction) => prediction.matchId === existingPrediction.matchId
+      );
+      if (newData) {
+        await this.update(existingPrediction._id, { ...newData });
+        edited = [...edited, existingPrediction];
+      }
+    });
+    const created = (await this.createMultiple(data)) || [];
+    return {
+      edited,
+      created,
+    };
   }
   async editPrediction(
     predictionId: string,
@@ -65,6 +92,19 @@ export class PredictionDAO extends Container<PredictionDocument> {
     return this.getMany({
       userId: userId,
       userGroupId: userGroupId,
+    });
+  }
+  async getSomeByUserInGroup(
+    userId: string,
+    userGroupId: string,
+    matchIds: string[]
+  ): Promise<LeanDocument<PredictionDocument>[] | null> {
+    return this.getMany({
+      userId: userId,
+      userGroupId: userGroupId,
+      matchId: {
+        $in: matchIds,
+      },
     });
   }
   async scorePrediction(predictionId: string, score: number): Promise<void> {
