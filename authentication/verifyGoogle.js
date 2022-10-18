@@ -18,9 +18,7 @@ const verify = async (token) => {
 };
 const checkGoogleUser = async (token) => {
   try {
-    console.log(token);
     const verifiedUser = await verify(token);
-    console.log(verifiedUser);
     if (!verifiedUser) throw new Error("Google verification failed");
     const user = await User.findByEmail(verifiedUser.email);
     if (user) {
