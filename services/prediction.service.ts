@@ -1,13 +1,14 @@
 import { PredictionDAO } from "../Persistence/DAOS/Prediction.dao";
+import { GroupDAO } from "../Persistence/DAOS/Group.dao";
 import { PredictionDTO } from "../DTOS/Prediction/PredictionPost.dto";
 import {
   PredictionT,
   PredictionDocument,
 } from "../Persistence/Models/Prediction.model";
 import {
-  PredictionValidator,
+  PredictionAndFifa,
   IPredictionData,
-} from "../Persistence/Repositories/PredictionValidator.respository";
+} from "../Persistence/Repositories/PredictionAndFifa.respository";
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { LeanDocument } from "mongoose";
@@ -49,7 +50,8 @@ const partition = (
 
 class PredictionService extends Validated {
   predictions = new PredictionDAO();
-  validator = new PredictionValidator();
+  predictionsWithMatches = new PredictionAndFifa();
+  groups = new GroupDAO();
 
   constructor() {
     super();
@@ -65,7 +67,7 @@ class PredictionService extends Validated {
     )
       throw new CustomError(400, "Scores must be positive numbers");
     if (
-      !(await this.validator.validateSinglePrediction(
+      !(await this.predictionsWithMatches.validateSinglePrediction(
         predictionData.prediction.matchId,
         predictionData.userGroupId
       ))
@@ -92,10 +94,11 @@ class PredictionService extends Validated {
         "Missing data",
         "User group ID and user are required"
       );
-    const dateValidated = await this.validator.validateManyPredictions(
-      predictionData.prediction,
-      predictionData.userGroupId
-    );
+    const dateValidated =
+      await this.predictionsWithMatches.validateManyPredictions(
+        predictionData.prediction,
+        predictionData.userGroupId
+      );
     const [validated, scoreErrors] = partition(dateValidated.valid, (e) =>
       this.arePositiveNumbers([e.awayScore, e.homeScore])
     );
@@ -145,7 +148,7 @@ class PredictionService extends Validated {
     )
       throw new CustomError(400, "Scores must be positive numbers");
     if (
-      !(await this.validator.validateSinglePrediction(
+      !(await this.predictionsWithMatches.validateSinglePrediction(
         predictionData.matchId,
         predictionData.userGroupId
       ))
@@ -160,6 +163,29 @@ class PredictionService extends Validated {
     );
     if (!edited) throw new CustomError(500, "Failed to edit prediction");
     return edited;
+  }
+  async fetchAllPredictions(
+    userId: string,
+    userGroupId: string | undefined,
+    stageId: string | undefined,
+    groupId: string | undefined,
+    justOwn: boolean
+  ) {
+    if (!userId) throw new CustomError(401, "Missing user");
+    let predictions: LeanDocument<PredictionDocument>[] | null = [];
+    if (userGroupId) {
+      if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+        throw new CustomError(401, "User not in group");
+      predictions = justOwn
+        ? await this.predictions.getAllByUserInGroup(userId, userGroupId)
+        : await this.predictions.getAllInGroup(userGroupId);
+    } else predictions = await this.predictions.getAllByUser(userId);
+    if (!predictions) return [];
+    return this.predictionsWithMatches.filterForStageOrGroup(
+      predictions,
+      stageId,
+      groupId
+    );
   }
 }
 

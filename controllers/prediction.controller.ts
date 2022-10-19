@@ -35,6 +35,14 @@ class PredictionController {
   }
   async getAll(req: Request, res: Response, next: NextFunction) {
     try {
+      const payload = await predictionService.fetchAllPredictions(
+        req.user?._id,
+        req.query.userGroupId?.toString(),
+        req.query.stageId?.toString(),
+        req.query.groupId?.toString(),
+        req.query.own?.toString().toLowerCase() === "true"
+      );
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }

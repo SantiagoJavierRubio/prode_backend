@@ -1,7 +1,10 @@
 import { CustomError } from "../../Middleware/Errors/CustomError";
 import { FifaDAO } from "../DAOS/Fifa.dao";
 import { GroupDAO } from "../DAOS/Group.dao";
-import { PredictionT } from "../Models/Prediction.model";
+import { PredictionT, PredictionDocument } from "../Models/Prediction.model";
+import { LeanDocument } from "mongoose";
+import { fifaCodes } from "../../utils/fifaCodes";
+import e from "express";
 
 export interface IPredictionData {
   matchId: PredictionT["matchId"];
@@ -14,7 +17,7 @@ export interface IManyPredictionValidate {
   expired: IPredictionData[];
 }
 
-export class PredictionValidator {
+export class PredictionAndFifa {
   private fifa = new FifaDAO(true);
   private groups = new GroupDAO();
 
@@ -56,5 +59,28 @@ export class PredictionValidator {
       else result.expired = [...result.expired, prediction];
     });
     return result;
+  }
+  async filterForStageOrGroup(
+    predictions: LeanDocument<PredictionDocument>[],
+    stageId: string | undefined,
+    groupId: string | undefined
+  ): Promise<LeanDocument<PredictionDocument>[]> {
+    if (stageId) {
+      const matches = await this.fifa.getOneStage(
+        fifaCodes.getStageCode(stageId)
+      );
+      const stageMatchesIds = matches.map((match) => match.id);
+      return predictions.filter((prediction) =>
+        stageMatchesIds.includes(prediction.matchId)
+      );
+    } else if (groupId) {
+      const matches = await this.fifa.getOneGroup(
+        fifaCodes.getGroupCode(groupId)
+      );
+      const groupMatchesIds = matches.map((match) => match.id);
+      return predictions.filter((prediction) =>
+        groupMatchesIds.includes(prediction.matchId)
+      );
+    } else return predictions;
   }
 }
