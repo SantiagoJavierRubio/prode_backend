@@ -76,7 +76,7 @@ export class UserDAO extends Container<UserDocument> {
     const user = await this.getById(userId);
     if (!user) throw new CustomError(404, "User not found");
     const exists = await this.getOne({ name: data.name });
-    if (exists && exists._id !== userId)
+    if (exists && exists._id.toString() !== userId)
       throw new CustomError(406, "User name already in use");
     await this.update(userId, {
       name: data.name || user.name,

@@ -43,8 +43,8 @@ export interface ApiMatchData {
   AwayTeamScore: number | null;
   MatchStatus: number;
   Winner: string | null;
-  PlaceholderA: string;
-  PlaceholderB: string;
+  PlaceHolderA: string;
+  PlaceHolderB: string;
 }
 
 export class Match {
@@ -74,8 +74,8 @@ export class Match {
     this.date = new Date(data.Date);
     this.stadiumId = data.Stadium.IdStadium;
     this.stadium = data.Stadium.Name[0].Description;
-    this.home = data.Home ? new Team(data.Home) : data.PlaceholderA;
-    this.away = data.Away ? new Team(data.Away) : data.PlaceholderB;
+    this.home = data.Home ? new Team(data.Home) : data.PlaceHolderA;
+    this.away = data.Away ? new Team(data.Away) : data.PlaceHolderB;
     this.homeScore = data.HomeTeamScore;
     this.awayScore = data.AwayTeamScore;
     this.status = data.MatchStatus;

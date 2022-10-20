@@ -34,9 +34,13 @@ class GroupController {
       errorHandler(err, req, res, next);
     }
   }
-  // TODO: implement
   async getScores(req: Request, res: Response, next: NextFunction) {
     try {
+      const payload = await groupService.fetchGroupDataWithScores(
+        req.user?._id,
+        req.query.groupName?.toString()
+      );
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }

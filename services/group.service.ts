@@ -2,10 +2,13 @@ import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { GroupDAO, GroupCreate } from "../Persistence/DAOS/Group.dao";
 import { GroupAndUsers } from "../Persistence/Repositories/GroupAndUsers.repository";
+import { Scores } from "../Persistence/Repositories/Scores.repository";
 
 class GroupService extends Validated {
   groups = new GroupDAO();
   groupsAndUsers = new GroupAndUsers();
+  scores = new Scores();
+
   constructor() {
     super();
   }
@@ -87,6 +90,26 @@ class GroupService extends Validated {
     );
     if (!groupData) throw new CustomError(404, "Group not found");
     return groupData.rules;
+  }
+  async fetchGroupDataWithScores(
+    userId: string,
+    groupName: string | undefined
+  ) {
+    if (!userId || !groupName) throw new CustomError(400, "Missing data");
+    const groupData = await this.groups.getOne({
+      name: groupName.toUpperCase(),
+    });
+    if (!groupData) throw new CustomError(404, "Group not found");
+    if (!(await this.groups.checkForUserInGroup(groupData?._id, userId)))
+      throw new CustomError(401, "User not in gorup");
+    const data = await this.scores.getScoresByUser(groupData);
+    return {
+      group: {
+        name: groupData.name,
+        owner: data.owner?.name,
+      },
+      scores: data.scores,
+    };
   }
 }
 

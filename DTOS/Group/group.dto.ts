@@ -25,7 +25,7 @@ export class GroupDataDTO {
       avatar: member.avatar,
     }));
     this.owner = membersData.filter(
-      (member) => member._id == groupData.owner
+      (member) => member._id.toString() === groupData.owner
     )[0];
     this.rules = groupData.rules;
   }
