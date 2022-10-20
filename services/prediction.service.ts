@@ -227,6 +227,33 @@ class PredictionService extends Validated {
     }
     return null;
   }
+  async deletePredictionById(
+    predictionId: string | undefined,
+    userId: string
+  ): Promise<void> {
+    if (!userId || !predictionId) throw new CustomError(400, "Missing data");
+    if (!(await this.predictions.removePrediction(predictionId, userId)))
+      throw new CustomError(500, "Failed to remove prediction");
+  }
+  async fetchOthersPredictions(
+    userId: string,
+    userGroupId: string | undefined,
+    otherUserId: string | undefined
+  ) {
+    if (!userId || !userGroupId || !otherUserId)
+      throw new CustomError(400, "Missing data");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    const predictions = await this.predictions.getAllByUserInGroup(
+      otherUserId,
+      userGroupId
+    );
+    if (!predictions) return [];
+    return this.predictionsWithMatches.matchEvaluatedUserPredictionToMatches(
+      userGroupId,
+      predictions
+    );
+  }
 }
 
 export const predictionService = new PredictionService();

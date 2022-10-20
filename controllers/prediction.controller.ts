@@ -64,12 +64,23 @@ class PredictionController {
   }
   async getOtherUsers(req: Request, res: Response, next: NextFunction) {
     try {
+      const payload = await predictionService.fetchOthersPredictions(
+        req.user?._id,
+        req.query.userGroupId?.toString(),
+        req.params.id
+      );
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }
   }
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
+      await predictionService.deletePredictionById(
+        req.params.id,
+        req.user?._id
+      );
+      res.sendStatus(200);
     } catch (err) {
       errorHandler(err, req, res, next);
     }

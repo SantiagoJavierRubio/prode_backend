@@ -1,10 +1,11 @@
 import { CustomError } from "../../Middleware/Errors/CustomError";
-import { FifaDAO, Stage } from "../DAOS/Fifa.dao";
+import { FifaDAO } from "../DAOS/Fifa.dao";
 import { GroupDAO } from "../DAOS/Group.dao";
 import { PredictionT, PredictionDocument } from "../Models/Prediction.model";
 import { LeanDocument } from "mongoose";
 import { fifaCodes } from "../../utils/fifaCodes";
 import { Match, Team } from "../../DTOS/Fixture/fifa.match.dto";
+import { PredictionAndMatch } from "../../DTOS/Prediction/PredictionAndMatch.dto";
 
 export interface IPredictionData {
   matchId: PredictionT["matchId"];
@@ -164,5 +165,28 @@ export class PredictionAndFifa {
     return validFutureMatches[
       Math.floor(Math.random() * validFutureMatches.length)
     ];
+  }
+  async matchEvaluatedUserPredictionToMatches(
+    userGroupId: string,
+    predictions: LeanDocument<PredictionDocument>[]
+  ): Promise<PredictionAndMatch[]> {
+    const group = await this.groups.getById(userGroupId, "-_id rules");
+    const matchIds = await predictions.map((prediction) => prediction.matchId);
+    const matches = await this.fifa.getMatchesById(matchIds);
+    const now = Date.now();
+    const result: PredictionAndMatch[] = [];
+    for (let prediction of predictions) {
+      const match = matches.find((match) => {
+        match.id === prediction.matchId;
+      });
+      if (
+        !match ||
+        !group?.rules?.timeLimit ||
+        match.date.getTime() > now + group?.rules?.timeLimit
+      )
+        continue;
+      result.push(new PredictionAndMatch(match, prediction));
+    }
+    return result;
   }
 }
