@@ -10,13 +10,14 @@ predictionRoutes.get("/", predictionController.getAll);
 predictionRoutes.get("/length", predictionController.getUserPredictionLength);
 predictionRoutes.get(
   "/percentage",
-  predictionController.getLengthOfUserPredictions
+  predictionController.getLengthOfUserPredictionsByStage
 );
 predictionRoutes.get("/profile/:id", predictionController.getOtherUsers);
 predictionRoutes.put("/:id", predictionController.edit);
 predictionRoutes.delete("/:id", predictionController.remove);
-predictionRoutes.get("/history", predictionController.getPreviousForStage);
 predictionRoutes.get(
   "/random-missing",
   predictionController.getRandomUnpredictedMatch
 );
+// UNUSED
+// predictionRoutes.get("/history", predictionController.getPreviousForStage);

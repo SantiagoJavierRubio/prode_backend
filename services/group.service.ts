@@ -61,7 +61,10 @@ class GroupService extends Validated {
     return groupId;
   }
   async fetchGroupData(groupName: string | undefined, userId: string) {
-    if (groupName) return this.groupsAndUsers.getGroupWithUsers(groupName);
+    if (groupName) {
+      const groupData = await this.groupsAndUsers.getGroupWithUsers(groupName);
+      return { groupData };
+    }
     if (!userId)
       throw new CustomError(400, "Missing data", "Group name or user required");
     return this.groupsAndUsers.getGroupsWithOwnernames(userId);

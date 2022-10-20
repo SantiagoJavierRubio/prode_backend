@@ -64,6 +64,9 @@ export class Container<T extends Document> {
       );
     }
   }
+  async count(conditions: object): Promise<number> {
+    return this._model.countDocuments(conditions);
+  }
   protected async create(data: object): Promise<LeanDocument<T> | null> {
     try {
       const newElement = new this._model(data);

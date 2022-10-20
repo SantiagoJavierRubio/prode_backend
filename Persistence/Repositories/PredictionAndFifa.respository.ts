@@ -1,10 +1,10 @@
 import { CustomError } from "../../Middleware/Errors/CustomError";
-import { FifaDAO } from "../DAOS/Fifa.dao";
+import { FifaDAO, Stage } from "../DAOS/Fifa.dao";
 import { GroupDAO } from "../DAOS/Group.dao";
 import { PredictionT, PredictionDocument } from "../Models/Prediction.model";
 import { LeanDocument } from "mongoose";
 import { fifaCodes } from "../../utils/fifaCodes";
-import e from "express";
+import { Match, Team } from "../../DTOS/Fixture/fifa.match.dto";
 
 export interface IPredictionData {
   matchId: PredictionT["matchId"];
@@ -15,6 +15,20 @@ export interface IPredictionData {
 export interface IManyPredictionValidate {
   valid: IPredictionData[];
   expired: IPredictionData[];
+}
+
+interface ISingleStagePredictionLength {
+  predicted: number;
+  total: number;
+}
+export interface IPredictionLengthByStage {
+  [key: string]: ISingleStagePredictionLength;
+  GRUPOS: ISingleStagePredictionLength;
+  OCTAVOS: ISingleStagePredictionLength;
+  CUARTOS: ISingleStagePredictionLength;
+  SEMIFINAL: ISingleStagePredictionLength;
+  FINAL: ISingleStagePredictionLength;
+  TERCER_PUESTO: ISingleStagePredictionLength;
 }
 
 export class PredictionAndFifa {
@@ -82,5 +96,73 @@ export class PredictionAndFifa {
         groupMatchesIds.includes(prediction.matchId)
       );
     } else return predictions;
+  }
+  async getPredictionCountForStages(
+    predictions: LeanDocument<PredictionDocument>[] | null
+  ): Promise<IPredictionLengthByStage> {
+    const stages = await this.fifa.getAllStages();
+    let result: IPredictionLengthByStage = {
+      GRUPOS: {
+        predicted: 0,
+        total: 0,
+      },
+      CUARTOS: {
+        predicted: 0,
+        total: 0,
+      },
+      OCTAVOS: {
+        predicted: 0,
+        total: 0,
+      },
+      TERCER_PUESTO: {
+        predicted: 0,
+        total: 0,
+      },
+      FINAL: {
+        predicted: 0,
+        total: 0,
+      },
+      SEMIFINAL: {
+        predicted: 0,
+        total: 0,
+      },
+    };
+    for (let stage of stages) {
+      const stageName = fifaCodes.getStageName(stage.id);
+      if (stageName === "GRUPOS") {
+        stage.matches =
+          stage.groups?.map((group) => group.matches).flat() || [];
+      }
+      result[stageName].total = stage.matches?.length || 0;
+      const matchIds = stage.matches?.map((match) => match.id);
+      if (!predictions) continue;
+      result[stageName].predicted = predictions.filter((prediction) =>
+        matchIds?.includes(prediction.matchId)
+      ).length;
+    }
+    return result;
+  }
+  async getRandomUnpredictedMatch(
+    predictions: LeanDocument<PredictionDocument>[] | null,
+    timeLimit: number | undefined
+  ): Promise<Match | null> {
+    if (!predictions || timeLimit === undefined || isNaN(timeLimit))
+      return null;
+    const predictionMatchIds = predictions.map(
+      (prediction) => prediction.matchId
+    );
+    const matches = await this.fifa.getAllMatches();
+    const now = Date.now();
+    const validFutureMatches = matches.filter(
+      (match) =>
+        match.home instanceof Team &&
+        match.away instanceof Team &&
+        now + timeLimit < match.date.getTime() &&
+        !predictionMatchIds.includes(match.id)
+    );
+    if (validFutureMatches.length === 0) return null;
+    return validFutureMatches[
+      Math.floor(Math.random() * validFutureMatches.length)
+    ];
   }
 }

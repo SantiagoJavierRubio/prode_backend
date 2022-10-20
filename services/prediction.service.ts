@@ -8,6 +8,7 @@ import {
 import {
   PredictionAndFifa,
   IPredictionData,
+  IPredictionLengthByStage,
 } from "../Persistence/Repositories/PredictionAndFifa.respository";
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
@@ -180,12 +181,51 @@ class PredictionService extends Validated {
         ? await this.predictions.getAllByUserInGroup(userId, userGroupId)
         : await this.predictions.getAllInGroup(userGroupId);
     } else predictions = await this.predictions.getAllByUser(userId);
-    if (!predictions) return [];
+    if (!predictions || predictions.length < 1) return [];
     return this.predictionsWithMatches.filterForStageOrGroup(
       predictions,
       stageId,
       groupId
     );
+  }
+  async fetchUserPredictionLengthByStage(
+    userId: string,
+    userGroupId: string | undefined
+  ): Promise<IPredictionLengthByStage> {
+    let predictions: LeanDocument<PredictionDocument>[] | null;
+    if (userGroupId) {
+      if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+        throw new CustomError(401, "User not in group");
+      predictions = await this.predictions.getAllByUserInGroup(
+        userId,
+        userGroupId
+      );
+    } else predictions = await this.predictions.getAllByUser(userId);
+    return this.predictionsWithMatches.getPredictionCountForStages(predictions);
+  }
+  async fetchUserPredictionCount(userId: string): Promise<number> {
+    if (!userId) throw new CustomError(401, "Missing user");
+    return this.predictions.count({ userId: userId });
+  }
+  async fetchRandomUnpredictedMatch(userId: string) {
+    if (!userId) throw new CustomError(401, "Missing user");
+    const userGroups = await this.groups.getGroups(userId);
+    if (!userGroups || userGroups.length < 1)
+      throw new CustomError(204, "No groups found");
+    userGroups.sort(() => (Math.random() > 0.5 ? 0 : 1));
+    for await (let group of userGroups) {
+      const predicted = await this.predictions.getAllByUserInGroup(
+        userId,
+        group._id.toString()
+      );
+      const result =
+        await this.predictionsWithMatches.getRandomUnpredictedMatch(
+          predicted,
+          group.rules?.timeLimit
+        );
+      if (result) return { group, match: result };
+    }
+    return null;
   }
 }
 

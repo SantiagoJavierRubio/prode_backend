@@ -47,12 +47,17 @@ class PredictionController {
       errorHandler(err, req, res, next);
     }
   }
-  async getLengthOfUserPredictions(
+  async getLengthOfUserPredictionsByStage(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
+      const payload = await predictionService.fetchUserPredictionLengthByStage(
+        req.user?._id,
+        req.query.userGroupId?.toString()
+      );
+      res.json(payload);
     } catch (err) {
       errorHandler(err, req, res, next);
     }
@@ -69,28 +74,23 @@ class PredictionController {
       errorHandler(err, req, res, next);
     }
   }
-  async getPreviousForStage(req: Request, res: Response, next: NextFunction) {
-    try {
-    } catch (err) {
-      errorHandler(err, req, res, next);
-    }
-  }
-  async filterRandomUnpredictedByGroup(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-    } catch (err) {
-      errorHandler(err, req, res, next);
-    }
-  }
+  // TO IMPLEMENT IF NEEDED
+  // async getPreviousForStage(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //   } catch (err) {
+  //     errorHandler(err, req, res, next);
+  //   }
+  // }
   async getRandomUnpredictedMatch(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
+      const payload = await predictionService.fetchRandomUnpredictedMatch(
+        req.user?._id
+      );
+      payload ? res.json(payload) : res.sendStatus(204);
     } catch (err) {
       errorHandler(err, req, res, next);
     }
@@ -101,6 +101,12 @@ class PredictionController {
     next: NextFunction
   ) {
     try {
+      const result = await predictionService.fetchUserPredictionCount(
+        req.user?._id
+      );
+      res.json({
+        userPredictions: result,
+      });
     } catch (err) {
       errorHandler(err, req, res, next);
     }

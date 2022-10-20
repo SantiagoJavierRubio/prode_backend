@@ -10,6 +10,6 @@ export const errorHandler = (
   if (res.headersSent || !(err instanceof CustomError)) return next(err);
   return res.status(err.status).json({
     error: err.message,
-    details: err.details || null
+    details: err.details || null,
   });
 };
