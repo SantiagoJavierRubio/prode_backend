@@ -22,6 +22,7 @@ export class PredictionDAO extends Container<PredictionDocument> {
       userGroupId: data.userGroupId,
     });
     if (prediction) {
+      console.log("exists");
       await this.update(prediction._id, data);
       return this.getById(prediction._id);
     } else return this.create(data);
@@ -37,16 +38,23 @@ export class PredictionDAO extends Container<PredictionDocument> {
       "matchId"
     );
     let edited: LeanDocument<PredictionDocument>[] = [];
-    existing?.forEach(async (existingPrediction) => {
-      const newData = data.find(
-        (prediction) => prediction.matchId === existingPrediction.matchId
-      );
-      if (newData) {
-        await this.update(existingPrediction._id, { ...newData });
-        edited = [...edited, existingPrediction];
+    if (existing) {
+      for await (let existingPrediction of existing) {
+        const newData = data.find(
+          (prediction) => prediction.matchId === existingPrediction.matchId
+        );
+        if (newData) {
+          await this.update(existingPrediction._id, { ...newData });
+          edited = [...edited, existingPrediction];
+        }
       }
-    });
-    const created = (await this.createMultiple(data)) || [];
+    }
+    const existingIds = existing?.map((pred) => pred.matchId) || [];
+    const nonExisting = data.filter(
+      (prediction) => !existingIds.includes(prediction.matchId)
+    );
+    const created = (await this.createMultiple(nonExisting)) || [];
+    console.log(edited, created);
     return {
       edited,
       created,

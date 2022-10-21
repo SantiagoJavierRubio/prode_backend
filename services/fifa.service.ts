@@ -41,11 +41,12 @@ class FifaService {
     const allMatches = await this.fifa.getAllMatches();
     const now = Date.now();
     return allMatches
-      .filter((match) => {
-        match?.home instanceof Team &&
+      .filter(
+        (match) =>
+          match?.home instanceof Team &&
           match?.away instanceof Team &&
-          now < match?.date.getTime();
-      })
+          now < match?.date.getTime()
+      )
       .sort((a, b) => a.date.getTime() - b.date.getTime())
       .slice(0, quantity);
   }
