@@ -22,7 +22,6 @@ export class PredictionDAO extends Container<PredictionDocument> {
       userGroupId: data.userGroupId,
     });
     if (prediction) {
-      console.log("exists");
       await this.update(prediction._id, data);
       return this.getById(prediction._id);
     } else return this.create(data);
@@ -54,7 +53,6 @@ export class PredictionDAO extends Container<PredictionDocument> {
       (prediction) => !existingIds.includes(prediction.matchId)
     );
     const created = (await this.createMultiple(nonExisting)) || [];
-    console.log(edited, created);
     return {
       edited,
       created,
