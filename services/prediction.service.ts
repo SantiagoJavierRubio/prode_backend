@@ -112,6 +112,10 @@ class PredictionService extends Validated {
         id: err.matchId,
         message: "Scores must be positive numbers",
       })),
+      ...dateValidated.empty.map((empty) => ({
+        id: empty.matchId,
+        message: "Missing field",
+      })),
     ];
     const valid = await this.predictions.createMany(
       validated.map(

@@ -72,6 +72,9 @@ export class PredictionDAO extends Container<PredictionDocument> {
     await this.delete(predictionId);
     return true;
   }
+  async removeManyByUser(userId: string, condition: object): Promise<void> {
+    return this.deleteMany({ ...condition, userId: userId });
+  }
   async getAllByUser(
     userId: string
   ): Promise<LeanDocument<PredictionDocument>[] | null> {

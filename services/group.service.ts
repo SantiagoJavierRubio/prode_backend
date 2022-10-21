@@ -3,11 +3,13 @@ import { CustomError } from "../Middleware/Errors/CustomError";
 import { GroupDAO, GroupCreate } from "../Persistence/DAOS/Group.dao";
 import { GroupAndUsers } from "../Persistence/Repositories/GroupAndUsers.repository";
 import { Scores } from "../Persistence/Repositories/Scores.repository";
+import { PredictionDAO } from "../Persistence/DAOS/Prediction.dao";
 
 class GroupService extends Validated {
   groups = new GroupDAO();
   groupsAndUsers = new GroupAndUsers();
   scores = new Scores();
+  predictions = new PredictionDAO();
 
   constructor() {
     super();
@@ -60,7 +62,9 @@ class GroupService extends Validated {
     );
     if (!groupId)
       throw new CustomError(500, "Failed to remove user from group");
-    // TODO: implement remove predictions by this user
+    await this.predictions.removeManyByUser(userId, {
+      userGroupId: groupId,
+    });
     return groupId;
   }
   async fetchGroupData(groupName: string | undefined, userId: string) {

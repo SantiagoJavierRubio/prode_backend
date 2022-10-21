@@ -16,6 +16,7 @@ export interface IPredictionData {
 export interface IManyPredictionValidate {
   valid: IPredictionData[];
   expired: IPredictionData[];
+  empty: IPredictionData[];
 }
 
 interface ISingleStagePredictionLength {
@@ -56,6 +57,7 @@ export class PredictionAndFifa {
     const result: IManyPredictionValidate = {
       valid: [],
       expired: [],
+      empty: [],
     };
     const groupRules = await this.groups.getById(userGroupId, "rules");
     if (!groupRules) throw new CustomError(404, "Group not found");
@@ -69,7 +71,9 @@ export class PredictionAndFifa {
         return match.id;
     });
     predictions.forEach((prediction) => {
-      if (validMatchIds.includes(prediction.matchId))
+      if (isNaN(prediction.homeScore) || isNaN(prediction.awayScore)) {
+        result.empty = [...result.empty, prediction];
+      } else if (validMatchIds.includes(prediction.matchId))
         result.valid = [...result.valid, prediction];
       else result.expired = [...result.expired, prediction];
     });

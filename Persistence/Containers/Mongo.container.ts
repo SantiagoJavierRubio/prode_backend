@@ -120,6 +120,18 @@ export class Container<T extends Document> {
       );
     }
   }
+  protected async deleteMany(condition: object): Promise<void> {
+    try {
+      await this._model.deleteMany({ condition });
+    } catch (err) {
+      throw new CustomError(
+        500,
+        "Failed to delete elements",
+        err instanceof Error ? err.message : null,
+        err instanceof Error ? err : null
+      );
+    }
+  }
   protected async updateMany(idList: string[], data: object): Promise<void> {
     try {
       await this._model.updateMany({ _id: { $in: idList } }, data);
