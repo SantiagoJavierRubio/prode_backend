@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
 import { groupService } from "../services/group.service";
+import { t } from "i18next";
 
 class GroupController {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -54,7 +55,7 @@ class GroupController {
         user?._id
       );
       res.json({
-        message: "User removed from group",
+        message: t("User removed from group"),
         group_id: removedId,
       });
     } catch (err) {
@@ -65,7 +66,7 @@ class GroupController {
     try {
       const userGroupId = req.query.userGroupId?.toString();
       await groupService.removeGroup(userGroupId, req.user?._id);
-      res.json({ message: "Group deleted" });
+      res.json({ message: t("Group deleted") });
     } catch (err) {
       errorHandler(err, req, res, next);
     }

@@ -13,6 +13,7 @@ import {
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { LeanDocument } from "mongoose";
+import { t } from "i18next";
 
 interface IOnePredictionIn {
   userGroupId: PredictionT["userGroupId"];
@@ -106,15 +107,15 @@ class PredictionService extends Validated {
     const errors = [
       ...dateValidated.expired.map((exp) => ({
         id: exp.matchId,
-        message: "Your time to edit this prediction has expired",
+        message: t("Your time to edit this prediction has expired"),
       })),
       ...scoreErrors.map((err) => ({
         id: err.matchId,
-        message: "Scores must be positive numbers",
+        message: t("Scores must be positive numbers"),
       })),
       ...dateValidated.empty.map((empty) => ({
         id: empty.matchId,
-        message: "Missing field",
+        message: t("Missing field"),
       })),
     ];
     const valid = await this.predictions.createMany(

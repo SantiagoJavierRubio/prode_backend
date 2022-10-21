@@ -6,6 +6,7 @@ import { Validated } from "./validated.util";
 import { cloudinary } from "../utils/defaultAvatars";
 import { LeanDocument } from "mongoose";
 import { GroupDocument } from "../Persistence/Models/Group.model";
+import { t } from "i18next";
 
 interface ProfileReturn {
   profile: UserProfileDTO;
@@ -53,7 +54,10 @@ export class UserService extends Validated {
     if (input.name) this.validateUserName(input.name);
     await this.users.editProfile(userId, input);
     const profile = await this.users.getById(userId, "name avatar");
-    return { message: "Profile updated", profile: new UserProfileDTO(profile) };
+    return {
+      message: t("Profile updated"),
+      profile: new UserProfileDTO(profile),
+    };
   }
   async fetchAvatars(): Promise<string[]> {
     return await cloudinary.getAvatars();

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { authService } from "../services/auth.service";
 import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
 import { CustomError } from "../Middleware/Errors/CustomError";
+import { t } from "i18next";
 import config from "../config";
 
 export class AuthController {
@@ -75,7 +76,7 @@ export class AuthController {
       const response = await authService.handlePasswordChangeRequest(
         req.body.email
       );
-      if (response) return res.json({ message: "Email sent" });
+      if (response) return res.json({ message: t("Email sent") });
       else throw new CustomError(500, "Something went wrong with your request");
     } catch (err) {
       errorHandler(err, req, res, next);

@@ -1,5 +1,6 @@
 import { CustomError } from "./CustomError";
 import { Request, Response, NextFunction } from "express";
+import { t } from "i18next";
 
 export const errorHandler = (
   err: Error | CustomError | unknown,
@@ -9,7 +10,7 @@ export const errorHandler = (
 ): void | Response => {
   if (res.headersSent || !(err instanceof CustomError)) return next(err);
   return res.status(err.status).json({
-    error: err.message,
+    error: t(err.message),
     details: err.details || null,
   });
 };

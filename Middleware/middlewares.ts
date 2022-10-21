@@ -5,6 +5,7 @@ import cors, { CorsOptions } from "cors";
 import passport from "passport";
 import { session } from "./Session/session.middleware";
 import { errorHandler } from "./Errors/errorHandler.middleware";
+import "./i18n/i18n.middleware";
 import "./Passport/passportStrategies.middleware";
 import "dotenv/config";
 
