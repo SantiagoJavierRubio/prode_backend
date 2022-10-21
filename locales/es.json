@@ -42,5 +42,7 @@
 	"Invalid username": "Nombre de usuario no válido",
 	"Only alphanumeric characters allowed": "Solo se permiten caracteres alfanuméricos",
 	"Username too long": "Nombre de usuario demasiado largo",
-	"Usernames should be 20 characters or less": "Los nombres de usuario deben tener hasta 20 caracteres"
+	"Usernames should be 20 characters or less": "Los nombres de usuario deben tener hasta 20 caracteres",
+	"You have no permission to delete this group": "You have no permission to delete this group",
+	"Group deleted": "Group deleted"
 }

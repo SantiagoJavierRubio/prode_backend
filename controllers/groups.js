@@ -75,6 +75,9 @@ export const deleteGroup = async (req, res, next) => {
     const userGroupId = req.query.userGroupId;
     const user = await req.user;
     await Group.deleteGroup(userGroupId, user._id);
+    await Prediction.model.deleteMany({
+      userGroupId: userGroupId,
+    });
     res.json({ message: i18n.__("Group deleted") });
   } catch (err) {
     errorHandler(err, req, res, next);

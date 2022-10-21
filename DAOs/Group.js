@@ -112,7 +112,7 @@ class Group extends Container {
     const group = await this.getOne({ _id: id }, "members owner");
     if (!group.members.includes(user_id))
       throw new CustomError(401, "User not in group");
-    if (group.owner === user_id)
+    if (group.owner !== user_id)
       throw new CustomError(401, "You have no permission to delete this group");
     if (group.members.length > 1)
       throw new CustomError(
