@@ -1,5 +1,6 @@
 import Container from "../Containers/fifa.js";
 import FakeMatch from "./FakeData/FakeModels/fakeMatch.js";
+import CustomError from "../Errors/CustomError";
 
 class FakeMatchDTO {
   constructor(data) {
