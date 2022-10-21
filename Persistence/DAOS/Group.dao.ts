@@ -51,7 +51,7 @@ export class GroupDAO extends Container<GroupDocument> {
     if (!group) throw new CustomError(404, "Group not found");
     if (!group.members.includes(userId))
       throw new CustomError(401, "User not in group");
-    if (group.owner === userId)
+    if (group.owner !== userId)
       throw new CustomError(401, "You have no permission to delete this group");
     if (group.members.length > 1)
       throw new CustomError(
