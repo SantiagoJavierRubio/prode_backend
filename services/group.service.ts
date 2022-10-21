@@ -83,7 +83,8 @@ class GroupService extends Validated {
         "Missing field",
         "Group id and user are required"
       );
-    return this.groups.deleteGroup(groupId, userId);
+    await this.groups.deleteGroup(groupId, userId);
+    return this.predictions.removeAllFromGroup(groupId);
   }
   async fetchGroupRules(groupName: string | undefined) {
     if (!groupName)

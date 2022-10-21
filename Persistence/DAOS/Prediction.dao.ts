@@ -126,4 +126,9 @@ export class PredictionDAO extends Container<PredictionDocument> {
   async checkMultiplePredictions(predictionIds: string[]): Promise<void> {
     return this.updateMany(predictionIds, { checked: true });
   }
+  async removeAllFromGroup(userGroupId: string): Promise<void> {
+    return this.deleteMany({
+      userGroupId: userGroupId,
+    });
+  }
 }
