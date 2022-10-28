@@ -17,11 +17,11 @@ class Group extends Container {
         "Group name is too long",
         "Group name must be less than 21 characters"
       );
-    if (!/[a-zA-Z0-9]/.test(data.name))
+    if (!/[a-zA-Z0-9]/.test(data.name) || /[/"?&$:'#%{}();,+@]/.test(data.name))
       throw new CustomError(
         406,
         "Group name not valid",
-        "Group name must contain at least one letter or number"
+        "Group name must contain no special characters and at least one letter or number"
       );
     if (data.timeLimit && !arePositiveNumbers([data.timeLimit]))
       throw new CustomError(

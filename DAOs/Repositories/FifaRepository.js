@@ -28,6 +28,9 @@ class FifaRepository {
     const data = await this.dao.getOneGroup(id, lang);
     return data;
   }
+  async getStageStartDates(lang = "es") {
+    return this.dao.getStageStartDates(lang);
+  }
 }
 
 export default FifaRepository;

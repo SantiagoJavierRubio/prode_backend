@@ -1,5 +1,5 @@
 {
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "prettier.semi": true,
     "prettier.singleQuote": false,
     "[typescript]": {

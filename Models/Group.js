@@ -15,6 +15,7 @@ const GroupSchema = new mongoose.Schema(
           FULL: 3,
         },
         timeLimit: 0,
+        limitByPhase: false,
       },
     },
   },

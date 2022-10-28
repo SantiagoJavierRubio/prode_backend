@@ -1,3 +1,7 @@
+// TODO> remove tests
+// ONLY FOR DEV TEST PURPOSE, REMOVE ON DEPLOY
+// import "dotenv/config";
+
 class Container {
   normalizeTeams(data) {
     if (!data) return null;
@@ -11,13 +15,19 @@ class Container {
   normalizeMatches(data) {
     try {
       return data.map((match) => {
+        // remove after testing
+        // const d = new Date(match.Date);
+        // d.setFullYear(2022);
+        // d.getMonth() === 5 ? d.setMonth(9) : d.setMonth(10);
+        // d.setDate(d.getDate() + 1);
         return {
           id: match.IdMatch,
           stageId: match.IdStage,
           stage: match.StageName[0]?.Description,
           groupId: match.IdGroup,
           group: match.GroupName[0]?.Description,
-          date: match.Date,
+          date: match.Date, // <= ORIGINAL
+          // date: (process.env.MODO_PRUEBA = "RUSIA" ? d : match.Date), // <= PRUEBA
           stadiumId: match.Stadium.IdStadium,
           stadium: match.Stadium.Name[0]?.Description,
           home: this.normalizeTeams(match.Home) || match.PlaceHolderA,

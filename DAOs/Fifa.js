@@ -73,6 +73,20 @@ class Fifa extends Container {
       );
     return this.normalizeMatches(data.data.Results);
   }
+  async getStageStartDates(lang = "es") {
+    const stages = await this.getAllStages(lang);
+    const result = {};
+    stages.forEach((stage) => {
+      let stageMatches =
+        stage.matches ||
+        stage.groups.flatMap((group) => {
+          return group.matches;
+        });
+      stageMatches.sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+      result[stage.id] = stageMatches[0].date;
+    });
+    return result;
+  }
 }
 
 export default Fifa;
