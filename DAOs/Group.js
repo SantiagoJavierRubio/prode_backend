@@ -39,6 +39,36 @@ class Group extends Container {
     if (!newGroup) throw new CustomError(500, "Failed to create group");
     return newGroup;
   }
+  async updateData(data, user) {
+    data.name = data.name.trim().toUpperCase();
+    if (hasNulls([data.name, user._id]))
+      throw new CustomError(406, "Missing data");
+    if (data.name.length > 20)
+      throw new CustomError(
+        406,
+        "Group name is too long",
+        "Group name must be less than 21 characters"
+      );
+    if (!/[a-zA-Z0-9]/.test(data.name) || /[/"?&$:'#%{}();,+@]/.test(data.name))
+      throw new CustomError(
+        406,
+        "Group name not valid",
+        "Group name must contain no special characters and at least one letter or number"
+      );
+    if (data.timeLimit && !arePositiveNumbers([data.timeLimit]))
+      throw new CustomError(
+        406,
+        "Time prediction limit must be a positive number"
+      );
+    const exists = await this.getById(data.id);
+    if (!exists) throw new CustomError(404, "Group not found");
+    if (exists.owner !== user._id)
+      throw new CustomError(401, "Not authorized to edit this group");
+    const nameExists = await this.getOne({ name: data.name });
+    if (nameExists && nameExists._id.toString() !== data.id)
+      throw new CustomError(409, "Group name already in use");
+    return this.update(data.id, data);
+  }
   async addMember(groupName, user) {
     if (hasNulls([groupName, user._id]))
       throw new CustomError(406, "Missing data");

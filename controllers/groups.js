@@ -17,6 +17,18 @@ export const create = async (req, res, next) => {
     errorHandler(err, req, res, next);
   }
 };
+export const edit = async (req, res, next) => {
+  try {
+    const groupData = req.body;
+    const groupId = req.params.id;
+    const user = await req.user;
+    if (await Group.updateData({ ...groupData, id: groupId }, user))
+      res.sendStatus(200);
+    else throw new CustomError(500, "Something went wrong");
+  } catch (err) {
+    errorHandler(err, req, res, next);
+  }
+};
 export const getGroupRules = async (req, res, next) => {
   try {
     const groupName = req.query.groupName.toUpperCase();
