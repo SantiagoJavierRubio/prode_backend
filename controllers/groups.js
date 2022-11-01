@@ -22,6 +22,8 @@ export const edit = async (req, res, next) => {
     const groupData = req.body;
     const groupId = req.params.id;
     const user = await req.user;
+    if (Date.now() > Date.parse("11-15-2022 13:00 GMT-0300"))
+      throw new CustomError(406, "You can't edit this data anymore");
     if (await Group.updateData({ ...groupData, id: groupId }, user))
       res.sendStatus(200);
     else throw new CustomError(500, "Something went wrong");
