@@ -33,7 +33,7 @@ class GroupController {
         req.params.id,
         req.body
       );
-      res.sendStatus(204);
+      res.sendStatus(200);
     } catch (err) {
       errorHandler(err, req, res, next);
     }
