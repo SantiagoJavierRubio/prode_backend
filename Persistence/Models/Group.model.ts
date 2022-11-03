@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface UserGroupRules {
+export interface UserGroupRules {
   manifesto: string;
   scoring: {
     NONE: number;
@@ -8,6 +8,7 @@ interface UserGroupRules {
     NULL: number;
   };
   timeLimit: number;
+  limitByPhase: boolean;
 }
 
 export type GroupT = {
@@ -43,6 +44,7 @@ const GroupSchema = new mongoose.Schema<
           FULL: 3,
         },
         timeLimit: 0,
+        limitByPhase: false,
       },
     },
   },

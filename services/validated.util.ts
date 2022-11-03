@@ -1,4 +1,5 @@
 import { CustomError } from "../Middleware/Errors/CustomError";
+import { GroupCreate } from "../Persistence/DAOS/Group.dao";
 
 export class Validated {
   hasNulls(data: any[]): boolean {
@@ -11,7 +12,7 @@ export class Validated {
       return true;
     return false;
   }
-  validateUserName(name: string) {
+  validateUserName(name: string): void {
     if (name.length > 20) {
       throw new CustomError(
         400,
@@ -38,5 +39,27 @@ export class Validated {
     )
       return false;
     return true;
+  }
+  validateGroupData(data: GroupCreate): void {
+    if (data.name.length > 20)
+      throw new CustomError(
+        400,
+        "Group name is too long",
+        "Group name must be less than 21 characters"
+      );
+    if (!/[a-zA-Z0-9]/.test(data.name) || /[/"?&$:'#%{}();,+@]/.test(data.name))
+      throw new CustomError(
+        400,
+        "Group name not valid",
+        "Group name must contain no special characters and at least one letter or number"
+      );
+    if (
+      data.rules?.timeLimit &&
+      !this.arePositiveNumbers([data.rules?.timeLimit])
+    )
+      throw new CustomError(
+        400,
+        "Time prediction limit must be a positive number"
+      );
   }
 }

@@ -2,6 +2,7 @@ import axios from "axios";
 import { FifaContainer, MatchesByCategory } from "../Containers/Fifa.container";
 import { Match } from "../../DTOS/Fixture/fifa.match.dto";
 import { CustomError } from "../../Middleware/Errors/CustomError";
+import { GroupDAO } from "./Group.dao";
 
 export interface Stage {
   id: string;
@@ -88,5 +89,20 @@ export class FifaDAO extends FifaContainer {
         "Fifa api did not respond as expected"
       );
     return this.normalizeMatches(data.data.Results);
+  }
+
+  async getStageStartDates(lang: string = "es") {
+    const stages = await this.getAllStages(lang);
+    const result: { [key: string]: Date } = {};
+    stages.forEach((stage) => {
+      let stageMatches: Match[] | undefined =
+        stage.matches ||
+        stage.groups?.flatMap((group) => {
+          return group.matches;
+        });
+      stageMatches?.sort((a, b) => a.date.getTime() - b.date.getTime());
+      if (stageMatches) result[stage.id] = stageMatches[0].date;
+    });
+    return result;
   }
 }

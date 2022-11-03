@@ -45,8 +45,13 @@ export class PredictionAndFifa {
     if (!groupRules) throw new CustomError(404, "Group not found");
     const match = await this.fifa.getMatchesById(matchId);
     if (!match[0]) throw new CustomError(404, "Match doesn't exist");
+    const stageStartDates = await this.fifa.getStageStartDates();
+    if (groupRules.rules?.limitByPhase && !stageStartDates[match[0].stageId])
+      throw new CustomError(404, "Phase start date not found");
     const now = Date.now();
-    const matchDate = match[0].date.getTime();
+    const matchDate = groupRules.rules?.limitByPhase
+      ? stageStartDates[match[0].stageId].getTime()
+      : match[0].date.getTime();
     return now + (groupRules.rules?.timeLimit || 0) < matchDate;
   }
 
@@ -66,9 +71,12 @@ export class PredictionAndFifa {
     );
     if (!matches) throw new CustomError(500, "Failed to obtain matches");
     const now = Date.now();
+    const stageStartDates = await this.fifa.getStageStartDates();
     const validMatchIds = matches.map((match) => {
-      if (now + (groupRules.rules?.timeLimit || 0) < match.date.getTime())
-        return match.id;
+      let matchDate = groupRules.rules?.limitByPhase
+        ? stageStartDates[match.stageId].getTime()
+        : match.date.getTime();
+      if (now + (groupRules.rules?.timeLimit || 0) < matchDate) return match.id;
     });
     predictions.forEach((prediction) => {
       if (isNaN(prediction.homeScore) || isNaN(prediction.awayScore)) {
