@@ -8,7 +8,7 @@ interface FixtureStatusI {
 }
 
 class FifaService {
-  private fifa = new FifaDAO(!(process.env.MODO_PRUEBA === "RUSIA"));
+  private fifa = new FifaDAO();
   async fetchFixture(groupId: string | null, stageId: string | null) {
     if (groupId)
       return await this.fifa.getOneGroup(fifaCodes.getGroupCode(groupId));

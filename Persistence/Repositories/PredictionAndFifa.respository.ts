@@ -34,7 +34,7 @@ export interface IPredictionLengthByStage {
 }
 
 export class PredictionAndFifa {
-  private fifa = new FifaDAO(true);
+  private fifa = new FifaDAO();
   private groups = new GroupDAO();
 
   async validateSinglePrediction(

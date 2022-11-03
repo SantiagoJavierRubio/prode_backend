@@ -13,7 +13,7 @@ class FifaCodes {
   private _GROUP_CODES: Codes = {};
 
   constructor(actual: boolean) {
-    this.fifa = new FifaDAO(actual);
+    this.fifa = new FifaDAO();
     this._getCodes();
   }
 

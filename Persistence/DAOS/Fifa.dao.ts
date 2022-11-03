@@ -2,7 +2,7 @@ import axios from "axios";
 import { FifaContainer, MatchesByCategory } from "../Containers/Fifa.container";
 import { Match } from "../../DTOS/Fixture/fifa.match.dto";
 import { CustomError } from "../../Middleware/Errors/CustomError";
-import { GroupDAO } from "./Group.dao";
+import "dotenv/config";
 
 export interface Stage {
   id: string;
@@ -12,14 +12,12 @@ export interface Stage {
 }
 
 export class FifaDAO extends FifaContainer {
-  private _SEASON_ID: string;
-  private _GROUP_STAGE: string;
+  private _SEASON_ID: string = process.env.SEASON_ID || "255711";
+  private _GROUP_STAGE: string = process.env.GROUP_DTAGE_ID || "285063";
   private _apiUrl: string = "https://api.fifa.com/api/v1/";
 
-  constructor(actual: boolean) {
+  constructor() {
     super();
-    this._SEASON_ID = actual ? "255711" : "254645";
-    this._GROUP_STAGE = actual ? "285063" : "275073";
   }
 
   async getAllMatches(lang: string = "es"): Promise<Match[]> {
