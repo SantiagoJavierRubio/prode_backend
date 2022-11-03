@@ -97,6 +97,24 @@ class GroupService extends Validated {
       scores: data.scores,
     };
   }
+  async updateGroupData(
+    userId: string,
+    groupId: string | undefined,
+    groupData: GroupCreate
+  ) {
+    if (!groupId || !userId || this.hasNulls([groupId, userId]))
+      throw new CustomError(
+        400,
+        "Missing field",
+        "Group id and user are required"
+      );
+    this.validateGroupData(groupData);
+    // TODO => Set this programmaticaly
+    if (Date.now() > Date.parse("11-15-2022 13:00 GMT-0300"))
+      throw new CustomError(406, "You can't edit this data anymore");
+    //
+    return this.groups.edit(groupId, groupData, userId);
+  }
 }
 
 export const groupService = new GroupService();

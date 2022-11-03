@@ -26,6 +26,18 @@ class GroupController {
       errorHandler(err, req, res, next);
     }
   }
+  async edit(req: Request, res: Response, next: NextFunction) {
+    try {
+      await groupService.updateGroupData(
+        req.user?._id,
+        req.params.id,
+        req.body
+      );
+      res.sendStatus(204);
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
   async getGroupRules(req: Request, res: Response, next: NextFunction) {
     try {
       const groupName = req.query.groupName?.toString();

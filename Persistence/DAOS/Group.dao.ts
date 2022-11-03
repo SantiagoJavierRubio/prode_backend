@@ -98,4 +98,18 @@ export class GroupDAO extends Container<GroupDocument> {
     }
     return group._id;
   }
+  async edit(
+    groupId: string,
+    groupData: GroupCreate,
+    userId: string
+  ): Promise<void> {
+    const exists = await this.getById(groupId);
+    if (!exists) throw new CustomError(404, "Group not found");
+    if (exists.owner !== userId)
+      throw new CustomError(401, "You are not authorized to edit this group");
+    const nameExists = await this.getOne({ name: groupData.name });
+    if (nameExists && nameExists._id.toString() !== groupId)
+      throw new CustomError(409, "Group name already in use");
+    return this.update(groupId, groupData);
+  }
 }

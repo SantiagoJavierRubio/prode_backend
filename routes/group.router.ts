@@ -8,6 +8,7 @@ groupRoutes.use(passport.authenticate("jwt", { session: false }));
 groupRoutes.get("/", groupController.getGroupData);
 groupRoutes.post("/create", groupController.create);
 groupRoutes.post("/join", groupController.join);
+groupRoutes.post("/edit/:id", groupController.edit);
 groupRoutes.post("/leave", groupController.leaveGroup);
 groupRoutes.delete("/delete", groupController.deleteGroup);
 groupRoutes.get("/rules", groupController.getGroupRules);
