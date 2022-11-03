@@ -1,18 +1,11 @@
 {
-    "env": {
-        "commonjs": false,
-        "es6": true,
-        "node": true
-    },
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "sourceType": "module",
         "ecmaVersion": "latest"
     },
-    "root": true,
-    "extends": ["prettier"],
-    "plugins": ["prettier"],
-    "rules": {
-        "prettier/prettier": ["error"],
-        "brace-style": ["error", "1tbs"]
-    }
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "prettier/@typescript-eslint",
+        "plugin:prettier/recommended"
+    ]
 }
