@@ -24,5 +24,6 @@
 	"Invalid username": "Invalid username",
 	"Only alphanumeric characters allowed": "Only alphanumeric characters allowed",
 	"Username too long": "Username too long",
-	"Usernames should be 20 characters or less": "Usernames should be 20 characters or less"
+	"Usernames should be 20 characters or less": "Usernames should be 20 characters or less",
+	"Group name must contain no special characters and at least one letter or number": "Group name must contain no special characters and at least one letter or number"
 }

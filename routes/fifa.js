@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.use(getLocaleLanguage);
+// router.use(getLocaleLanguage);
 router.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });

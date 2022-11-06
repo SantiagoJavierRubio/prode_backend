@@ -56,15 +56,15 @@ app.use(
   cors({
     credentials: true,
     origin: [config.clientUrl, "https://prodetest.vercel.app"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Preferred-Language"],
   })
 );
 
 app.use(helmet());
 app.use(i18n.init);
 app.use((req, res, next) => {
-  const l = i18n.getLocale(req);
-  if (l) i18n.setLocale(l);
+  const l = req.headers["preferred-language"];
+  req.setLocale(l);
   next();
 });
 app.use(errorHandler);
