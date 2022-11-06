@@ -6,6 +6,7 @@ import { LeanDocument } from "mongoose";
 import { fifaCodes } from "../../utils/fifaCodes";
 import { Match, Team } from "../../DTOS/Fixture/fifa.match.dto";
 import { PredictionAndMatch } from "../../DTOS/Prediction/PredictionAndMatch.dto";
+import __ from "i18next";
 
 export interface IPredictionData {
   matchId: PredictionT["matchId"];
@@ -43,9 +44,9 @@ export class PredictionAndFifa {
   ): Promise<boolean> {
     const groupRules = await this.groups.getById(userGroupId, "rules");
     if (!groupRules) throw new CustomError(404, "Group not found");
-    const match = await this.fifa.getMatchesById(matchId);
+    const match = await this.fifa.getMatchesById(matchId, __.language);
     if (!match[0]) throw new CustomError(404, "Match doesn't exist");
-    const stageStartDates = await this.fifa.getStageStartDates();
+    const stageStartDates = await this.fifa.getStageStartDates(__.language);
     if (groupRules.rules?.limitByPhase && !stageStartDates[match[0].stageId])
       throw new CustomError(404, "Phase start date not found");
     const now = Date.now();
@@ -67,11 +68,12 @@ export class PredictionAndFifa {
     const groupRules = await this.groups.getById(userGroupId, "rules");
     if (!groupRules) throw new CustomError(404, "Group not found");
     const matches = await this.fifa.getMatchesById(
-      predictions.map((prediction) => prediction.matchId)
+      predictions.map((prediction) => prediction.matchId),
+      __.language
     );
     if (!matches) throw new CustomError(500, "Failed to obtain matches");
     const now = Date.now();
-    const stageStartDates = await this.fifa.getStageStartDates();
+    const stageStartDates = await this.fifa.getStageStartDates(__.language);
     const validMatchIds = matches.map((match) => {
       let matchDate = groupRules.rules?.limitByPhase
         ? stageStartDates[match.stageId].getTime()
@@ -94,7 +96,8 @@ export class PredictionAndFifa {
   ): Promise<LeanDocument<PredictionDocument>[]> {
     if (stageId) {
       const matches = await this.fifa.getOneStage(
-        fifaCodes.getStageCode(stageId)
+        fifaCodes.getStageCode(stageId),
+        __.language
       );
       const stageMatchesIds = matches.map((match) => match.id);
       return predictions.filter((prediction) =>
@@ -102,7 +105,8 @@ export class PredictionAndFifa {
       );
     } else if (groupId) {
       const matches = await this.fifa.getOneGroup(
-        fifaCodes.getGroupCode(groupId)
+        fifaCodes.getGroupCode(groupId),
+        __.language
       );
       const groupMatchesIds = matches.map((match) => match.id);
       return predictions.filter((prediction) =>
@@ -113,7 +117,7 @@ export class PredictionAndFifa {
   async getPredictionCountForStages(
     predictions: LeanDocument<PredictionDocument>[] | null
   ): Promise<IPredictionLengthByStage> {
-    const stages = await this.fifa.getAllStages();
+    const stages = await this.fifa.getAllStages(__.language);
     let result: IPredictionLengthByStage = {
       GRUPOS: {
         predicted: 0,
@@ -164,7 +168,7 @@ export class PredictionAndFifa {
     const predictionMatchIds = predictions.map(
       (prediction) => prediction.matchId
     );
-    const matches = await this.fifa.getAllMatches();
+    const matches = await this.fifa.getAllMatches(__.language);
     const now = Date.now();
     const validFutureMatches = matches.filter(
       (match) =>
@@ -184,7 +188,7 @@ export class PredictionAndFifa {
   ): Promise<PredictionAndMatch[]> {
     const group = await this.groups.getById(userGroupId, "-_id rules");
     const matchIds = await predictions.map((prediction) => prediction.matchId);
-    const matches = await this.fifa.getMatchesById(matchIds);
+    const matches = await this.fifa.getMatchesById(matchIds, __.language);
     const now = Date.now();
     const result: PredictionAndMatch[] = [];
     for (let prediction of predictions) {
