@@ -96,16 +96,22 @@ class PredictionService extends Validated {
         "Missing data",
         "User group ID and user are required"
       );
-    const dateValidated =
+    const { validated, expired, empty, scoreErrors } =
       await this.predictionsWithMatches.validateManyPredictions(
         predictionData.prediction,
         predictionData.userGroupId
       );
-    const [validated, scoreErrors] = partition(dateValidated.valid, (e) =>
-      this.arePositiveNumbers([e.awayScore, e.homeScore])
-    );
+    // const [validated, scoreErrors] = partition(dateValidated.valid, (e) =>
+    //   this.arePositiveNumbers([e.awayScore, e.homeScore])
+    // );
+    // const validated = dateValidated.valid.filter((e) =>
+    //   this.arePositiveNumbers([e.awayScore, e.homeScore])
+    // );
+    // const scoreErrors = dateValidated.valid.filter(
+    //   (e) => !this.arePositiveNumbers([e.awayScore, e.homeScore])
+    // );
     const errors = [
-      ...dateValidated.expired.map((exp) => ({
+      ...expired.map((exp) => ({
         id: exp.matchId,
         message: t("Your time to edit this prediction has expired"),
       })),
@@ -113,7 +119,7 @@ class PredictionService extends Validated {
         id: err.matchId,
         message: t("Scores must be positive numbers"),
       })),
-      ...dateValidated.empty.map((empty) => ({
+      ...empty.map((empty) => ({
         id: empty.matchId,
         message: t("Missing field"),
       })),

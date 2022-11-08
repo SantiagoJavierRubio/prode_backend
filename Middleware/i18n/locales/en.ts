@@ -31,4 +31,6 @@ export default {
   "Usernames should be 20 characters or less":
     "Usernames should be 20 characters or less",
   "Email sent": "Email sent",
+  "Password change already required, check your email":
+    "Password change already required, check your email",
 };

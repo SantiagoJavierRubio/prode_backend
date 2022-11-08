@@ -12,6 +12,16 @@ export class VerificationTokenDAO extends Container<VerificationTokenDocument> {
     super(VerificationToken);
   }
   async generate(userId: string): Promise<string> {
+    const exists = await this.getOne({ user_id: userId });
+    if (exists) {
+      if (exists.expiration.getTime() < Date.now())
+        await this.delete(exists._id);
+      else
+        throw new CustomError(
+          406,
+          "Password change already required, check your email"
+        );
+    }
     const newToken = await this.create({
       user_id: userId,
       token: uuid(),

@@ -27,6 +27,7 @@ export class PredictionDAO extends Container<PredictionDocument> {
     } else return this.create(data);
   }
   async createMany(data: PredictionDTO[]): Promise<ICreateManyResponse> {
+    console.time("writing");
     const matchIds = data.map((prediction) => prediction.matchId);
     const existing = await this.getMany(
       {
@@ -53,6 +54,7 @@ export class PredictionDAO extends Container<PredictionDocument> {
       (prediction) => !existingIds.includes(prediction.matchId)
     );
     const created = (await this.createMultiple(nonExisting)) || [];
+    console.timeEnd("writing");
     return {
       edited,
       created,

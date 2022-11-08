@@ -15,6 +15,7 @@ export class FifaDAO extends FifaContainer {
   private _SEASON_ID: string = process.env.SEASON_ID || "255711";
   private _GROUP_STAGE: string = process.env.GROUP_DTAGE_ID || "285063";
   private _apiUrl: string = "https://api.fifa.com/api/v1/";
+  static START_DATES: { [key: string]: Date } = {};
 
   constructor() {
     super();
@@ -90,6 +91,8 @@ export class FifaDAO extends FifaContainer {
   }
 
   async getStageStartDates(lang: string = "es") {
+    if (Object.entries(FifaDAO.START_DATES).length > 0)
+      return FifaDAO.START_DATES;
     const stages = await this.getAllStages(lang);
     const result: { [key: string]: Date } = {};
     stages.forEach((stage) => {
@@ -101,6 +104,7 @@ export class FifaDAO extends FifaContainer {
       stageMatches?.sort((a, b) => a.date.getTime() - b.date.getTime());
       if (stageMatches) result[stage.id] = stageMatches[0].date;
     });
+    FifaDAO.START_DATES = result;
     return result;
   }
 }

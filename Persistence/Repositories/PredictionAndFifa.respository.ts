@@ -15,9 +15,10 @@ export interface IPredictionData {
 }
 
 export interface IManyPredictionValidate {
-  valid: IPredictionData[];
+  validated: IPredictionData[];
   expired: IPredictionData[];
   empty: IPredictionData[];
+  scoreErrors: IPredictionData[];
 }
 
 interface ISingleStagePredictionLength {
@@ -61,10 +62,12 @@ export class PredictionAndFifa {
     userGroupId: string
   ): Promise<IManyPredictionValidate> {
     const result: IManyPredictionValidate = {
-      valid: [],
+      validated: [],
       expired: [],
       empty: [],
+      scoreErrors: [],
     };
+    console.time("validation");
     const groupRules = await this.groups.getById(userGroupId, "rules");
     if (!groupRules) throw new CustomError(404, "Group not found");
     const matches = await this.fifa.getMatchesById(
@@ -81,12 +84,22 @@ export class PredictionAndFifa {
       if (now + (groupRules.rules?.timeLimit || 0) < matchDate) return match.id;
     });
     predictions.forEach((prediction) => {
-      if (isNaN(prediction.homeScore) || isNaN(prediction.awayScore)) {
+      if (
+        isNaN(prediction.homeScore) ||
+        isNaN(prediction.awayScore) ||
+        (typeof prediction.awayScore !== "number" &&
+          isNaN(parseInt(prediction.awayScore))) ||
+        (typeof prediction.homeScore !== "number" &&
+          isNaN(parseInt(prediction.homeScore)))
+      ) {
         result.empty = [...result.empty, prediction];
+      } else if (prediction.homeScore < 0 || prediction.awayScore < 0) {
+        result.scoreErrors = [...result.scoreErrors, prediction];
       } else if (validMatchIds.includes(prediction.matchId))
-        result.valid = [...result.valid, prediction];
+        result.validated = [...result.validated, prediction];
       else result.expired = [...result.expired, prediction];
     });
+    console.timeEnd("validation");
     return result;
   }
   async filterForStageOrGroup(

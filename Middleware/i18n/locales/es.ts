@@ -53,4 +53,6 @@ export default {
   "Usernames should be 20 characters or less":
     "Los nombres de usuario deben tener hasta 20 caracteres",
   "Email sent": "Email enviado",
+  "Password change already required, check your email":
+    "Cambio de contraseña ya solicitado, revisa tu correo",
 };
