@@ -45,5 +45,6 @@
 	"Usernames should be 20 characters or less": "Los nombres de usuario deben tener hasta 20 caracteres",
 	"You have no permission to delete this group": "You have no permission to delete this group",
 	"Group deleted": "Group deleted",
-	"You can't edit this data anymore": "Ya no puedes editar esta información"
+	"You can't edit this data anymore": "Ya no puedes editar esta información",
+	"Password change already required, check your email": "Cambio de contraseña ya solicitado, revisa tu correo"
 }

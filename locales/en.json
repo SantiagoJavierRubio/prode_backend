@@ -27,5 +27,6 @@
 	"Usernames should be 20 characters or less": "Usernames should be 20 characters or less",
 	"Group name must contain no special characters and at least one letter or number": "Group name must contain no special characters and at least one letter or number",
 	"Failed to send password change email": "Failed to send password change email",
-	"Failed to create verification token": "Failed to create verification token"
+	"Failed to create verification token": "Failed to create verification token",
+	"Password change already required, check your email": "Password change already required, check your email"
 }

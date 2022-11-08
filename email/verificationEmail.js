@@ -9,28 +9,23 @@ import config from "../config.js";
 import CustomError from "../Errors/CustomError.js";
 
 const generateVerificationToken = async (user_id) => {
-  try {
-    const exists = await VerificationToken.find({ user_id });
-    if (exists) {
-      if (Date.parse(exists.expiration) < Date.now())
-        await VerificationToken.findByIdAndDelete(exists._id);
-      else return new CustomError(406, "");
-    }
-    const token = uuid();
-    const newVerification = new VerificationToken({
-      user_id,
-      token,
-    });
-    await newVerification.save();
-    return token;
-  } catch (err) {
-    throw new CustomError(
-      500,
-      "Failed to create verification token",
-      err.message,
-      err
-    );
+  const exists = await VerificationToken.findOne({ user_id });
+  if (exists) {
+    if (exists.expiration.getTime() < Date.now())
+      await VerificationToken.findByIdAndDelete(exists._id);
+    else
+      throw new CustomError(
+        406,
+        "Password change already required, check your email"
+      );
   }
+  const token = uuid();
+  const newVerification = new VerificationToken({
+    user_id,
+    token,
+  });
+  await newVerification.save();
+  return token;
 };
 export const sendVerificationEmail = async (user, lang) => {
   try {
@@ -49,6 +44,7 @@ export const sendVerificationEmail = async (user, lang) => {
     if (!mail.accepted.length > 0) throw new Error("Failed to send email");
     return { success: true };
   } catch (err) {
+    if (err instanceof CustomError) throw err;
     throw new CustomError(500, "Failed to send email", err.message, err);
   }
 };
@@ -67,6 +63,7 @@ export const sendPasswordChangeEmail = async (user, lang) => {
     if (!mail.accepted.length > 0) throw new Error("Email rejected");
     return { success: true };
   } catch (err) {
+    if (err instanceof CustomError) throw err;
     throw new CustomError(
       500,
       "Failed to send password change email",
