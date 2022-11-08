@@ -22,7 +22,7 @@ export const getUserData = async (req, res, next) => {
 export const createWithEmail = async (req, res, next) => {
   try {
     const user = await User.createWithEmail(req.body);
-    await sendVerificationEmail(user);
+    await sendVerificationEmail(user, req.locale);
     res.status(200).json({ user_id: user._id });
   } catch (err) {
     errorHandler(err, req, res, next);
@@ -90,7 +90,7 @@ export const requirePasswordChange = async (req, res, next) => {
         "User registered with google",
         "Try to sign in with google"
       );
-    await sendPasswordChangeEmail(user);
+    await sendPasswordChangeEmail(user, req.locale);
     res.sendStatus(200);
   } catch (err) {
     errorHandler(err, req, res, next);

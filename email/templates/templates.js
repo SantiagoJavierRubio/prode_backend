@@ -1,15 +1,19 @@
 import fs from "fs";
 import path from "path";
 
-const stringFromHtml = (name) => {
-  const filePath = path.join(process.cwd(), "/email/templates/", name);
+const stringFromHtml = (name, lang) => {
+  const filePath = path.join(
+    process.cwd(),
+    "/email/templates/",
+    `${name}_${lang}`
+  );
   return fs.readFileSync(`${filePath}.html`, "utf8").toString();
 };
 
-export const verificationEmailTemplate = (link) => {
-  return stringFromHtml("verificationEmail").replace("{{link}}", link);
+export const verificationEmailTemplate = (link, lang) => {
+  return stringFromHtml("verificationEmail", lang).replace("{{link}}", link);
 };
 
-export const changePasswordEmailTemplate = (link) => {
-  return stringFromHtml("changePasswordEmail").replace("{{link}}", link);
+export const changePasswordEmailTemplate = (link, lang) => {
+  return stringFromHtml("changePasswordEmail", lang).replace("{{link}}", link);
 };

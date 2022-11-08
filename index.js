@@ -64,7 +64,7 @@ app.use(helmet());
 app.use(i18n.init);
 app.use((req, res, next) => {
   const l = req.headers["preferred-language"];
-  req.setLocale(l);
+  if (l) req.setLocale(l);
   next();
 });
 app.use(errorHandler);

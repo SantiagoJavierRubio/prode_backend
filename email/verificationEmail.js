@@ -10,6 +10,12 @@ import CustomError from "../Errors/CustomError.js";
 
 const generateVerificationToken = async (user_id) => {
   try {
+    const exists = await VerificationToken.find({ user_id });
+    if (exists) {
+      if (Date.parse(exists.expiration) < Date.now())
+        await VerificationToken.findByIdAndDelete(exists._id);
+      else return new CustomError(406, "");
+    }
     const token = uuid();
     const newVerification = new VerificationToken({
       user_id,
@@ -26,15 +32,19 @@ const generateVerificationToken = async (user_id) => {
     );
   }
 };
-export const sendVerificationEmail = async (user) => {
+export const sendVerificationEmail = async (user, lang) => {
   try {
     const token = await generateVerificationToken(user._id);
     const link = `${config.serverUrl}/auth/email/verify?token=${token}&user_id=${user._id}`;
+    const subject =
+      lang === "es"
+        ? "Bienvenido a Chumbazo, verifica tu cuenta"
+        : "Welcome to Chumbazo, verify your account";
     const mail = await transporter.sendMail({
       to: user.email,
       from: `Chumbazo <${config.emailAccount}>`,
-      subject: "Bienvenido a Chumbazo, verifica tu cuenta",
-      html: verificationEmailTemplate(link),
+      subject: subject,
+      html: verificationEmailTemplate(link, lang),
     });
     if (!mail.accepted.length > 0) throw new Error("Failed to send email");
     return { success: true };
@@ -42,15 +52,17 @@ export const sendVerificationEmail = async (user) => {
     throw new CustomError(500, "Failed to send email", err.message, err);
   }
 };
-export const sendPasswordChangeEmail = async (user) => {
+export const sendPasswordChangeEmail = async (user, lang) => {
   try {
     const token = await generateVerificationToken(user._id);
     const link = `${config.serverUrl}/auth/change-password?token=${token}&user_id=${user._id}`;
+    const subject =
+      lang === "es" ? "Cambia tu contraseña" : "Change your password";
     const mail = await transporter.sendMail({
       to: user.email,
       from: `Chumbazo <${config.emailAccount}>`,
-      subject: "Cambia tu contraseña",
-      html: changePasswordEmailTemplate(link),
+      subject: subject,
+      html: changePasswordEmailTemplate(link, lang),
     });
     if (!mail.accepted.length > 0) throw new Error("Email rejected");
     return { success: true };
