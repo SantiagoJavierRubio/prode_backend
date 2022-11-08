@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon dist/index.js",
-    "build": "tsc -w"
+    "pre-build": "rimraf dist/",
+    "build": "yarn pre-build && tsc && yarn post-build",
+    "post-build": "copyfiles -u 1 ./**/templates/*.html ./dist/Middleware && copyfiles -u 1 ./public/* ./dist/public",
+    "postinstall": "yarn build"
   },
   "repository": {
     "type": "git",
@@ -55,11 +58,13 @@
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
     "babel-eslint": "^10.1.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "nodemon": "^2.0.19",
     "prettier": "^2.6.2",
+    "rimraf": "^3.0.2",
     "typescript": "^4.8.3"
   },
   "eslintConfig": {
