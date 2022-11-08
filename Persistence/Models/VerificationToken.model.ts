@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const VerificationSchema = new mongoose.Schema(
   {
-    user_id: { type: String, required: true, unique: true },
+    user_id: { type: String, required: true },
     token: { type: String, required: true },
     expiration: {
       type: Date,

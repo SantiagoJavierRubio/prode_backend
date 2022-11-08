@@ -31,14 +31,19 @@ class Mailer {
   async sendVerificationEmail(
     userId: string,
     userEmail: string,
-    token: string
+    token: string,
+    language: string
   ): Promise<boolean> {
     const link = `${config.serverUrl}/auth/email/verify?token=${token}&user_id=${userId}`;
+    const subject =
+      language === "es"
+        ? "Bienvenido a Chumbazo, verifica tu cuenta"
+        : "Welcome to Chumbazo, verify your account";
     const mail = await this._transporter.sendMail({
       to: userEmail,
       from: `Chumbazo <${config.emailAccount}>`,
-      subject: "Bienvenido a Chumbazo, verifica tu cuenta",
-      html: verificationEmailTemplate(link),
+      subject: subject,
+      html: verificationEmailTemplate(link, language),
     });
     if (!(mail.accepted.length > 0)) throw new Error("Failed to send email");
     return true;
@@ -46,14 +51,17 @@ class Mailer {
   async sendPasswordChangeEmail(
     userId: string,
     userEmail: string,
-    token: string
+    token: string,
+    language: string
   ): Promise<boolean> {
     const link = `${config.serverUrl}/auth/change-password?token=${token}&user_id=${userId}`;
+    const subject =
+      language === "es" ? "Cambia tu contraseña" : "Change your password";
     const mail = await this._transporter.sendMail({
       to: userEmail,
       from: `Chumbazo <${config.emailAccount}>`,
-      subject: "Cambia tu contraseña",
-      html: changePasswordEmailTemplate(link),
+      subject: subject,
+      html: changePasswordEmailTemplate(link, language),
     });
     if (!(mail.accepted.length > 0)) throw new Error("Email rejected");
     return true;

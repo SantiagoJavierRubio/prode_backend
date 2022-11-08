@@ -12,7 +12,10 @@ export class VerificationTokenDAO extends Container<VerificationTokenDocument> {
     super(VerificationToken);
   }
   async generate(userId: string): Promise<string> {
-    const newToken = await this.create({ user_id: userId, token: uuid() });
+    const newToken = await this.create({
+      user_id: userId,
+      token: uuid(),
+    });
     if (!newToken) throw new CustomError(500, "Failed to create token");
     return newToken.token;
   }

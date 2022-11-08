@@ -8,6 +8,7 @@ import { generateJwtToken } from "../utils/jwtToken";
 import { googleClient } from "../Middleware/Google/google.middleware";
 import { VerificationTokenDAO } from "../Persistence/DAOS/VerificationToken.dao";
 import { mailer } from "../Middleware/Nodemailer/mailer.middleware";
+import __ from "i18next";
 
 interface IUserData {
   user: LeanDocument<UserDocument>;
@@ -52,7 +53,8 @@ export class AuthService extends Validated {
       !(await mailer.sendVerificationEmail(
         user._id,
         user.email,
-        verificationToken
+        verificationToken,
+        __.language
       ))
     )
       throw new CustomError(500, "Failed to send verification email");
@@ -101,12 +103,15 @@ export class AuthService extends Validated {
         "User registered with Google",
         "Try to sign in with Google"
       );
-    const temporaryToken = await this.verificationTokens.generate(user._id);
+    const temporaryToken = await this.verificationTokens.generate(
+      user._id.toString()
+    );
     if (
       !(await mailer.sendPasswordChangeEmail(
         user._id,
         user.email,
-        temporaryToken
+        temporaryToken,
+        __.language
       ))
     )
       throw new CustomError(500, "Failed to send password change email");

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { authService } from "../services/auth.service";
 import { errorHandler } from "../Middleware/Errors/errorHandler.middleware";
 import { CustomError } from "../Middleware/Errors/CustomError";
-import { t } from "i18next";
+import __, { t } from "i18next";
 import config from "../config";
 
 export class AuthController {
