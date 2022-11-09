@@ -67,9 +67,8 @@ export class Validated {
     if (data?.extraPredictions) {
       data.extraPredictions.forEach((ePred) => {
         if (
-          /[/"?&$:'#%{}();,+@]/.test(ePred?.key) ||
+          /[/"?&$:'#%{}();,+@\s]/.test(ePred?.key) ||
           /[/"?&$:'#%{}();,+@]/.test(ePred?.description)
-          // || !(ePred?.timeLimit instanceof Date)
         )
           throw new CustomError(400, "Extra prediction format not valid");
       });
