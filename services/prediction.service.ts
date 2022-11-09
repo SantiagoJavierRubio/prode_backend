@@ -13,6 +13,7 @@ import {
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { LeanDocument } from "mongoose";
+import { ExtraPredictionsDAO } from "../Persistence/DAOS/ExtraPredictions.dao";
 import { t } from "i18next";
 
 interface IOnePredictionIn {
@@ -36,24 +37,29 @@ interface IManyPredictionsResponse {
   errors: IPredictionError[];
 }
 
-// TODO: Abstract, generalize
-const partition = (
-  array: IPredictionData[],
-  callback: (e: IPredictionData) => boolean
-) =>
-  array.reduce(
-    (acc: IPredictionData[][], e) => {
-      acc[callback(e) ? 0 : 1].push(e);
-      return acc;
-    },
-    [[], []]
-  );
+interface IExtraPredictionsIn {
+  [key: string]: string;
+}
+
+// TO?DO: Abstract, generalize
+// const partition = (
+//   array: IPredictionData[],
+//   callback: (e: IPredictionData) => boolean
+// ) =>
+//   array.reduce(
+//     (acc: IPredictionData[][], e) => {
+//       acc[callback(e) ? 0 : 1].push(e);
+//       return acc;
+//     },
+//     [[], []]
+//   );
 //
 
 class PredictionService extends Validated {
   predictions = new PredictionDAO();
   predictionsWithMatches = new PredictionAndFifa();
   groups = new GroupDAO();
+  extraPredictions = new ExtraPredictionsDAO();
 
   constructor() {
     super();
@@ -264,6 +270,52 @@ class PredictionService extends Validated {
       userGroupId,
       predictions
     );
+  }
+  async submitExtraPredictions(
+    userId: string,
+    userGroupId: string | undefined,
+    predictions: IExtraPredictionsIn | undefined
+  ) {
+    if (!userId || !userGroupId || !predictions)
+      throw new CustomError(400, "Missing data");
+    const groupExtraPredictionsSet = await this.groups.getById(
+      userGroupId,
+      "extraPredictions"
+    );
+    if (!groupExtraPredictionsSet)
+      throw new CustomError(404, "Group not found");
+    if (!groupExtraPredictionsSet.extraPredictions)
+      throw new CustomError(404, "Group extra predictions data not found");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    const predictionMap: Map<string, string> = new Map();
+    groupExtraPredictionsSet.extraPredictions.forEach((EP) => {
+      if (predictions[EP.key] && Date.now() < new Date(EP.timeLimit).getTime())
+        predictionMap.set(EP.key, predictions[EP.key]);
+    });
+    return this.extraPredictions.createPredictions(
+      userId,
+      userGroupId,
+      predictionMap
+    );
+  }
+  async fetchUserExtraPredictions(
+    userId: string,
+    userGroupId: string | undefined
+  ) {
+    if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    return this.extraPredictions.deleteAllByUserInGroup(userId, userGroupId);
+  }
+  async fetchGroupExtraPredictions(
+    userId: string,
+    userGroupId: string | undefined
+  ) {
+    if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    return this.extraPredictions.getAllByGroup(userGroupId);
   }
 }
 

@@ -9,7 +9,8 @@
     "pre-build": "rimraf dist/",
     "build": "yarn pre-build && tsc && yarn post-build",
     "post-build": "copyfiles -u 1 ./**/templates/*.html ./dist/Middleware && copyfiles -u 1 ./public/* ./dist/public",
-    "postinstall": "yarn build"
+    "postinstall": "yarn build",
+    "build:dev": "tsc -w"
   },
   "repository": {
     "type": "git",

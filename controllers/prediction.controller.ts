@@ -122,6 +122,41 @@ class PredictionController {
       errorHandler(err, req, res, next);
     }
   }
+  async createExtraPredictions(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const result = await predictionService.submitExtraPredictions(
+        req.user?._id,
+        req.query.userGroupId?.toString(),
+        req.body
+      );
+      res.json({
+        extraPredictions: result,
+      });
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
+  async getExtraPredictionsForGroup(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const result = await predictionService.fetchGroupExtraPredictions(
+        req.user?._id,
+        req.query.userGroupId?.toString()
+      );
+      res.json({
+        extraPredictions: result,
+      });
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
 }
 
 export const predictionController = new PredictionController();
