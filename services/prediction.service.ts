@@ -306,16 +306,19 @@ class PredictionService extends Validated {
     if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
     if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
       throw new CustomError(401, "User not in group");
-    return this.extraPredictions.deleteAllByUserInGroup(userId, userGroupId);
+    return;
   }
   async fetchGroupExtraPredictions(
     userId: string,
-    userGroupId: string | undefined
+    userGroupId: string | undefined,
+    justOwn: boolean
   ) {
     if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
     if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
       throw new CustomError(401, "User not in group");
-    return this.extraPredictions.getAllByGroup(userGroupId);
+    return justOwn
+      ? this.extraPredictions.getAllByUserInGroup(userGroupId, userId)
+      : this.extraPredictions.getAllByGroup(userGroupId);
   }
 }
 

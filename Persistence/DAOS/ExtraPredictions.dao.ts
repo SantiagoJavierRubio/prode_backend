@@ -36,6 +36,9 @@ export class ExtraPredictionsDAO extends Container<ExtraPredictionsDocument> {
   async getAllByGroup(userGroupId: string) {
     return this.getMany({ userGroupId });
   }
+  async getAllByUserInGroup(userGroupId: string, userId: string) {
+    return this.getMany({ userGroupId, userId });
+  }
   async deleteAllByUserInGroup(userId: string, userGroupId: string) {
     return this.deleteMany({ userId, userGroupId });
   }

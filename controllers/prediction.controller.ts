@@ -148,7 +148,8 @@ class PredictionController {
     try {
       const result = await predictionService.fetchGroupExtraPredictions(
         req.user?._id,
-        req.query.userGroupId?.toString()
+        req.query.userGroupId?.toString(),
+        req.query.own?.toString().toLowerCase() === "true"
       );
       res.json({
         extraPredictions: result,
