@@ -1,5 +1,6 @@
 import { PredictionDAO } from "../Persistence/DAOS/Prediction.dao";
 import { GroupDAO } from "../Persistence/DAOS/Group.dao";
+import { Scores } from "../Persistence/Repositories/Scores.repository";
 import { PredictionDTO } from "../DTOS/Prediction/PredictionPost.dto";
 import {
   PredictionT,
@@ -41,25 +42,12 @@ interface IExtraPredictionsIn {
   [key: string]: string;
 }
 
-// TO?DO: Abstract, generalize
-// const partition = (
-//   array: IPredictionData[],
-//   callback: (e: IPredictionData) => boolean
-// ) =>
-//   array.reduce(
-//     (acc: IPredictionData[][], e) => {
-//       acc[callback(e) ? 0 : 1].push(e);
-//       return acc;
-//     },
-//     [[], []]
-//   );
-//
-
 class PredictionService extends Validated {
   predictions = new PredictionDAO();
   predictionsWithMatches = new PredictionAndFifa();
   groups = new GroupDAO();
   extraPredictions = new ExtraPredictionsDAO();
+  scores = new Scores();
 
   constructor() {
     super();
@@ -107,15 +95,6 @@ class PredictionService extends Validated {
         predictionData.prediction,
         predictionData.userGroupId
       );
-    // const [validated, scoreErrors] = partition(dateValidated.valid, (e) =>
-    //   this.arePositiveNumbers([e.awayScore, e.homeScore])
-    // );
-    // const validated = dateValidated.valid.filter((e) =>
-    //   this.arePositiveNumbers([e.awayScore, e.homeScore])
-    // );
-    // const scoreErrors = dateValidated.valid.filter(
-    //   (e) => !this.arePositiveNumbers([e.awayScore, e.homeScore])
-    // );
     const errors = [
       ...expired.map((exp) => ({
         id: exp.matchId,
@@ -130,16 +109,19 @@ class PredictionService extends Validated {
         message: t("Missing field"),
       })),
     ];
-    const valid = await this.predictions.createMany(
-      validated.map(
-        (validPrediction) =>
-          new PredictionDTO({
-            ...validPrediction,
-            userGroupId: predictionData.userGroupId,
-            userId,
-          })
-      )
-    );
+    const valid =
+      validated.length > 0
+        ? await this.predictions.createMany(
+            validated.map(
+              (validPrediction) =>
+                new PredictionDTO({
+                  ...validPrediction,
+                  userGroupId: predictionData.userGroupId,
+                  userId,
+                })
+            )
+          )
+        : { edited: [], created: [] };
     return {
       edited: valid.edited,
       created: valid.created,
@@ -316,9 +298,11 @@ class PredictionService extends Validated {
     if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
     if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
       throw new CustomError(401, "User not in group");
-    return justOwn
-      ? this.extraPredictions.getAllByUserInGroup(userGroupId, userId)
-      : this.extraPredictions.getAllByGroup(userGroupId);
+    if (justOwn)
+      return this.extraPredictions.getAllByUserInGroup(userGroupId, userId);
+    const groupData = await this.groups.getById(userGroupId);
+    if (!groupData) throw new CustomError(404, "Group not found");
+    return this.scores.getExtraPredictionsResultsByUser(groupData);
   }
 }
 
