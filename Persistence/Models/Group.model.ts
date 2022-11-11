@@ -15,6 +15,7 @@ export interface ExtraPredictionsCategory {
   key: string;
   description: string;
   timeLimit: Date;
+  score: Number;
 }
 
 export type GroupT = {
