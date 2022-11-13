@@ -58,19 +58,19 @@ class PredictionService extends Validated {
   constructor() {
     super();
   }
-  async createOne(predictionData: IOnePredictionIn, userId: string) {
-    if (!userId || !predictionData.prediction.matchId)
+  async createOne(predictionData: IPredictionData, userId: string) {
+    if (!userId || !predictionData.matchId)
       throw new CustomError(400, "Missing data");
     if (
       !this.arePositiveNumbers([
-        predictionData.prediction.awayScore,
-        predictionData.prediction.homeScore,
+        predictionData.awayScore,
+        predictionData.homeScore,
       ])
     )
       throw new CustomError(400, "Scores must be positive numbers");
     if (
       !(await this.predictionsWithMatches.validateSinglePrediction(
-        predictionData.prediction.matchId,
+        predictionData.matchId,
         predictionData.userGroupId
       ))
     )
@@ -80,8 +80,7 @@ class PredictionService extends Validated {
       );
     return this.predictions.createPrediction(
       new PredictionDTO({
-        ...predictionData.prediction,
-        userGroupId: predictionData.userGroupId,
+        ...predictionData,
         userId,
       })
     );

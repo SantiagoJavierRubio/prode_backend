@@ -12,6 +12,7 @@ export interface IPredictionData {
   matchId: PredictionT["matchId"];
   homeScore: PredictionT["homeScore"];
   awayScore: PredictionT["awayScore"];
+  userGroupId: PredictionT["userGroupId"];
 }
 
 export interface IManyPredictionValidate {
@@ -67,7 +68,6 @@ export class PredictionAndFifa {
       empty: [],
       scoreErrors: [],
     };
-    console.time("validation");
     const groupRules = await this.groups.getById(userGroupId, "rules");
     if (!groupRules) throw new CustomError(404, "Group not found");
     const matches = await this.fifa.getMatchesById(
@@ -99,7 +99,6 @@ export class PredictionAndFifa {
         result.validated = [...result.validated, prediction];
       else result.expired = [...result.expired, prediction];
     });
-    console.timeEnd("validation");
     return result;
   }
   async filterForStageOrGroup(
