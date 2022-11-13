@@ -4,12 +4,14 @@ import { GroupDAO, GroupCreate } from "../Persistence/DAOS/Group.dao";
 import { GroupAndUsers } from "../Persistence/Repositories/GroupAndUsers.repository";
 import { Scores } from "../Persistence/Repositories/Scores.repository";
 import { PredictionDAO } from "../Persistence/DAOS/Prediction.dao";
+import { ExtraPredictionsDAO } from "../Persistence/DAOS/ExtraPredictions.dao";
 
 class GroupService extends Validated {
   groups = new GroupDAO();
   groupsAndUsers = new GroupAndUsers();
   scores = new Scores();
   predictions = new PredictionDAO();
+  extraPredictions = new ExtraPredictionsDAO();
 
   constructor() {
     super();
@@ -46,6 +48,7 @@ class GroupService extends Validated {
     await this.predictions.removeManyByUser(userId, {
       userGroupId: groupId,
     });
+    await this.extraPredictions.deleteAllByUserInGroup(userId, groupId);
     return groupId;
   }
   async fetchGroupData(groupName: string | undefined, userId: string) {
