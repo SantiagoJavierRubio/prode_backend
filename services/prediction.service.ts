@@ -15,11 +15,6 @@ import { CustomError } from "../Middleware/Errors/CustomError";
 import { LeanDocument } from "mongoose";
 import { t } from "i18next";
 
-interface IOnePredictionIn {
-  userGroupId: PredictionT["userGroupId"];
-  prediction: IPredictionData;
-}
-
 interface IManyPredictionIn {
   userGroupId: PredictionT["userGroupId"];
   prediction: IPredictionData[];
@@ -36,19 +31,19 @@ interface IManyPredictionsResponse {
   errors: IPredictionError[];
 }
 
-// TODO: Abstract, generalize
-const partition = (
-  array: IPredictionData[],
-  callback: (e: IPredictionData) => boolean
-) =>
-  array.reduce(
-    (acc: IPredictionData[][], e) => {
-      acc[callback(e) ? 0 : 1].push(e);
-      return acc;
-    },
-    [[], []]
-  );
-//
+// // TODO: Abstract, generalize
+// const partition = (
+//   array: IPredictionData[],
+//   callback: (e: IPredictionData) => boolean
+// ) =>
+//   array.reduce(
+//     (acc: IPredictionData[][], e) => {
+//       acc[callback(e) ? 0 : 1].push(e);
+//       return acc;
+//     },
+//     [[], []]
+//   );
+// //
 
 class PredictionService extends Validated {
   predictions = new PredictionDAO();
