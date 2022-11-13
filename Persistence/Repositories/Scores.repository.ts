@@ -84,7 +84,7 @@ export class Scores {
             )
           );
           return [
-            userPredictions.userId.toString(),
+            user.name,
             {
               user: {
                 name: user.name,
