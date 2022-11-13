@@ -12,6 +12,7 @@ export interface IPredictionData {
   matchId: PredictionT["matchId"];
   homeScore: PredictionT["homeScore"];
   awayScore: PredictionT["awayScore"];
+  userGroupId: PredictionT["userGroupId"];
 }
 
 export interface IManyPredictionValidate {
