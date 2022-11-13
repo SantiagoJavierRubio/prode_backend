@@ -1,6 +1,7 @@
 import { UserT, UserDocument } from "../../Persistence/Models/User.model";
 import { GroupT, GroupDocument } from "../../Persistence/Models/Group.model";
 import { LeanDocument } from "mongoose";
+import { ExtraPredictionsCategoryDTO } from "../ExtraPredictions/ExtraPredictionsCategory.dto";
 
 interface GroupMember {
   name: UserT["name"];
@@ -13,6 +14,7 @@ export class GroupDataDTO {
   members: GroupMember[];
   owner: GroupMember;
   rules: GroupT["rules"];
+  extraPredictions: GroupT["extraPredictions"];
 
   constructor(
     groupData: LeanDocument<GroupDocument>,
@@ -28,5 +30,10 @@ export class GroupDataDTO {
       (member) => member._id.toString() === groupData.owner
     )[0];
     this.rules = groupData.rules;
+    this.extraPredictions = groupData.extraPredictions
+      ? groupData.extraPredictions.map(
+          (ep) => new ExtraPredictionsCategoryDTO(ep)
+        )
+      : undefined;
   }
 }

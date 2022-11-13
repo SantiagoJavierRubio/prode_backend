@@ -1,5 +1,6 @@
 import { PredictionDAO } from "../Persistence/DAOS/Prediction.dao";
 import { GroupDAO } from "../Persistence/DAOS/Group.dao";
+import { Scores } from "../Persistence/Repositories/Scores.repository";
 import { PredictionDTO } from "../DTOS/Prediction/PredictionPost.dto";
 import {
   PredictionT,
@@ -13,6 +14,7 @@ import {
 import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { LeanDocument } from "mongoose";
+import { ExtraPredictionsDAO } from "../Persistence/DAOS/ExtraPredictions.dao";
 import { t } from "i18next";
 
 interface IOnePredictionIn {
@@ -36,24 +38,16 @@ interface IManyPredictionsResponse {
   errors: IPredictionError[];
 }
 
-// TODO: Abstract, generalize
-const partition = (
-  array: IPredictionData[],
-  callback: (e: IPredictionData) => boolean
-) =>
-  array.reduce(
-    (acc: IPredictionData[][], e) => {
-      acc[callback(e) ? 0 : 1].push(e);
-      return acc;
-    },
-    [[], []]
-  );
-//
+interface IExtraPredictionsIn {
+  [key: string]: string;
+}
 
 class PredictionService extends Validated {
   predictions = new PredictionDAO();
   predictionsWithMatches = new PredictionAndFifa();
   groups = new GroupDAO();
+  extraPredictions = new ExtraPredictionsDAO();
+  scores = new Scores();
 
   constructor() {
     super();
@@ -100,15 +94,6 @@ class PredictionService extends Validated {
         predictionData.prediction,
         predictionData.userGroupId
       );
-    // const [validated, scoreErrors] = partition(dateValidated.valid, (e) =>
-    //   this.arePositiveNumbers([e.awayScore, e.homeScore])
-    // );
-    // const validated = dateValidated.valid.filter((e) =>
-    //   this.arePositiveNumbers([e.awayScore, e.homeScore])
-    // );
-    // const scoreErrors = dateValidated.valid.filter(
-    //   (e) => !this.arePositiveNumbers([e.awayScore, e.homeScore])
-    // );
     const errors = [
       ...expired.map((exp) => ({
         id: exp.matchId,
@@ -123,16 +108,19 @@ class PredictionService extends Validated {
         message: t("Missing field"),
       })),
     ];
-    const valid = await this.predictions.createMany(
-      validated.map(
-        (validPrediction) =>
-          new PredictionDTO({
-            ...validPrediction,
-            userGroupId: predictionData.userGroupId,
-            userId,
-          })
-      )
-    );
+    const valid =
+      validated.length > 0
+        ? await this.predictions.createMany(
+            validated.map(
+              (validPrediction) =>
+                new PredictionDTO({
+                  ...validPrediction,
+                  userGroupId: predictionData.userGroupId,
+                  userId,
+                })
+            )
+          )
+        : { edited: [], created: [] };
     return {
       edited: valid.edited,
       created: valid.created,
@@ -263,6 +251,57 @@ class PredictionService extends Validated {
       userGroupId,
       predictions
     );
+  }
+  async submitExtraPredictions(
+    userId: string,
+    userGroupId: string | undefined,
+    predictions: IExtraPredictionsIn | undefined
+  ) {
+    if (!userId || !userGroupId || !predictions)
+      throw new CustomError(400, "Missing data");
+    const groupExtraPredictionsSet = await this.groups.getById(
+      userGroupId,
+      "extraPredictions"
+    );
+    if (!groupExtraPredictionsSet)
+      throw new CustomError(404, "Group not found");
+    if (!groupExtraPredictionsSet.extraPredictions)
+      throw new CustomError(404, "Group extra predictions data not found");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    const predictionMap: Map<string, string> = new Map();
+    groupExtraPredictionsSet.extraPredictions.forEach((EP) => {
+      if (predictions[EP.key] && Date.now() < new Date(EP.timeLimit).getTime())
+        predictionMap.set(EP.key, predictions[EP.key]);
+    });
+    return this.extraPredictions.createPredictions(
+      userId,
+      userGroupId,
+      predictionMap
+    );
+  }
+  async fetchUserExtraPredictions(
+    userId: string,
+    userGroupId: string | undefined
+  ) {
+    if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    return;
+  }
+  async fetchGroupExtraPredictions(
+    userId: string,
+    userGroupId: string | undefined,
+    justOwn: boolean
+  ) {
+    if (!userId || !userGroupId) throw new CustomError(400, "Missing data");
+    if (!(await this.groups.checkForUserInGroup(userGroupId, userId)))
+      throw new CustomError(401, "User not in group");
+    if (justOwn)
+      return this.extraPredictions.getAllByUserInGroup(userGroupId, userId);
+    const groupData = await this.groups.getById(userGroupId);
+    if (!groupData) throw new CustomError(404, "Group not found");
+    return this.scores.getExtraPredictionsResultsByUser(groupData);
   }
 }
 

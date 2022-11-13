@@ -11,6 +11,7 @@ interface GroupWithOwnerName {
   members: GroupT["members"];
   owner: string;
   rules: GroupT["rules"];
+  extraPredictions: GroupT["extraPredictions"];
 }
 
 interface OwnerMap {
@@ -24,7 +25,7 @@ export class GroupAndUsers {
   async getGroupWithUsers(groupName: string): Promise<GroupDataDTO> {
     const group = await this.groups.getOne(
       { name: groupName.toUpperCase() },
-      "name members owner rules"
+      "name members owner rules extraPredictions"
     );
     if (!group) throw new CustomError(404, "Group not found");
     const members = await this.users.getManyById(group.members, "name avatar");
@@ -51,6 +52,7 @@ export class GroupAndUsers {
         members: group.members,
         owner: ownersMap[group.owner] || group.owner,
         rules: group.rules,
+        extraPredictions: group.extraPredictions,
       };
     });
   }

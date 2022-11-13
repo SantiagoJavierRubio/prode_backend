@@ -19,5 +19,10 @@ predictionRoutes.get(
   "/random-missing",
   predictionController.getRandomUnpredictedMatch
 );
+predictionRoutes.get(
+  "/extra",
+  predictionController.getExtraPredictionsForGroup
+);
+predictionRoutes.post("/extra", predictionController.createExtraPredictions);
 // UNUSED
 // predictionRoutes.get("/history", predictionController.getPreviousForStage);
