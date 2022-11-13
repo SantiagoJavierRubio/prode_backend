@@ -11,10 +11,18 @@ export interface UserGroupRules {
   limitByPhase: boolean;
 }
 
+export interface ExtraPredictionsCategory {
+  key: string;
+  description: string;
+  timeLimit: Date;
+  score: number;
+}
+
 export type GroupT = {
   name: string;
   owner: string;
   members: string[];
+  extraPredictions?: ExtraPredictionsCategory[];
   rules: UserGroupRules | undefined;
 };
 
@@ -33,6 +41,7 @@ const GroupSchema = new mongoose.Schema<
     name: { type: String, required: true },
     owner: { type: String, required: true },
     members: [String],
+    extraPredictions: { type: [Object], required: false },
     rules: {
       type: Object,
       required: true,

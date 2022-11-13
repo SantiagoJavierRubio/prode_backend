@@ -6,6 +6,7 @@ import { LeanDocument } from "mongoose";
 export interface GroupCreate {
   name: GroupT["name"];
   rules: GroupT["rules"];
+  extraPredictions: GroupT["extraPredictions"];
 }
 
 export class GroupDAO extends Container<GroupDocument> {
@@ -28,7 +29,10 @@ export class GroupDAO extends Container<GroupDocument> {
   async getGroups(
     userId: string
   ): Promise<LeanDocument<GroupDocument>[] | null> {
-    return await this.getMany({ members: userId }, "members name owner rules");
+    return await this.getMany(
+      { members: userId },
+      "members name owner rules extraPredictions"
+    );
   }
   async getCommonGroups(
     userId: string,
