@@ -205,7 +205,7 @@ class PredictionService extends Validated {
     const userGroups = await this.groups.getGroups(userId);
     if (!userGroups || userGroups.length < 1)
       throw new CustomError(204, "No groups found");
-    userGroups.sort(() => (Math.random() > 0.5 ? 0 : 1));
+    userGroups.sort((a, b) => 0.5 - Math.random());
     for await (let group of userGroups) {
       const predicted = await this.predictions.getAllByUserInGroup(
         userId,
@@ -216,6 +216,7 @@ class PredictionService extends Validated {
           predicted,
           group.rules?.timeLimit
         );
+      if (predicted?.length === 0) console.log(group.name, result);
       if (result) return { group, match: result };
     }
     return null;

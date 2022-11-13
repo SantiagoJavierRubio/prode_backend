@@ -176,7 +176,11 @@ export class PredictionAndFifa {
     predictions: LeanDocument<PredictionDocument>[] | null,
     timeLimit: number | undefined
   ): Promise<Match | null> {
-    if (!predictions || timeLimit === undefined || isNaN(timeLimit))
+    if (
+      predictions === null ||
+      predictions === undefined ||
+      timeLimit === undefined
+    )
       return null;
     const predictionMatchIds = predictions.map(
       (prediction) => prediction.matchId
