@@ -45,10 +45,10 @@ class GroupService extends Validated {
     );
     if (!groupId)
       throw new CustomError(500, "Failed to remove user from group");
-    await this.predictions.removeManyByUser(userId, {
-      userGroupId: groupId,
-    });
-    await this.extraPredictions.deleteAllByUserInGroup(userId, groupId);
+    // await this.predictions.removeManyByUser(userId, {
+    //   userGroupId: groupId,
+    // });
+    // await this.extraPredictions.deleteAllByUserInGroup(userId, groupId);
     return groupId;
   }
   async fetchGroupData(groupName: string | undefined, userId: string) {
@@ -68,7 +68,7 @@ class GroupService extends Validated {
         "Group id and user are required"
       );
     await this.groups.deleteGroup(groupId, userId);
-    return this.predictions.removeAllFromGroup(groupId);
+    // return this.predictions.removeAllFromGroup(groupId);
   }
   async fetchGroupRules(groupName: string | undefined) {
     if (!groupName)
