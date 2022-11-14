@@ -54,6 +54,8 @@ class GroupService extends Validated {
   async fetchGroupData(groupName: string | undefined, userId: string) {
     if (groupName) {
       const groupData = await this.groupsAndUsers.getGroupWithUsers(groupName);
+      if (!(await this.groups.checkForUserInGroup(groupData.id, userId)))
+        throw new CustomError(401, "User not in group");
       return { groupData };
     }
     if (!userId)
