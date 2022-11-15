@@ -7,18 +7,18 @@ import { Match } from "../DTOS/Fixture/fifa.match.dto";
 import { FifaDAO } from "../Persistence/DAOS/Fifa.dao";
 import { GroupDAO } from "../Persistence/DAOS/Group.dao";
 import { UserGroupRules } from "../Persistence/Models/Group.model";
-import { Connections } from "../connections";
+// import { Connections } from "../connections";
 import { LeanDocument } from "mongoose";
 
 console.log(
   "____#################\n Initializing scoring process \n____#################\n"
 );
-const connect = new Connections();
+// const connect = new Connections();
 const fifa = new FifaDAO();
 const groups = new GroupDAO();
 const predictions = new PredictionDAO();
 
-connect.createConnections();
+// connect.createConnections();
 
 const MATCH_RESULT_TYPES = {
   HOME: "home",
