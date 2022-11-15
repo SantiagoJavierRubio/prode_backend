@@ -4,6 +4,7 @@ import { LeanDocument } from "mongoose";
 import { ExtraPredictionsCategoryDTO } from "../ExtraPredictions/ExtraPredictionsCategory.dto";
 
 interface GroupMember {
+  id?: string;
   name: UserT["name"];
   avatar?: UserT["avatar"];
 }
@@ -23,6 +24,7 @@ export class GroupDataDTO {
     this.id = groupData._id.toString();
     this.name = groupData.name;
     this.members = membersData.map((member) => ({
+      id: member._id.toString(),
       name: member.name,
       avatar: member.avatar,
     }));
