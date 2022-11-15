@@ -79,7 +79,14 @@ export class PredictionDAO extends Container<PredictionDocument> {
     return true;
   }
   async removeManyByUser(userId: string, condition: object): Promise<void> {
-    return this.deleteMany({ ...condition, userId: userId });
+    const predictionIds = await this.getMany(
+      { ...condition, userId: userId },
+      "_id"
+    );
+    if (!predictionIds) throw new CustomError(404, "Predictions not found");
+    const ids = predictionIds?.map((p) => p._id.toString());
+    return console.log(ids);
+    return this.deleteMany(ids);
   }
   async getAllByUser(
     userId: string
@@ -127,8 +134,13 @@ export class PredictionDAO extends Container<PredictionDocument> {
     return this.updateMany(predictionIds, { checked: true });
   }
   async removeAllFromGroup(userGroupId: string): Promise<void> {
-    return this.deleteMany({
-      userGroupId: userGroupId,
-    });
+    const predictionIds = await this.getMany(
+      { userGroupId: userGroupId },
+      "_id"
+    );
+    if (!predictionIds) throw new CustomError(404, "Predictions not found");
+    const ids = predictionIds?.map((p) => p._id.toString());
+    return console.log(ids);
+    return this.deleteMany(ids);
   }
 }

@@ -216,7 +216,6 @@ class PredictionService extends Validated {
           predicted,
           group.rules?.timeLimit
         );
-      if (predicted?.length === 0) console.log(group.name, result);
       if (result) return { group, match: result };
     }
     return null;

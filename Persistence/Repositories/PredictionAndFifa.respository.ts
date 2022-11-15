@@ -84,7 +84,6 @@ export class PredictionAndFifa {
       if (now + (groupRules.rules?.timeLimit || 0) < matchDate) return match.id;
     });
     predictions.forEach((prediction) => {
-      console.log(typeof prediction.homeScore);
       if (
         isNaN(prediction.homeScore) ||
         isNaN(prediction.awayScore) ||

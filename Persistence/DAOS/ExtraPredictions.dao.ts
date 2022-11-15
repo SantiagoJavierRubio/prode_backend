@@ -40,6 +40,14 @@ export class ExtraPredictionsDAO extends Container<ExtraPredictionsDocument> {
     return this.getMany({ userGroupId, userId });
   }
   async deleteAllByUserInGroup(userId: string, userGroupId: string) {
-    return this.deleteMany({ userId, userGroupId });
+    const extraPredictionsIds = await this.getMany(
+      { userId: userId, userGroupId: userGroupId },
+      "_id"
+    );
+    if (!extraPredictionsIds)
+      throw new CustomError(404, "Predictions not found");
+    const ids = extraPredictionsIds.map((ep) => ep._id.toString());
+    return console.log(ids);
+    return this.deleteMany(ids);
   }
 }

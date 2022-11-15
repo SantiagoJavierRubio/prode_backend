@@ -120,9 +120,9 @@ export class Container<T extends Document> {
       );
     }
   }
-  protected async deleteMany(condition: object): Promise<void> {
+  protected async deleteMany(idList: string[]): Promise<void> {
     try {
-      await this._model.deleteMany({ condition });
+      await this._model.deleteMany({ _id: { $in: idList } });
     } catch (err) {
       throw new CustomError(
         500,
