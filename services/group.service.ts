@@ -115,7 +115,7 @@ class GroupService extends Validated {
       );
     this.validateGroupData(groupData);
     // TODO => Set this programmaticaly
-    if (Date.now() > Date.parse("11-15-2022 13:00 GMT-0300"))
+    if (Date.now() > Date.parse("11-18-2022 13:00 GMT-0300"))
       throw new CustomError(406, "You can't edit this data anymore");
     //
     return this.groups.edit(groupId, groupData, userId);
