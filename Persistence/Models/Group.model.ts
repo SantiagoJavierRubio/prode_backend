@@ -5,7 +5,7 @@ export interface UserGroupRules {
   scoring: {
     NONE: number;
     WINNER: number;
-    NULL: number;
+    FULL: number;
   };
   timeLimit: number;
   limitByPhase: boolean;

@@ -5,6 +5,7 @@ import { authRoutes } from "./routes/auth.router";
 import { fifaRoutes } from "./routes/fifa.router";
 import { groupRoutes } from "./routes/group.router";
 import { predictionRoutes } from "./routes/prediction.router";
+import { predictionScoreRoutes } from "./routes/predictionScore.route";
 import { Middlewares } from "./Middleware/middlewares";
 import { Connections } from "./connections";
 
@@ -15,6 +16,7 @@ const ROUTERS = [
   { path: "/fifa", router: fifaRoutes },
   { path: "/group", router: groupRoutes },
   { path: "/predictions", router: predictionRoutes },
+  { path: "/score-predictions", router: predictionScoreRoutes },
 ];
 const middlewareManager = new Middlewares();
 const connectionManager = new Connections();

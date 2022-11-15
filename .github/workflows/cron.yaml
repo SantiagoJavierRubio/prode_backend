@@ -1,7 +1,7 @@
 name: score-every-15
 on:
   schedule:
-    - cron: '*/15 7-17 * * *'
+    - cron: "*/15 5-20 * * *"
 jobs:
   cron:
     runs-on: ubuntu-latest
@@ -11,4 +11,4 @@ jobs:
           curl --request POST \
           --url '${{ secrets.CLIENT_URL }}' \
           --header 'authorization: ${{ secrets.SCORE_PREDICTIONS_PASSWORD }}' \
-          --header 'accept-language: es'
+          --header 'preferred-language: es'
