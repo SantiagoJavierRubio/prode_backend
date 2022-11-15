@@ -85,7 +85,6 @@ export class PredictionDAO extends Container<PredictionDocument> {
     );
     if (!predictionIds) throw new CustomError(404, "Predictions not found");
     const ids = predictionIds?.map((p) => p._id.toString());
-    return console.log(ids);
     return this.deleteMany(ids);
   }
   async getAllByUser(
@@ -140,7 +139,6 @@ export class PredictionDAO extends Container<PredictionDocument> {
     );
     if (!predictionIds) throw new CustomError(404, "Predictions not found");
     const ids = predictionIds?.map((p) => p._id.toString());
-    return console.log(ids);
     return this.deleteMany(ids);
   }
 }

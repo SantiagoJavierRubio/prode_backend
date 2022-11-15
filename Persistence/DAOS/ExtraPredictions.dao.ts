@@ -47,7 +47,6 @@ export class ExtraPredictionsDAO extends Container<ExtraPredictionsDocument> {
     if (!extraPredictionsIds)
       throw new CustomError(404, "Predictions not found");
     const ids = extraPredictionsIds.map((ep) => ep._id.toString());
-    return console.log(ids);
     return this.deleteMany(ids);
   }
 }
