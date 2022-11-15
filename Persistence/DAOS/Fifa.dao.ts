@@ -14,7 +14,7 @@ export interface Stage {
 export class FifaDAO extends FifaContainer {
   private _SEASON_ID: string = process.env.SEASON_ID || "255711";
   private _GROUP_STAGE: string = process.env.GROUP_DTAGE_ID || "285063";
-  private _apiUrl: string = "https://api.fifa.com/api/v1/";
+  private _apiUrl: string = "https://api.fifa.com/api/v3/";
   static START_DATES: { [key: string]: Date } = {};
 
   constructor() {
