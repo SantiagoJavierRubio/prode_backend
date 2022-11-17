@@ -139,23 +139,21 @@ const scorePredictions = async () => {
   return await addScores(predictionData.predictions, predictionData.matches);
 };
 
-const main = async (): Promise<void> => {
+const main = async (): Promise<string> => {
   try {
     const start = process.hrtime();
     const result = await scorePredictions();
     const end = process.hrtime(start);
     const time = (end[0] * 1e9 + end[1]) / 1e9;
     if (result.scored)
-      console.log(
-        "! --- @ --- !\n",
-        `Scored ${result.scored.length} predictions in ${time} seconds`
-      );
+      return `Scored ${result.scored.length} predictions in ${time} seconds`;
+    return "No results";
   } catch (err) {
-    if (err instanceof Error) console.log("### --->", err.message);
-    else console.log(err);
-  } finally {
-    process.exit();
+    if (err instanceof Error) return `### ---> ${err.message}`;
+    else throw err;
   }
 };
 
 main();
+
+export default main;
