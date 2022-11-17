@@ -4,6 +4,12 @@ import { UserDocument } from "../Persistence/Models/User.model.js";
 import { LeanDocument } from "mongoose";
 
 export const generateJwtToken = (user: LeanDocument<UserDocument>) => {
-  const token = jwt.sign(JSON.stringify(user), `${config.sessionSecret}`);
+  const tokenUser = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    verified: user.verified,
+  };
+  const token = jwt.sign(JSON.stringify(tokenUser), `${config.sessionSecret}`);
   return token;
 };
