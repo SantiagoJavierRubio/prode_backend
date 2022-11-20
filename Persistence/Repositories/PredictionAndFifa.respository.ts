@@ -211,7 +211,7 @@ export class PredictionAndFifa {
       const match = matches.find((match) => match.id === prediction.matchId);
       if (
         !match ||
-        !group?.rules?.timeLimit ||
+        group?.rules?.timeLimit === undefined ||
         match.date.getTime() > now + group?.rules?.timeLimit
       )
         continue;
