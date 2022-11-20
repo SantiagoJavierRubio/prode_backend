@@ -15,6 +15,7 @@ import { Validated } from "./validated.util";
 import { CustomError } from "../Middleware/Errors/CustomError";
 import { LeanDocument } from "mongoose";
 import { ExtraPredictionsDAO } from "../Persistence/DAOS/ExtraPredictions.dao";
+import { UserAddedDAO } from "../Persistence/DAOS/UserAdded.dao";
 import { t } from "i18next";
 
 interface IManyPredictionIn {
@@ -43,6 +44,7 @@ class PredictionService extends Validated {
   groups = new GroupDAO();
   extraPredictions = new ExtraPredictionsDAO();
   scores = new Scores();
+  isUserNew = new UserAddedDAO();
 
   constructor() {
     super();
@@ -84,10 +86,19 @@ class PredictionService extends Validated {
         "Missing data",
         "User group ID and user are required"
       );
+    const joinDate = await this.isUserNew.getDateJoined(
+      userId,
+      predictionData.userGroupId
+    );
+    const isNewInGroup = joinDate
+      ? new Date(joinDate.getTime() + 60 * 60 * 24 * 1000).getTime() >
+        Date.now()
+      : false;
     const { validated, expired, empty, scoreErrors } =
       await this.predictionsWithMatches.validateManyPredictions(
         predictionData.prediction,
-        predictionData.userGroupId
+        predictionData.userGroupId,
+        isNewInGroup
       );
     const errors = [
       ...expired.map((exp) => ({

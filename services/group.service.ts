@@ -5,6 +5,7 @@ import { GroupAndUsers } from "../Persistence/Repositories/GroupAndUsers.reposit
 import { Scores } from "../Persistence/Repositories/Scores.repository";
 import { PredictionDAO } from "../Persistence/DAOS/Prediction.dao";
 import { ExtraPredictionsDAO } from "../Persistence/DAOS/ExtraPredictions.dao";
+import { UserAddedDAO } from "..//Persistence/DAOS/UserAdded.dao";
 
 class GroupService extends Validated {
   groups = new GroupDAO();
@@ -12,6 +13,7 @@ class GroupService extends Validated {
   scores = new Scores();
   predictions = new PredictionDAO();
   extraPredictions = new ExtraPredictionsDAO();
+  newUserReg = new UserAddedDAO();
 
   constructor() {
     super();
@@ -30,7 +32,10 @@ class GroupService extends Validated {
         "Missing field",
         "Group name and user are required"
       );
-    return this.groups.addMember(groupName.toUpperCase(), userId);
+    const group = await this.groups.addMember(groupName.toUpperCase(), userId);
+    if (group)
+      await this.newUserReg.registerUserJoined(userId, group?._id.toString());
+    return group;
   }
   async removeFromGroup(groupName: string | undefined, userId: string) {
     if (!groupName || !userId || this.hasNulls([groupName, userId]))
@@ -56,7 +61,17 @@ class GroupService extends Validated {
       const groupData = await this.groupsAndUsers.getGroupWithUsers(groupName);
       if (!(await this.groups.checkForUserInGroup(groupData.id, userId)))
         throw new CustomError(401, "User not in group");
-      return { groupData };
+      const isNewInGroup = await this.newUserReg.getDateJoined(
+        userId,
+        groupData.id
+      );
+      return {
+        groupData,
+        isNew: isNewInGroup
+          ? new Date(isNewInGroup.getTime() + 60 * 60 * 24 * 1000).getTime() >
+            Date.now()
+          : false,
+      };
     }
     if (!userId)
       throw new CustomError(400, "Missing data", "Group name or user required");
