@@ -203,14 +203,12 @@ export class PredictionAndFifa {
     predictions: LeanDocument<PredictionDocument>[]
   ): Promise<PredictionAndMatch[]> {
     const group = await this.groups.getById(userGroupId, "-_id rules");
-    const matchIds = await predictions.map((prediction) => prediction.matchId);
+    const matchIds = predictions.map((prediction) => prediction.matchId);
     const matches = await this.fifa.getMatchesById(matchIds, __.language);
     const now = Date.now();
     const result: PredictionAndMatch[] = [];
     for (let prediction of predictions) {
-      const match = matches.find((match) => {
-        match.id === prediction.matchId;
-      });
+      const match = matches.find((match) => match.id === prediction.matchId);
       if (
         !match ||
         !group?.rules?.timeLimit ||
