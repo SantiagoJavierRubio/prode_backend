@@ -205,16 +205,16 @@ export class PredictionAndFifa {
     const group = await this.groups.getById(userGroupId, "-_id rules");
     const matchIds = predictions.map((prediction) => prediction.matchId);
     const matches = await this.fifa.getMatchesById(matchIds, __.language);
+    const startDates = await this.fifa.getStageStartDates();
     const now = Date.now();
     const result: PredictionAndMatch[] = [];
     for (let prediction of predictions) {
       const match = matches.find((match) => match.id === prediction.matchId);
-      if (
-        !match ||
-        group?.rules?.timeLimit === undefined ||
-        match.date.getTime() > now + group?.rules?.timeLimit
-      )
-        continue;
+      if (!match || group?.rules?.timeLimit === undefined) continue;
+      if (group?.rules?.limitByPhase) {
+        if (startDates[match.stageId].getTime() > now + group?.rules?.timeLimit)
+          continue;
+      } else if (match.date.getTime() > now + group?.rules?.timeLimit) continue;
       result.push(new PredictionAndMatch(match, prediction));
     }
     return result;
