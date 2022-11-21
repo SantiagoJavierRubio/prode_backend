@@ -60,7 +60,8 @@ export class PredictionAndFifa {
 
   async validateManyPredictions(
     predictions: IPredictionData[],
-    userGroupId: string
+    userGroupId: string,
+    isNewInGroup: boolean = false
   ): Promise<IManyPredictionValidate> {
     const result: IManyPredictionValidate = {
       validated: [],
@@ -78,9 +79,10 @@ export class PredictionAndFifa {
     const now = Date.now();
     const stageStartDates = await this.fifa.getStageStartDates(__.language);
     const validMatchIds = matches.map((match) => {
-      let matchDate = groupRules.rules?.limitByPhase
-        ? stageStartDates[match.stageId].getTime()
-        : match.date.getTime();
+      let matchDate =
+        groupRules.rules?.limitByPhase && !isNewInGroup
+          ? stageStartDates[match.stageId].getTime()
+          : match.date.getTime();
       if (now + (groupRules.rules?.timeLimit || 0) < matchDate) return match.id;
     });
     predictions.forEach((prediction) => {
