@@ -8,6 +8,7 @@ import { predictionRoutes } from "./routes/prediction.router";
 import { predictionScoreRoutes } from "./routes/predictionScore.route";
 import { Middlewares } from "./Middleware/middlewares";
 import { Connections } from "./connections";
+import scorePredictions from "./utils/scorePredictions";
 
 const PORT = process.env.PORT || 8080;
 const ROUTERS = [
@@ -30,3 +31,9 @@ const app = new App(
 );
 
 app.start();
+
+setInterval(() => {
+  scorePredictions()
+    .then((res) => console.log(res))
+    .catch((err) => console.log(err));
+}, 1000 * 60 * 3);

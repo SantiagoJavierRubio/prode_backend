@@ -10,9 +10,6 @@ import { UserGroupRules } from "../Persistence/Models/Group.model";
 // import { Connections } from "../connections";
 import { LeanDocument } from "mongoose";
 
-console.log(
-  "____#################\n Initializing scoring process \n____#################\n"
-);
 // const connect = new Connections();
 const fifa = new FifaDAO();
 const groups = new GroupDAO();
@@ -140,6 +137,9 @@ const scorePredictions = async () => {
 };
 
 const main = async (): Promise<string> => {
+  console.log(
+    "____#################\n Initializing scoring process \n____#################\n"
+  );
   try {
     const start = process.hrtime();
     const result = await scorePredictions();
@@ -154,6 +154,6 @@ const main = async (): Promise<string> => {
   }
 };
 
-main();
+// main();
 
 export default main;
