@@ -38,6 +38,18 @@ class FifaController {
       errorHandler(err, req, res, next);
     }
   }
+  async getLiveMatch(req: Request, res: Response, next: NextFunction) {
+    try {
+      const payload = await fifaService.fetchLiveMatch(
+        req.query.id?.toString(),
+        req.query.stageId?.toString()
+      );
+      if (!payload) return res.sendStatus(204);
+      res.send(payload);
+    } catch (err) {
+      errorHandler(err, req, res, next);
+    }
+  }
 }
 
 export const fifaController = new FifaController();

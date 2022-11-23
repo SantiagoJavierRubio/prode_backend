@@ -1,4 +1,22 @@
-interface ApiTeamData {
+export interface GoalData {
+  IdPlayer: string;
+  Minute: string;
+  Type: number;
+}
+
+export interface PlayerData {
+  IdPlayer: string;
+  ShirtNumber: number;
+  ShortName: [{ Description: string }];
+}
+
+export interface SubstitutionData {
+  Minute: string;
+  IdPlayerOff: string;
+  IdPlayerOn: string;
+}
+
+export interface ApiTeamData {
   IdTeam: string;
   TeamName: [
     {
@@ -7,6 +25,10 @@ interface ApiTeamData {
   ];
   IdCountry: string;
   PictureUrl: string;
+  Goals: GoalData[];
+  Players: PlayerData[];
+  Substitutions: SubstitutionData[];
+  Score: number;
 }
 
 export class Team {
@@ -41,10 +63,13 @@ export interface ApiMatchData {
   Away: ApiTeamData | null;
   HomeTeamScore: number | null;
   AwayTeamScore: number | null;
+  HomeTeam: ApiTeamData | null;
+  AwayTeam: ApiTeamData | null;
   MatchStatus: number;
   Winner: string | null;
   PlaceHolderA: string;
   PlaceHolderB: string;
+  MatchTime: string;
 }
 
 export class Match {
