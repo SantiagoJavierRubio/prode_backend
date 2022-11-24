@@ -1,6 +1,7 @@
 import { FifaDAO } from "../Persistence/DAOS/Fifa.dao";
 import { fifaCodes } from "../utils/fifaCodes";
 import { Team, Match } from "../DTOS/Fixture/fifa.match.dto";
+import { LiveMatch } from "../DTOS/Fixture/fifa.liveMatch.dto";
 import __ from "i18next";
 import "dotenv/config";
 
@@ -56,6 +57,17 @@ class FifaService {
       )
       .sort((a, b) => a.date.getTime() - b.date.getTime())
       .slice(0, quantity);
+  }
+  async fetchLiveMatch(
+    id: string | undefined,
+    stageId: string | undefined
+  ): Promise<LiveMatch | Match | null> {
+    if (id && stageId) {
+      const liveMatch = await this.fifa.getLiveData(id, stageId, __.language);
+      if (liveMatch && liveMatch.status === 3) return liveMatch;
+    }
+    const allMatches = await this.fifa.getAllMatches(__.language);
+    return allMatches.find((match) => match.status === 3) || null;
   }
 }
 

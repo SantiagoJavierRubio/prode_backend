@@ -1,4 +1,5 @@
 import { ApiMatchData, Match } from "../../DTOS/Fixture/fifa.match.dto";
+import { LiveMatch } from "../../DTOS/Fixture/fifa.liveMatch.dto";
 
 export interface MatchesByCategory {
   id: string;
@@ -13,6 +14,9 @@ interface CategoryAcc {
 export class FifaContainer {
   normalizeMatches(matches: ApiMatchData[]): Match[] {
     return matches.map((match) => new Match(match));
+  }
+  normalizeLiveMatch(matchData: ApiMatchData): LiveMatch {
+    return new LiveMatch(matchData);
   }
   groupByStage(matches: Match[]): MatchesByCategory[] {
     const stages = matches.reduce((acc: CategoryAcc, match): CategoryAcc => {
